@@ -1,4 +1,4 @@
-package nclozer.tnamespace;
+package z.a;
 
 import android.view.View;
 import android.widget.LinearLayout;
@@ -14,16 +14,16 @@ abstract public class TView extends View
 
     abstract public View 	convert();
     
-    public long callLong(TElement tElement) {
-    	return callLong(tElement.n);
+    public long tRunLong(TElement tElement) {
+    	return nRunLong(tElement.n);
     }
 
-    public Object callObject(TElement tElement) {
-    	return callObject(tElement.n);
+    public Object tRunObject(TElement tElement) {
+    	return nRunObject(tElement.n);
     }
 
-	public native long 		callLong(long nElement);
-	public native Object    callObject(long nElement);
+	public native long 		nRunLong(long nElement);
+	public native Object    nRunObject(long nElement);
 }
 
 class TLinearLayout extends TView

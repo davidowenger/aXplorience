@@ -1,4 +1,4 @@
-package nclozer.tnamespace;
+package z.a;
 
 public class TElement {
 	public long n;

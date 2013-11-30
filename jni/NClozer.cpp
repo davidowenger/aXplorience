@@ -3,9 +3,14 @@
 namespace NNameSpace
 {
 
-NClozer::NClozer(NWrapper* w)
+NClozer::NClozer(NWrapper* w, JNIEnv* env, jobject tFrame)
 	: w(w)
 {
+	w->env = env;
+	w->tFrame = tFrame;
+	mnTotal = sizeof(NElementList)/sizeof(NElement*);
+	mapNElement = new long[mnTotal]();
+	mbbNElement = w->env->NewGlobalRef(factoryDirectBuffer((void*)mapNElement, 1, mnTotal*sizeof(long)));
 }
 
 NClozer::~NClozer()
@@ -16,69 +21,59 @@ NClozer::~NClozer()
 	w->env->DeleteGlobalRef(mbbNElement);
 }
 
-void NClozer::initEnv(JNIEnv* env, jobject tFrame)
-{
-	w->env = env;
-	w->tFrame = tFrame;
-}
-
-jobject NClozer::initElement(jobjectArray aTElement)
+jobject NClozer::nInit(jobjectArray aTElement)
 {
 	int j;
-	int nTotal = sizeof(NElementList)/sizeof(NElement*);
 
 	w->nElementList->alpha = new NAlpha();
 	w->nElementList->beta = new NBeta();
 	w->nElementList->gamma = new NGamma();
-	maPNElement = new long[nTotal]();
 
-	for (j = 0 ; j < nTotal && j <  w->env->GetArrayLength(aTElement) ; ++j) {
+	for (j = 0 ; j < mnTotal && j <  w->env->GetArrayLength(aTElement) ; ++j) {
 		NElement* pNElement = ((NElement**)w->nElementList)[j];
 		pNElement->t = w->env->GetObjectArrayElement(aTElement, (jsize)j);
-		maPNElement[j] = (long)pNElement;
+		mapNElement[j] = (long)pNElement;
 	}
-	mbbNElement = w->env->NewGlobalRef(factoryDirectBuffer((void*)maPNElement, 1, nTotal*sizeof(long)));
-
 	return mbbNElement;
 }
 
-jlong NClozer::runLong(NElement* nElement)
+jlong NClozer::nRunLong(NElement* nElement)
 {
-    LOGI("runLong");
+    LOGI("nRunLong");
 	return nElement->acceptLong(this);
 }
 
-jobject NClozer::runObject(NElement* nElement)
+jobject NClozer::nRunObject(NElement* nElement)
 {
 	return nElement->acceptObject(this);
 }
 
-jlong NClozer::visitLong(NAlpha* alpha)
+jlong NClozer::nVisitLong(NAlpha* alpha)
 {
 	return 0;
 }
 
-jobject NClozer::visitObject(NAlpha* alpha)
+jobject NClozer::nVisitObject(NAlpha* alpha)
 {
 	return NULL;
 }
 
-jlong NClozer::visitLong(NBeta* beta)
+jlong NClozer::nVisitLong(NBeta* beta)
 {
 	return 0;
 }
 
-jobject NClozer::visitObject(NBeta* beta)
+jobject NClozer::nVisitObject(NBeta* beta)
 {
 	return NULL;
 }
 
-jlong NClozer::visitLong(NGamma* gamma)
+jlong NClozer::nVisitLong(NGamma* gamma)
 {
 	return 0;
 }
 
-jobject NClozer::visitObject(NGamma* gamma)
+jobject NClozer::nVisitObject(NGamma* gamma)
 {
 	return NULL;
 }

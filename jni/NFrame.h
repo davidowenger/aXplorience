@@ -8,12 +8,11 @@ class NFrame : public NVisitor
 {
 public:
 	NFrame();
-   ~NFrame();
+	virtual ~NFrame();
 
-    virtual void initEnv(JNIEnv* env, jobject tFrame) = 0;
-	virtual jobject initElement(jobjectArray aTElement) = 0;
-	virtual jlong runLong(NElement* nElement) = 0;
-	virtual jobject runObject(NElement* nElement) = 0;
+	virtual jobject nInit(jobjectArray aTElement) = 0;
+	virtual jlong nRunLong(NElement* nElement) = 0;
+	virtual jobject nRunObject(NElement* nElement) = 0;
 };
 
 } // END namespace

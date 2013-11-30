@@ -7,7 +7,6 @@ NLib::NLib()
 	: w(new NWrapper())
 {
 	w->nElementList = new NElementList();
-	w->nFrame = new NClozer(w);
 }
 
 NLib::~NLib()
@@ -16,33 +15,32 @@ NLib::~NLib()
 	delete w->nElementList;
 }
 
-// Static initialization
+// Static nInitialization
 NLib* nLib = new NLib();
 
-JNIEXPORT jobject JNICALL Java_nclozer_tnamespace_TClozer_initElement(JNIEnv* env, jobject tFrame, jobjectArray aTElement)
+JNIEXPORT jobject JNICALL Java_z_a_TClozer_nInit(JNIEnv* env, jobject tFrame, jobjectArray aTElement)
 {
-	nLib->w->nFrame->initEnv(env, tFrame);
-
-	return nLib->w->nFrame->initElement(aTElement);
+	nLib->w->nFrame = new NClozer(nLib->w, env, tFrame);
+	return nLib->w->nFrame->nInit(aTElement);
 }
 
-JNIEXPORT jlong JNICALL Java_nclozer_tnamespace_TClozer_runLong(JNIEnv* env, jobject obj, jlong nElement)
+JNIEXPORT jlong JNICALL Java_z_a_TClozer_nRunLong(JNIEnv* env, jobject obj, jlong nElement)
 {
-    LOGI("Java_nclozer_tnamespace_TClozer_runLong");
+    LOGI("Java_z_a_TClozer_nRunLong");
     LOGI("nLib->w->nElementList->alpha>%ld<", (long)nLib->w->nElementList->alpha);
     LOGI("jlong nElement>%ld<", (long)nElement);
-	return 0; //nLib->w->nFrame->runLong((NElement*)nElement);
+	return 0; //nLib->w->nFrame->nRunLong((NElement*)nElement);
 }
 
-JNIEXPORT jobject JNICALL Java_nclozer_tnamespace_TClozer_runObject(JNIEnv* env, jobject obj, jlong nElement)
+JNIEXPORT jobject JNICALL Java_z_a_TClozer_nRunObject(JNIEnv* env, jobject obj, jlong nElement)
 {
-    LOGI("Java_nclozer_tnamespace_TClozer_runObject");
+    LOGI("Java_z_a_TClozer_nRunObject");
     LOGI("nLib->w->nElementList->alpha>%ld<", (long)nLib->w->nElementList->alpha);
     LOGI("jlong nElement>%ld<", (long)nElement);
-	return 0; //nLib->w->nFrame->runObject((NElement*)nElement);
+	return nLib->w->nFrame->nRunObject((NElement*)nElement);
 }
 
 } // END namespace
 
-//nclozer_tnamespace_TCloze
-//nclozer_tnamespace_TFrame
+//z_a_TCloze
+//z_a_TFrame

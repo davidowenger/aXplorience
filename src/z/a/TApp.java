@@ -1,4 +1,4 @@
-package nclozer.tnamespace;
+package z.a;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,27 +8,26 @@ public class TApp extends Activity
 	public TWrapper w;
 	
     /* Called when the activity is first created */
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
         w = new TWrapper();
         w.context = getApplication();
         w.tFrame = new TClozer(w);
-        w.tFrame.init();
+        w.tFrame.tInit();
         w.view = w.tView.convert();
         setContentView(w.view);
+        
     }
 
-    @Override 
     protected void onPause() {
         super.onPause();
-        w.tView.callLong(w.alpha);
+        //w.tView.callLong(w.alpha);
     }
 
-    @Override 
     protected void onResume() {
         super.onResume();
-        w.tView.callLong(w.beta);
+        //w.tView.callLong(w.beta);
     }
 }     
 
@@ -50,7 +49,7 @@ public class TApp extends Activity
 //jstring Java_com_example_hellojni_HelloJni_stringFromJNI( JNIEnv* env, jobject thiz )
 //return (*env)->NewStringUTF(env, "Hello from JNI !");
 
-//import nclozer.tnamespace.R;
+//import hashCode.R;
 
 //import android.content.Context;
 //import android.content.SharedPreferences;
