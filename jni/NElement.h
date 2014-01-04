@@ -7,48 +7,40 @@ namespace NNameSpace
 class NElement
 {
 public:
-	//virtual jlong acceptLong(NVisitor* visitor) = 0;
-	//virtual jobject acceptObject(NVisitor* visitor) = 0;
-	virtual jlong acceptLong(NVisitor* visitor);
-	virtual jobject acceptObject(NVisitor* visitor);
+	virtual ~NElement();
+
+	virtual jlong acceptLong(NVisitorLong* visitor) = 0;
+//	virtual jobject acceptObject(NVisitor* visitor) = 0;
+
+    static const int i = -1;
 
 	jobject t;
 };
 
 class NAlpha : public NElement
 {
-};
-
-class NBeta : public NElement
-{
-};
-
-class NGamma : public NElement
-{
-};
-
-/*
-class NAlpha : public NElement
-{
 public:
-	jlong acceptLong(NVisitor* visitor);
-	jobject acceptObject(NVisitor* visitor);
+    static const int i = 0;
+
+	jlong acceptLong(NVisitorLong* visitor);
 };
 
 class NBeta : public NElement
 {
 public:
-	jlong acceptLong(NVisitor* visitor);
-	jobject acceptObject(NVisitor* visitor);
+    static const int i = 1;
+
+	jlong acceptLong(NVisitorLong* visitor);
 };
 
 class NGamma : public NElement
 {
 public:
-	jlong acceptLong(NVisitor* visitor);
-	jobject acceptObject(NVisitor* visitor);
+    static const int i = 2;
+
+	jlong acceptLong(NVisitorLong* visitor);
 };
-*/
+
 } // END namespace
 
 #endif

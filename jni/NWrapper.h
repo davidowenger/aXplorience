@@ -4,20 +4,20 @@
 namespace NNameSpace
 {
 
-typedef struct NElementListType
-{
-	NElement* alpha;
-	NElement* beta;
-	NElement* gamma;
-} NElementList;
-
 class NWrapper
 {
 public :
+    static const nuint nNElement = 3;
+
 	JNIEnv* env;
 	NFrame* nFrame;
 	jobject tFrame;
-	NElementList* nElementList;
+	nlong* apNElement;
+	NElement* alpha;
+	NElement* beta;
+	NElement* gamma;
+	jclass jclassByteBuffer;
+	jmethodID jmidByteBufferAllocate;
 };
 
 } // END namespace

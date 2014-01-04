@@ -25,7 +25,6 @@ public:
 extern "C"
 {
     JNIEXPORT jobject JNICALL Java_z_a_TClozer_nInit(JNIEnv * env, jobject obj, jobjectArray aTElement);
-    JNIEXPORT jlong JNICALL Java_z_a_TClozer_nRunLong(JNIEnv * env, jobject obj, jlong nElement);
     JNIEXPORT jobject JNICALL Java_z_a_TClozer_nRunObject(JNIEnv * env, jobject obj, jlong nElement);
 };
 

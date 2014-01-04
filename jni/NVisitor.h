@@ -4,22 +4,30 @@
 namespace NNameSpace
 {
 
-class NVisitor
+class NVisitorLong
 {
 public:
-	NVisitor();
-   ~NVisitor();
+	NVisitorLong();
+	virtual ~NVisitorLong();
 
-    virtual jlong visitLong(NElement* nElement);
-    virtual jobject visitObject(NElement* nElement);
-    virtual jlong visitLong(NAlpha* alpha);
-    virtual jobject visitObject(NAlpha* alpha);
-    virtual jlong visitLong(NBeta* beta);
-    virtual jobject visitObject(NBeta* beta);
-    virtual jlong visitLong(NGamma* gamma);
-    virtual jobject visitObject(NGamma* gamma);
+	virtual jlong nRunLong(NElement* nElement) = 0;
+    virtual jlong visitLong(NAlpha* alpha) = 0;
+    virtual jlong visitLong(NBeta* beta) = 0;
+    virtual jlong visitLong(NGamma* gamma) = 0;
 };
+/*
+class NVisitorObject
+{
+public:
+	NVisitorObject();
+	virtual ~NVisitorObject();
 
+	virtual jobject nRunObject(NElement* nElement) = 0;
+    virtual jobject visitObject(NAlpha* alpha) = 0;
+    virtual jobject visitObject(NBeta* beta) = 0;
+    virtual jobject visitObject(NGamma* gamma) = 0;
+};
+*/
 } // END namespace
 
 #endif

@@ -4,15 +4,13 @@
 namespace NNameSpace
 {
 
-class NFrame : public NVisitor
+class NFrame : public NVisitorLong
 {
 public:
 	NFrame();
 	virtual ~NFrame();
 
 	virtual jobject nInit(jobjectArray aTElement) = 0;
-	virtual jlong nRunLong(NElement* nElement) = 0;
-	virtual jobject nRunObject(NElement* nElement) = 0;
 };
 
 } // END namespace

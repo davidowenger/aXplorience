@@ -1,6 +1,7 @@
 package z.a;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class TClozer extends TFrame
 {
@@ -14,27 +15,27 @@ public class TClozer extends TFrame
     	int j;
 
     	w.aTElement = new TElement[]{
-    	    	w.alpha = new TAlpha(),
-    	    	w.beta = new TBeta(),
-    	    	w.gamma = new TGamma()
+	    	w.alpha = new TAlpha(),
+	    	w.beta = new TBeta(),
+	    	w.gamma = new TGamma()
     	};
+    	
+    	// Create a <ByteBuffer> in the native library and get a shared reference to it 
     	ByteBuffer bbNElement = nInit(w.aTElement);
+    	bbNElement.order(ByteOrder.nativeOrder());
 
-    	for (j = 0 ; j < bbNElement.capacity()/4 && j < w.aTElement.length; j++) {
+    	// <long> has a size of 4 bytes and the capacity of a <ByteBuffer> is defined in bytes  
+    	int nCapacity = bbNElement.capacity()/4;
+
+    	for (j = 0 ; j < nCapacity && j < w.aTElement.length; j++) {
     		w.aTElement[j].n = bbNElement.getLong(j);
     	}
-    	w.tView = (TView)tRunObject(w.alpha);
+    	if (j < nCapacity) {
+    		bbNElement.getLong(j++);
+    	}
+    	w.tView = (TView)nRunObject(w.alpha.n);
     }
 
-    public long tRunLong(TElement tElement) {
-    	return nRunLong(tElement.n);
-    }
-
-    public Object tRunObject(TElement tElement) {
-    	return nRunObject(tElement.n);
-    }
-    
     public static native ByteBuffer	nInit(TElement[] aTElement);
-	public static native long		nRunLong(long nElement);
     public static native Object		nRunObject(long nElement);
 }

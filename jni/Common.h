@@ -11,10 +11,13 @@
 #include <stdlib.h>
 #include <math.h>
 
+typedef unsigned int nuint;
+typedef long long nlong;
+
 namespace NNameSpace
 {
 
-class NVisitor;
+class NVisitorLong;
 
 } // END namespace
 
@@ -22,6 +25,7 @@ class NVisitor;
 #include "NVisitor.h"
 #include "NFrame.h"
 #include "NWrapper.h"
+#include "NBufferLong.h"
 #include "NClozer.h"
 #include "NView.h"
 #include "NLib.h"

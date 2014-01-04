@@ -6,35 +6,77 @@ namespace NNameSpace
 NClozer::NClozer(NWrapper* w, JNIEnv* env, jobject tFrame)
 	: w(w)
 {
+	int j;
+
 	w->env = env;
 	w->tFrame = tFrame;
-	mnTotal = sizeof(NElementList)/sizeof(NElement*);
-	mapNElement = new long[mnTotal]();
-	mbbNElement = w->env->NewGlobalRef(factoryDirectBuffer((void*)mapNElement, 1, mnTotal*sizeof(long)));
+	w->apNElement = new nlong[w->nNElement] {
+		(nlong)(w->alpha = new NAlpha()),
+		(nlong)(w->beta = new NBeta()),
+		(nlong)(w->gamma = new NGamma())
+	};
+
+	if (w->env != NULL) {
+		/*
+		 * jclass FindClass(JNIEnv *env, const char *name);
+		 * The name argument is a fully-qualified class name or an array type signature . For example, the fully-qualified class name for the java.lang.String class is:
+		 * "java/lang/String"
+		 * The array type signature of the array class java.lang.Object[] is:
+		 * "[Ljava/lang/Object;"
+		 * Returns a class object from a fully-qualified name, or NULL if the class cannot be found.
+		 * ClassFormatError: if the class data does not specify a valid class.
+		 * ClassCircularityError: if a class or interface would be its own superclass or superinterface.
+		 * NoClassDefFoundError: if no definition for a requested class or interface can be found.
+		 * OutOfMemoryError: if the system runs out of memory.
+		 */
+
+		w->jclassByteBuffer = w->env->FindClass("java/nio/ByteBuffer");
+	}
+	if (w->jclassByteBuffer != NULL) {
+		/*
+		 * jmethodID GetMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+		 * <init> as the method name and void (V) as the return type.
+		 * Returns a method ID, or NULL if the specified method cannot be found.
+		 * NoSuchMethodError: if the specified method cannot be found.
+		 * ExceptionInInitializerError: if the class initializer fails due to an exception.
+		 * OutOfMemoryError: if the system runs out of memory.
+		 */
+		//w->jmidBufferInit = w->env->GetMethodID(w->jclassByteBuffer, "<init>", "(V)");
+		/*
+		 * jmethodID GetStaticMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
+		 * Returns the method ID for a static method of a class. The method is specified by its name and signature.
+		 * GetStaticMethodID() causes an uninitialized class to be initialized.
+		 * Returns a method ID, or NULL if the operation fails.
+		 * NoSuchMethodError: if the specified static method cannot be found.
+		 * ExceptionInInitializerError: if the class initializer fails due to an exception.
+		 * OutOfMemoryError: if the system runs out of memory.
+		 */
+		w->jmidByteBufferAllocate = w->env->GetStaticMethodID(w->jclassByteBuffer, "allocate", "(I)Ljava/nio/ByteBuffer;");
+	}
+	if (w->jmidByteBufferAllocate != NULL) {
+		mBufferLong = factoryBufferLong(mnLong + w->nNElement, true);
+		mBufferLong->set(w->alpha, 0);
+		mBufferLong->set(w->beta, w->apNElement, w->nNElement);
+	}
 }
 
 NClozer::~NClozer()
 {
-	delete w->nElementList->alpha;
-	delete w->nElementList->beta;
-	delete w->nElementList->gamma;
-	w->env->DeleteGlobalRef(mbbNElement);
+	delete w->alpha;
+	delete w->beta;
+	delete w->gamma;
+	delete[] w->apNElement;
+	delete mBufferLong;
 }
 
 jobject NClozer::nInit(jobjectArray aTElement)
 {
 	int j;
 
-	w->nElementList->alpha = new NAlpha();
-	w->nElementList->beta = new NBeta();
-	w->nElementList->gamma = new NGamma();
-
-	for (j = 0 ; j < mnTotal && j <  w->env->GetArrayLength(aTElement) ; ++j) {
-		NElement* pNElement = ((NElement**)w->nElementList)[j];
-		pNElement->t = w->env->GetObjectArrayElement(aTElement, (jsize)j);
-		mapNElement[j] = (long)pNElement;
+	for (j = 0 ; j < w->nNElement && j <  w->env->GetArrayLength(aTElement) ; ++j) {
+		((NElement*)w->apNElement[j])->t = w->env->GetObjectArrayElement(aTElement, (jsize)j);
 	}
-	return mbbNElement;
+	return mBufferLong->mjBuffer;
 }
 
 jlong NClozer::nRunLong(NElement* nElement)
@@ -43,74 +85,24 @@ jlong NClozer::nRunLong(NElement* nElement)
 	return nElement->acceptLong(this);
 }
 
-jobject NClozer::nRunObject(NElement* nElement)
-{
-	return nElement->acceptObject(this);
-}
-
-jlong NClozer::nVisitLong(NAlpha* alpha)
+jlong NClozer::visitLong(NAlpha* alpha)
 {
 	return 0;
 }
 
-jobject NClozer::nVisitObject(NAlpha* alpha)
-{
-	return NULL;
-}
-
-jlong NClozer::nVisitLong(NBeta* beta)
+jlong NClozer::visitLong(NBeta* beta)
 {
 	return 0;
 }
 
-jobject NClozer::nVisitObject(NBeta* beta)
-{
-	return NULL;
-}
-
-jlong NClozer::nVisitLong(NGamma* gamma)
+jlong NClozer::visitLong(NGamma* gamma)
 {
 	return 0;
 }
 
-jobject NClozer::nVisitObject(NGamma* gamma)
+NBufferLong* NClozer::factoryBufferLong(int nLength, bool bDirect)
 {
-	return NULL;
-}
-
-jobject NClozer::factoryDirectBuffer(void* pData, long nLength, size_t nSize)
-{
-	return w->env->NewDirectByteBuffer(pData, (jlong)(nLength*nSize));
+	return new NBufferLong(w, nLength, bDirect);
 }
 
 } // END namespace
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//NewGlobalRef(JNIEnv *env, jobject obj);
-//w->env->DeleteGlobalRef()
-
-
-

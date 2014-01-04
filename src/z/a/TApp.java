@@ -10,7 +10,12 @@ public class TApp extends Activity
     /* Called when the activity is first created */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+        try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         w = new TWrapper();
         w.context = getApplication();
         w.tFrame = new TClozer(w);
