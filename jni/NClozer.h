@@ -7,22 +7,14 @@ namespace NNameSpace
 class NClozer : public NFrame
 {
 public:
-	NClozer(NWrapper* w, JNIEnv* env, jobject tFrame);
+	NClozer(NWrapper* w);
 	virtual ~NClozer();
 
-	jlong nRunLong(NElement* nElement);
-	jlong visitLong(NAlpha* alpha);
-	jlong visitLong(NBeta* beta);
-	jlong visitLong(NGamma* gamma);
+	NReturn nInit(NINIT cState);
+	NReturnObject tRunString(CharSequence boxed);
 
-	jobject nInit(jobjectArray aTElement);
-
-	NBufferLong* factoryBufferLong(int nLength, bool bDirect);
-
-    static const nuint mnLong = 1;
-
-    NWrapper* w;
-    NBufferLong* mBufferLong;
+	NReturn visit(NAlpha* element, NParam a = 0, NParam b = 0, NParam c = 0);
+	NReturn visit(NOmega* element, NParam a = 0, NParam b = 0, NParam c = 0);
 };
 
 } // END namespace

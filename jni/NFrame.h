@@ -4,13 +4,18 @@
 namespace NNameSpace
 {
 
-class NFrame : public NVisitorLong
+class NFrame : public NVisitor
 {
 public:
-	NFrame();
+	static const NINIT GET_W = 0;
+	static const NINIT GET_ELEMENT = GET_W + 1;
+	static const NINIT GET_VISITOR = GET_ELEMENT + 1;
+
+	NFrame(NWrapper* w);
 	virtual ~NFrame();
 
-	virtual jobject nInit(jobjectArray aTElement) = 0;
+	virtual NReturn nInit(NINIT cState) = 0;
+	virtual NReturnObject tRunString(CharSequence boxed) = 0;
 };
 
 } // END namespace

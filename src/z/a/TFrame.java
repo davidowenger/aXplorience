@@ -1,11 +1,41 @@
 package z.a;
 
-abstract public class TFrame
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
+public abstract class TFrame extends TVisitor
 {
-    /* Static initializer block */
-    static {
-        System.loadLibrary("TApp");
+	public static final int GET_W = 0;
+	public static final int GET_ELEMENT = GET_W + 1;
+	public static final int GET_VISITOR = GET_ELEMENT + 1;
+
+    public TFrame(TWrapper w) {
+    	super(w);
     }
-    
-    abstract public void tInit();
+
+    public abstract void tInit();
+
+    public String search(Hashtable<String, Object> table, Object value)
+    {
+    	Iterator<Entry<String, Object>> it = table.entrySet().iterator();
+    	String key = null;
+
+    	while (key == null && it.hasNext()) {
+    		Entry<String, Object> entry = it.next();
+    		if (entry.getValue() == value) {
+    			key = entry.getKey();
+    		}
+    	}
+    	return key;
+	}
+	//return Long.parseLong(search(w.vObject, w.vObject.get("" + a)));
+
+    public Object tGetService(Object o) {
+    	return nGetService(o);
+    }
+
+    // Native
+    public native long nInit(long nWrapper, int cState);
+    public native Object nGetService(Object mIBluetoothProxy);
 }

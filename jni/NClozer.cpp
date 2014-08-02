@@ -1,108 +1,104 @@
-#include "Common.h"
+#include "NCommon.h"
 
 namespace NNameSpace
 {
 
-NClozer::NClozer(NWrapper* w, JNIEnv* env, jobject tFrame)
-	: w(w)
+NClozer::NClozer(NWrapper* w)
+	: NFrame(w)
 {
-	int j;
-
-	w->env = env;
-	w->tFrame = tFrame;
-	w->apNElement = new nlong[w->nNElement] {
+	w->apNElement = new nlong[w->N_ELEMENT] {
 		(nlong)(w->alpha = new NAlpha()),
 		(nlong)(w->beta = new NBeta()),
-		(nlong)(w->gamma = new NGamma())
+		(nlong)(w->gamma = new NGamma()),
+		(nlong)(w->delta = new NDelta()),
+		(nlong)(w->epsilon = new NEpsilon()),
+		(nlong)(w->dzeta = new NDzeta()),
+		(nlong)(w->eta = new NEta()),
+		(nlong)(w->theta = new NTheta()),
+		(nlong)(w->iota = new NIota()),
+		(nlong)(w->kappa = new NKappa()),
+		(nlong)(w->lambda = new NLambda()),
+		(nlong)(w->mu = new NMu()),
+		(nlong)(w->nu = new NNu()),
+		(nlong)(w->xi = new NXi()),
+		(nlong)(w->omicron = new NOmicron()),
+		(nlong)(w->pi = new NPi()),
+		(nlong)(w->rho = new NRho()),
+		(nlong)(w->sigma = new NSigma()),
+		(nlong)(w->tau = new NTau()),
+		(nlong)(w->upsilon = new NUpsilon()),
+		(nlong)(w->phi = new NPhi()),
+		(nlong)(w->khi = new NKhi()),
+		(nlong)(w->psi = new NPsi()),
+		(nlong)(w->omega = new NOmega())
 	};
-
-	if (w->env != NULL) {
-		/*
-		 * jclass FindClass(JNIEnv *env, const char *name);
-		 * The name argument is a fully-qualified class name or an array type signature . For example, the fully-qualified class name for the java.lang.String class is:
-		 * "java/lang/String"
-		 * The array type signature of the array class java.lang.Object[] is:
-		 * "[Ljava/lang/Object;"
-		 * Returns a class object from a fully-qualified name, or NULL if the class cannot be found.
-		 * ClassFormatError: if the class data does not specify a valid class.
-		 * ClassCircularityError: if a class or interface would be its own superclass or superinterface.
-		 * NoClassDefFoundError: if no definition for a requested class or interface can be found.
-		 * OutOfMemoryError: if the system runs out of memory.
-		 */
-
-		w->jclassByteBuffer = w->env->FindClass("java/nio/ByteBuffer");
-	}
-	if (w->jclassByteBuffer != NULL) {
-		/*
-		 * jmethodID GetMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
-		 * <init> as the method name and void (V) as the return type.
-		 * Returns a method ID, or NULL if the specified method cannot be found.
-		 * NoSuchMethodError: if the specified method cannot be found.
-		 * ExceptionInInitializerError: if the class initializer fails due to an exception.
-		 * OutOfMemoryError: if the system runs out of memory.
-		 */
-		//w->jmidBufferInit = w->env->GetMethodID(w->jclassByteBuffer, "<init>", "(V)");
-		/*
-		 * jmethodID GetStaticMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig);
-		 * Returns the method ID for a static method of a class. The method is specified by its name and signature.
-		 * GetStaticMethodID() causes an uninitialized class to be initialized.
-		 * Returns a method ID, or NULL if the operation fails.
-		 * NoSuchMethodError: if the specified static method cannot be found.
-		 * ExceptionInInitializerError: if the class initializer fails due to an exception.
-		 * OutOfMemoryError: if the system runs out of memory.
-		 */
-		w->jmidByteBufferAllocate = w->env->GetStaticMethodID(w->jclassByteBuffer, "allocate", "(I)Ljava/nio/ByteBuffer;");
-	}
-	if (w->jmidByteBufferAllocate != NULL) {
-		mBufferLong = factoryBufferLong(mnLong + w->nNElement, true);
-		mBufferLong->set(w->alpha, 0);
-		mBufferLong->set(w->beta, w->apNElement, w->nNElement);
-	}
+	w->apNVisitor = new nlong[w->N_VISITOR] {
+		(nlong)(this),
+		(nlong)(w->nVisitorApp = new NVisitorApp(w)),
+		(nlong)(w->nVisitorView = new NVisitorView(w)),
+		(nlong)(w->nVisitorWidget = new NVisitorWidget(w))
+	};
 }
 
 NClozer::~NClozer()
 {
+	NAPI_nTerminate(w);
+
+	delete w->nVisitorApp;
+	delete w->nVisitorView;
+	delete w->nVisitorWidget;
+	delete[] w->apNVisitor;
+
+	//TODO
 	delete w->alpha;
 	delete w->beta;
 	delete w->gamma;
 	delete[] w->apNElement;
-	delete mBufferLong;
 }
 
-jobject NClozer::nInit(jobjectArray aTElement)
+NReturn NClozer::nInit(NINIT cState)
 {
-	int j;
+	NReturn ret = 0;
 
-	for (j = 0 ; j < w->nNElement && j <  w->env->GetArrayLength(aTElement) ; ++j) {
-		((NElement*)w->apNElement[j])->t = w->env->GetObjectArrayElement(aTElement, (jsize)j);
+	switch (cState) {
+	case GET_W:
+		ret = (NReturn)w;
+		break;
+	case GET_VISITOR:
+		ret = (NReturn)w->nFrame;
+		break;
+	case GET_ELEMENT:
+		ret = (NReturn)w->alpha;
+		break;
 	}
-	return mBufferLong->mjBuffer;
+	return ret;
 }
 
-jlong NClozer::nRunLong(NElement* nElement)
+NReturnObject NClozer::tRunString(CharSequence boxed)
 {
-    LOGI("nRunLong");
-	return nElement->acceptLong(this);
+	LOGI("Call to API for a new string from char sequence : %s", boxed);
+	return NAPI_tRunString(w, boxed);
 }
 
-jlong NClozer::visitLong(NAlpha* alpha)
+NReturn NClozer::visit(NAlpha* element, NParam a, NParam b, NParam c)
 {
-	return 0;
+	nuint index;
+
+	for (index = 1 ; index < w->N_ELEMENT; ++index) {
+		tRun(w->alpha, (NParam)w->apNElement[index], index);
+	}
+	for (index = 1 ; index < w->N_VISITOR; ++index) {
+		tRun(w->beta, (NParam)w->apNVisitor[index], index);
+	}
+	w->nActivity = new NNSUser::MyApplication();
+	w->nActivity->w = w;
+
+	return (NReturn)w->nActivity;
 }
 
-jlong NClozer::visitLong(NBeta* beta)
+NReturn NClozer::visit(NOmega* element, NParam a, NParam b, NParam c)
 {
-	return 0;
-}
-
-jlong NClozer::visitLong(NGamma* gamma)
-{
-	return 0;
-}
-
-NBufferLong* NClozer::factoryBufferLong(int nLength, bool bDirect)
-{
-	return new NBufferLong(w, nLength, bDirect);
+	return (NReturn)(*(NReturnObject*)(a + b));
 }
 
 } // END namespace

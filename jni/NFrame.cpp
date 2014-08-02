@@ -1,9 +1,10 @@
-#include "Common.h"
+#include "NCommon.h"
 
 namespace NNameSpace
 {
 
-NFrame::NFrame()
+NFrame::NFrame(NWrapper* w)
+	: NVisitor(w)
 {
 }
 
