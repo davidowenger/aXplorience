@@ -6,7 +6,7 @@ public abstract class TVisitor implements INVisitor, ITVisitor
     static {
     	//System.loadLibrary("c++_shared");
     	//System.loadLibrary("gnustl_shared");
-        System.loadLibrary("TApp");
+    	//System.loadLibrary("TApp");
     }
 
 	public TWrapper w;

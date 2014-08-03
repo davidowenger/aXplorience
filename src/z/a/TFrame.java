@@ -4,6 +4,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build.VERSION;
+
 public abstract class TFrame extends TVisitor
 {
 	public static final int GET_W = 0;
@@ -15,6 +19,30 @@ public abstract class TFrame extends TVisitor
     }
 
     public abstract void tInit();
+    public abstract void tDestroy();
+
+	public int getAPINumber()
+	{
+		int ret = VERSION.SDK_INT;
+		String sSDK = VERSION.SDK;
+
+		if (sSDK.equals("BASE")) {
+			ret = 1;
+		} else if (sSDK.equals("BASE_1_1")) {
+			ret = 2;
+		} else if (sSDK.equals("CUPCAKE")) {
+			ret = 3;
+		}
+        return ret;
+	}
+
+	public boolean hasRight(String permission)
+	{
+		Context c = w.context;
+		int res = c.getPackageManager().checkPermission(permission, c.getPackageName());
+		boolean ret = (res == PackageManager.PERMISSION_GRANTED);
+		return ret;
+	}
 
     public String search(Hashtable<String, Object> table, Object value)
     {

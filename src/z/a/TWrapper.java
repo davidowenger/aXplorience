@@ -1,13 +1,29 @@
 package z.a;
 
 import java.util.Hashtable;
+import java.util.UUID;
 
+import android.app.Activity;
 import android.content.Context;
 
 public class TWrapper
 {
-	TAndroid tAndroid;
 	int cAPI;
+	Context context;
+	Activity activity;
+
+	String serviceName;
+	UUID uuid;
+
+	TFrame tFrame;
+	TCore tCore;
+	THandler tHandler;
+	TConfig tConfig;
+	TBluetooth tBluetooth;
+
+	BtServer btServer;
+	BtConnect btConnect;
+	BtConnected btConnected;
 
 	TElement[] aTElement;
 	TAlpha   alpha;
@@ -36,7 +52,6 @@ public class TWrapper
 	TOmega   omega;
 
 	TVisitor[] aTVisitor;
-	TFrame tFrame;
 	TVisitor tVisitorApp;
 	TVisitor tVisitorView;
 	TVisitor tVisitorWidget;
@@ -44,9 +59,6 @@ public class TWrapper
 	Hashtable<String,TElement> vTElement;
 	Hashtable<String,TVisitor> vTVisitor;
 	Hashtable<String,Object> vObject;
-
-	TApp tApp;
-	Context context;
 
 	long nWrapper;
 }

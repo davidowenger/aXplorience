@@ -14,17 +14,4 @@ public class TVisitorApp extends TVisitor
 		((Activity)w.vObject.get("" + a)).setContentView((View)w.vObject.get("" + b));
 		return 0;
 	}
-
-	public long visit(TPi element, long a, long b, long c)
-	{
-		((TApp)w.vObject.get("" + a)).callOnPause();
-		return 0;
-	}
-
-	public long visit(TRho element, long a, long b, long c)
-	{
-		((TApp)w.vObject.get("" + a)).callOnResume();
-		return 0;
-	}
-
 }
