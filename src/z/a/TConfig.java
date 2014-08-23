@@ -19,6 +19,18 @@ public class TConfig
 		mEditor = mConfig.edit();
 	}
 
+	public void init()
+	{
+		w.dbh.get("Drop").delete("yes");
+
+		w.aBOSeed = w.boSeed.getSeeds();
+		w.aBODrop = w.boSeed.getDrops();
+
+		if (w.aBOSeed.size() == 0) {
+			w.aBOSeed.add(w.boSeed.addSeed("1", "Peer", "Hello world!"));
+		}
+	}
+
 	public String gets(int key)
 	{
 		return mConfig.getString("" + key, "");

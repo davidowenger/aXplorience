@@ -10,11 +10,16 @@ public class TAndroid extends TFrame
 
     public void tInit()
     {
-        w.context = w.activity.getApplication();
+        w.context = w.tApp.getApplication();
     	w.cAPI = getAPINumber();
-    	w.tConfig = new TConfig(w);
+
+    	w.dbh = new DBHandler(w);
+		w.tConfig = new TConfig(w);
         w.tBluetooth = new TBluetooth(w);
+        w.tAppHandler = new TAppHandler(w);
     	w.tCore = new TCore(w);
+		w.mac = w.tBluetooth.mac();
+
     	w.tCore.start();
     }
 

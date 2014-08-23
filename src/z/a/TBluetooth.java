@@ -3,11 +3,11 @@ package z.a;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.UUID;
-import java.util.Vector;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,14 +16,14 @@ import android.os.Build.VERSION_CODES;
 
 public class TBluetooth
 {
-	public static final int QUANTUM_TO_LOCK = 100;
+	public final int QUANTUM_TO_LOCK = 100;
 
-	public static final int INDEX_ENABLED = 0; // CONFIG_RUN
-	public static final int INDEX_DISCOVERABLE = INDEX_ENABLED + 1; // CONFIG_ALLOW_DISCOVERABLE_MODE
-	public static final int INDEX_CONNECTED = INDEX_DISCOVERABLE + 1; //
-	public static final int INDEX_TIMEOUT = INDEX_CONNECTED + 1; // CONFIG_ALLOW_MAX_TIMEOUT
-	public static final int INDEX_BLUETOOTH = INDEX_TIMEOUT + 1; // CONFIG_AUTO_ENABLE_BT
-	public static final int INDEX_LEGACY = INDEX_BLUETOOTH + 1; // CONFIG_ALLOW_LEGACY
+	public final int INDEX_ENABLED = 0; // CONFIG_RUN
+	public final int INDEX_DISCOVERABLE = INDEX_ENABLED + 1; // CONFIG_ALLOW_DISCOVERABLE_MODE
+	public final int INDEX_CONNECTED = INDEX_DISCOVERABLE + 1; //
+	public final int INDEX_TIMEOUT = INDEX_CONNECTED + 1; // CONFIG_ALLOW_MAX_TIMEOUT
+	public final int INDEX_BLUETOOTH = INDEX_TIMEOUT + 1; // CONFIG_AUTO_ENABLE_BT
+	public final int INDEX_LEGACY = INDEX_BLUETOOTH + 1; // CONFIG_ALLOW_LEGACY
 
 	public TWrapper w;
 
@@ -31,16 +31,15 @@ public class TBluetooth
 	public boolean mHasProxy;
 	public boolean mIsSystem;
 
+	public String mMac;
 	public TConfig mPrefs;
-	public TBluetoothReceiver[] mReceiver;
 	public int[] mState;
 	public boolean[] mConfig;
 	public boolean[] mSaved;
 
 	public BluetoothAdapter mBlueAdapter;
-	public String[] mBtAction;
-	public String[] mBtKey;
-	public int[] mBtValue;
+	public TBluetoothReceiver[] mReceiver;
+	public int mcDiscoveredDevice;
 
 	public Object mBlueProxy;
 	public Method mMEnable;
@@ -48,21 +47,16 @@ public class TBluetooth
 	public Method mMgetDiscoverableTimeout;
 	public Method mMSetScanMode;
 
+	public String[] mBtAction;
+	public String[] mBtKey;
+	public int[] mBtValue;
+
 	public TBluetooth(TWrapper w)
 	{
 		this.w = w;
-
 		mPrefs = w.tConfig;
-		mPrefs.setb(INDEX_ENABLED, true);
-		mPrefs.setb(INDEX_DISCOVERABLE, true);
-		mPrefs.setb(INDEX_TIMEOUT, true);
-		mPrefs.setb(INDEX_BLUETOOTH, true);
-		mPrefs.setb(INDEX_LEGACY, true);
 
-    	w.serviceName = "Proximity service";
-    	w.uuid = new UUID(2001L,2000L);
-    	//w.uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-
+    	mcDiscoveredDevice = 0;
 		mHasBluetooth = false;
 		mHasProxy = false;
 		mIsSystem = false;
@@ -92,7 +86,7 @@ public class TBluetooth
 			-1,
 			-1,
 			120,
-			-1,
+			0,
 		};
     	mConfig = new boolean[] {
 			false,
@@ -173,15 +167,46 @@ public class TBluetooth
 	public void onDestroy()
     {
 		mBlueAdapter.cancelDiscovery();
-		w.activity.unregisterReceiver(mReceiver[INDEX_ENABLED]);
-		w.activity.unregisterReceiver(mReceiver[INDEX_DISCOVERABLE]);
-		w.activity.unregisterReceiver(mReceiver[INDEX_CONNECTED]);
-		w.activity.unregisterReceiver(mReceiver[INDEX_TIMEOUT]);
-		w.activity.unregisterReceiver(mReceiver[INDEX_BLUETOOTH]);
+		w.tApp.unregisterReceiver(mReceiver[INDEX_ENABLED]);
+		w.tApp.unregisterReceiver(mReceiver[INDEX_DISCOVERABLE]);
+		w.tApp.unregisterReceiver(mReceiver[INDEX_CONNECTED]);
+		w.tApp.unregisterReceiver(mReceiver[INDEX_TIMEOUT]);
+		w.tApp.unregisterReceiver(mReceiver[INDEX_BLUETOOTH]);
+    }
+
+	public String mac()
+	{
+		String mac = "";
+
+		if (mHasBluetooth) {
+			mac = mBlueAdapter.getAddress();
+		}
+	    return mac;
+    }
+
+	public boolean isEnabled()
+	{
+		boolean ret = false;
+
+		if (mHasBluetooth) {
+			ret = mBlueAdapter.isEnabled();
+		}
+	    return ret;
+    }
+
+	public boolean isDiscoverable()
+	{
+	    return (isEnabled() && (mBlueAdapter.getScanMode() == mBtValue[INDEX_DISCOVERABLE]));
     }
 
 	public void init()
 	{
+		mPrefs.setb(INDEX_ENABLED, true);
+		mPrefs.setb(INDEX_DISCOVERABLE, true);
+		mPrefs.setb(INDEX_TIMEOUT, true);
+		mPrefs.setb(INDEX_BLUETOOTH, true);
+		mPrefs.setb(INDEX_LEGACY, true);
+
 		// Set current state
     	mState[INDEX_ENABLED] = ( isEnabled() ? mBtValue[INDEX_ENABLED] : -1 );
     	mState[INDEX_DISCOVERABLE] = ( isDiscoverable() ? mBtValue[INDEX_DISCOVERABLE] : -1 );
@@ -210,65 +235,13 @@ public class TBluetooth
 	public TBluetoothReceiver factoryReceiver(int index)
 	{
 		TBluetoothReceiver receiver = new TBluetoothReceiver(w, index);
-		w.activity.registerReceiver(receiver, new IntentFilter(mBtAction[index]));
+		w.tApp.registerReceiver(receiver, new IntentFilter(mBtAction[index]));
 		return receiver;
-	}
-
-	public void server()
-	{
-		// Create a server
-        w.btServer = new BtServer(w);
-        w.btServer.start();
-	}
-
-	public void connect()
-	{
-		// Create a client connection
-		boolean found = false;
-
-		while (!found) {
-			found = discover(15000);
-
-        	try {
-    			Thread.sleep(15000);
-        	}
-    		catch (Exception e) {
-    			e.printStackTrace();
-    		}
-		}
-		BluetoothDevice device = mReceiver[INDEX_BLUETOOTH].maDevice.lastElement();
-        w.btConnect = new BtConnect(w, device);
-        w.btConnect.start();
-	}
-
-	public boolean discover(int durationToLock)
-	{
-		if (mHasBluetooth && !mConfig[INDEX_BLUETOOTH]) {
-			mBlueAdapter.startDiscovery();
-	    }
-	    durationToLock /= QUANTUM_TO_LOCK;
-
-		while (!mConfig[INDEX_BLUETOOTH] && --durationToLock >= 0) {
-			mReceiver[INDEX_BLUETOOTH].lock(QUANTUM_TO_LOCK);
-		}
-		mBlueAdapter.cancelDiscovery();
-
-		return mConfig[INDEX_BLUETOOTH];
 	}
 
 	public boolean isConnected()
 	{
 	    return false;
-    }
-
-	public boolean isEnabled()
-	{
-		boolean ret = false;
-
-		if (mHasBluetooth) {
-			ret = mBlueAdapter.isEnabled();
-		}
-	    return ret;
     }
 
 	public boolean enable(int durationToLock)
@@ -332,11 +305,6 @@ public class TBluetooth
 	    }
     }
 
-	public boolean isDiscoverable()
-	{
-	    return (mHasBluetooth && (mBlueAdapter.getScanMode() == mBtValue[INDEX_DISCOVERABLE]));
-    }
-
 	public boolean discoverable(int durationToLock)
 	{
 	    // Enable discoverable mode
@@ -352,10 +320,10 @@ public class TBluetooth
 				e.printStackTrace();
 			}
 	    }
-	    if (!done && mHasBluetooth) {
+	    if (!done && isEnabled()) {
 			Intent intentDiscoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 			intentDiscoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, getPreferedTimeout());
-	    	w.activity.startActivityForResult(intentDiscoverable, INDEX_DISCOVERABLE);
+	    	w.tApp.startActivityForResult(intentDiscoverable, INDEX_DISCOVERABLE);
 	    }
 	    durationToLock /= QUANTUM_TO_LOCK;
 
@@ -370,64 +338,122 @@ public class TBluetooth
 	{
 		return discoverable(0);
     }
+
+	public void startDiscovery()
+	{
+		if (isEnabled()) {
+			mBlueAdapter.startDiscovery();
+	    }
+	}
+
+	public void cancelDiscovery()
+	{
+		if (isEnabled()) {
+			mBlueAdapter.cancelDiscovery();
+	    }
+	}
+
+	public boolean discover(int durationToLock)
+	{
+	    durationToLock /= QUANTUM_TO_LOCK;
+
+		while (isEnabled() && mcDiscoveredDevice == mState[INDEX_BLUETOOTH] && --durationToLock >= 0 && mBlueAdapter.isDiscovering()) {
+			mReceiver[INDEX_BLUETOOTH].lock(QUANTUM_TO_LOCK);
+		}
+		mConfig[INDEX_BLUETOOTH] = (mcDiscoveredDevice < mState[INDEX_BLUETOOTH]);
+		mcDiscoveredDevice = mState[INDEX_BLUETOOTH];
+
+		return mConfig[INDEX_BLUETOOTH];
+	}
+
+	public boolean discover()
+	{
+		return discover(0);
+	}
+
+	public BluetoothSocket connect(BluetoothDevice device, UUID uuid)
+	{
+		BluetoothSocket clientSocket = null;
+		try {
+			clientSocket = device.createInsecureRfcommSocketToServiceRecord(uuid);
+			clientSocket.connect();
+			//00001101-0000-1000-8000-00805F9B34FB
+			//tmp = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
+			//Method m = mDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+			//tmp = (BluetoothSocket) m.invoke(mDevice, 1);
+    	}
+        catch (Exception e) {
+			e.printStackTrace();
+			clientSocket = close(clientSocket);;
+        }
+		return clientSocket;
+	}
+
+	public BluetoothSocket close(BluetoothSocket peerSocket)
+	{
+        try {
+        	peerSocket.close();
+        }
+        catch (Exception e) {
+        }
+        return null;
+	}
 }
 
 class TBluetoothReceiver extends BroadcastReceiver
 {
 	public TWrapper w;
-	public TBluetooth mTBluetooth;
+
 	public int mIndex;
 	public String mExpectedAction;
 	public String mExpectedKey;
 	public int mExpectedValue;
-	public Vector<BluetoothDevice> maDevice;
 
 	public TBluetoothReceiver(TWrapper w, int index)
 	{
 		this.w = w;
 		mIndex = index;
-		mTBluetooth = w.tBluetooth;
-		mExpectedAction = mTBluetooth.mBtAction[mIndex];
-		mExpectedKey = mTBluetooth.mBtKey[mIndex];
-		mExpectedValue = mTBluetooth.mBtValue[mIndex];
+		mExpectedAction = w.tBluetooth.mBtAction[mIndex];
+		mExpectedKey = w.tBluetooth.mBtKey[mIndex];
+		mExpectedValue = w.tBluetooth.mBtValue[mIndex];
 	}
 
-    public synchronized void lock(int milliToLock)
-    {
+	public synchronized void lock(int durationToLock)
+	{
     	try {
-    		wait(milliToLock);
+    		wait(durationToLock);
     	}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-    }
+	}
 
-    public synchronized void unlock()
-    {
-    	notify();
-    }
+	public synchronized void unlock()
+	{
+		notify();
+	}
 
     public void onReceive(Context context, Intent intent)
     {
     	BluetoothDevice device = null;
 
-        if (mIndex == TBluetooth.INDEX_BLUETOOTH) {
+		System.out.println("key ["+ mExpectedKey + "] expected ["+mExpectedValue+"]");
+
+        if (mIndex == w.tBluetooth.INDEX_BLUETOOTH) {
             device = intent.getParcelableExtra(mExpectedKey);
-	    	mTBluetooth.mState[mIndex] = maDevice.size();
-	    	mTBluetooth.mConfig[mIndex] = ( device != null );
+	        System.out.println("extra parcel ok [" + (intent.getParcelableExtra(mExpectedKey) != null) + "]");
         } else {
-	    	mTBluetooth.mState[mIndex] = intent.getIntExtra(mExpectedKey, -1);
-	    	mTBluetooth.mConfig[mIndex] = ( mTBluetooth.mState[mIndex] == mExpectedValue );
+	    	w.tBluetooth.mState[mIndex] = intent.getIntExtra(mExpectedKey, -1);
+	    	w.tBluetooth.mConfig[mIndex] = ( w.tBluetooth.mState[mIndex] == mExpectedValue );
+	        System.out.println("value ["+intent.getIntExtra(mExpectedKey, -1) +"] ");
 	    }
         if (device != null) {
-            maDevice.add(device);
-	    	mTBluetooth.mState[mIndex] += 1;
+            w.aDiscoveredDevice.add(device);
+        	w.tBluetooth.mState[mIndex] = w.aDiscoveredDevice.size();
 	    }
-		System.out.println("key ["+ mExpectedKey + "] value ["+intent.getIntExtra(mExpectedKey, mExpectedValue - 1) +"] expected ["+mExpectedValue+"]");
-
-        if (mTBluetooth.mConfig[mIndex]) {
+        if (device != null || w.tBluetooth.mConfig[mIndex]) {
 			System.out.println("expected!");
-        	unlock();
+			unlock();
         }
     }
 }
