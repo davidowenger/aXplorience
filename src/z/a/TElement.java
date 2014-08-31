@@ -12,197 +12,776 @@ abstract public class TElement
 		this.i = counter++;
 	}
 
-	abstract public long accept(TVisitor visitor, long a, long b, long c);
+	abstract public long accept(TVisitor visitor, long a, long b, long c, long d);
 }
 
-class TAlpha extends TElement
+class TAlpha00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TBeta extends TElement
+class TBeta00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TGamma extends TElement
+class TGamma00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TDelta extends TElement
+class TDelta00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TEpsilon extends TElement
+class TEpsilon00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TDzeta extends TElement
+class TDzeta00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TEta extends TElement
+class TEta00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TTheta extends TElement
+class TTheta00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TIota extends TElement
+class TIota00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TKappa extends TElement
+class TKappa00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TLambda extends TElement
+class TLambda00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TMu extends TElement
+class TMu00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TNu extends TElement
+class TNu00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TXi extends TElement
+class TXi00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TOmicron extends TElement
+class TOmicron00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TPi extends TElement
+class TPi00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TRho extends TElement
+class TRho00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TSigma extends TElement
+class TSigma00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TTau extends TElement
+class TTau00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TUpsilon extends TElement
+class TUpsilon00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TPhi extends TElement
+class TPhi00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TKhi extends TElement
+class TKhi00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TPsi extends TElement
+class TPsi00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
 	}
 }
 
-class TOmega extends TElement
+class TOmega00 extends TElement
 {
-	public long accept(TVisitor visitor, long a, long b, long c)
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
 	{
-		return visitor.visit(this, a, b, c);
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+
+class TAlpha01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TBeta01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TGamma01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TDelta01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TEpsilon01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TDzeta01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TEta01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TTheta01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TIota01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TKappa01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TLambda01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TMu01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TNu01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TXi01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TOmicron01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TPi01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TRho01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TSigma01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TTau01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TUpsilon01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TPhi01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TKhi01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TPsi01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TOmega01 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+
+class TAlpha02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TBeta02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TGamma02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TDelta02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TEpsilon02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TDzeta02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TEta02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TTheta02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TIota02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TKappa02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TLambda02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TMu02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TNu02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TXi02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TOmicron02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TPi02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TRho02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TSigma02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TTau02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TUpsilon02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TPhi02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TKhi02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TPsi02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TOmega02 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+
+class TAlpha03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TBeta03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TGamma03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TDelta03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TEpsilon03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TDzeta03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TEta03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TTheta03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TIota03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TKappa03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TLambda03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TMu03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TNu03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TXi03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TOmicron03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TPi03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TRho03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TSigma03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TTau03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TUpsilon03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TPhi03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TKhi03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TPsi03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
+	}
+}
+
+class TOmega03 extends TElement
+{
+	public long accept(TVisitor visitor, long a, long b, long c, long d)
+	{
+		return visitor.visit(this, a, b, c, d);
 	}
 }

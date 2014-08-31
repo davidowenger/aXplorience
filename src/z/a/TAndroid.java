@@ -15,7 +15,7 @@ public class TAndroid
     	this.w = w;
     }
 
-	public int getAPINumber()
+	public int getAPI00Number()
 	{
 		int ret = VERSION.SDK_INT;
 		String sSDK = VERSION.SDK;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2010 The Android Open Source Project
+<!--
+     Copyright (C) 2010 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,35 +15,36 @@
      limitations under the License.
 -->
 
-<!--
-    Creates a Linear Layout View to contain the spinner
- -->
+
+<!-- Creates a Linear Layout View to contain the spinner -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
+    android:orientation="vertical" >
 
     <!--
         Creates a spinner widget called Spinner01, within the Linear Layout
         The prompt text comes from the string "planet_prompt" in strings.xml
     -->
-    <Spinner 
+
+    <Spinner
         android:id="@+id/Spinner01"
-        android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-        android:drawSelectorOnTop = "true"
-        android:prompt = "@string/planet_prompt">
+        android:layout_height="wrap_content"
+        android:drawSelectorOnTop="true"
+        android:prompt="@string/planet_prompt" >
     </Spinner>
 
-    <!--
-        Creates a TextView called SpinnerResult, below the spinner.
-    -->
-    <TextView 
-        android:id="@+id/SpinnerResult" android:text="Result"
-        android:layout_height="fill_parent" android:textSize="10pt"
-        android:textStyle="bold" android:gravity="center"
-        android:layout_width="fill_parent">
+    <!-- Creates a TextView called SpinnerResult, below the spinner. -->
+
+    <TextView
+        android:id="@+id/SpinnerResult"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:text="Result"
+        android:textSize="10pt"
+        android:textStyle="bold" >
     </TextView>
 
 </LinearLayout>

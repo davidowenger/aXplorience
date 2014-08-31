@@ -10,27 +10,27 @@ public class TVisitorWidget extends TVisitor
 		super(w);
 	}
 
-	public long visit(TLambda element, long a, long b, long c)
+	public long visit(TLambda00 element, long a, long b, long c, long d)
 	{
-		w.vObject.put("" + a, new LinearLayout((Context)w.vObject.get("" + b)));
+		w.sObject.put("" + a, new LinearLayout((Context)w.sObject.get("" + b)));
 		return 0;
 	}
 
-	public long visit(TTau element, long a, long b, long c)
+	public long visit(TTau01 element, long a, long b, long c, long d)
 	{
-		w.vObject.put("" + a, new TextView((Context)w.vObject.get("" + b)));
+		w.sObject.put("" + a, new TextView((Context)w.sObject.get("" + b)));
 		return 0;
 	}
 
-	public long visit(TUpsilon element, long a, long b, long c)
+	public long visit(TUpsilon01 element, long a, long b, long c, long d)
 	{
-		((TextView)w.vObject.get("" + a)).setTextSize(b);
+		((TextView)w.sObject.get("" + a)).setTextSize(b);
 		return 0;
 	}
 
-	public long visit(TPhi element, long a, long b, long c)
+	public long visit(TPhi01 element, long a, long b, long c, long d)
 	{
-		((TextView)w.vObject.get("" + a)).setText((String)w.tFrame.nRunObject(w.omega, b));
+		((TextView)w.sObject.get("" + a)).setText((String)w.tFrame.nRunObject(b));
 		return 0;
 	}
 }

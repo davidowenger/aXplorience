@@ -31,11 +31,6 @@ public abstract class TFrame extends TVisitor
 	}
 	//return Long.parseLong(search(w.vObject, w.vObject.get("" + a)));
 
-    public Object tGetService(Object o) {
-    	return nGetService(o);
-    }
-
     // Native
     public native long nInit(long nWrapper, int cState);
-    public native Object nGetService(Object mIBluetoothProxy);
 }

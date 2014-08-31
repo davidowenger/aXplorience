@@ -9,9 +9,9 @@ public class TVisitorView extends TVisitor
 		super(w);
 	}
 
-	public long visit(TAlpha element, long a, long b, long c)
+	public long visit(TAlpha02 element, long a, long b, long c, long d)
 	{
-		((ViewGroup)w.vObject.get("" + a)).addView((View)w.vObject.get("" + b));
+		((ViewGroup)w.sObject.get("" + a)).addView((View)w.sObject.get("" + b));
 		return 0;
 	}
 }
