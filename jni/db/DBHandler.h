@@ -47,7 +47,7 @@ public:
 
     template<typename T> void add(const String& sTable)
     {
-    	if (maTable.count(sTable)) {
+    	if (!maTable.count(sTable)) {
     		maTable[sTable] = function<DBTable*()>([]()->DBTable*{return new T;});
     	}
     }
@@ -66,7 +66,7 @@ public:
 	DBTableHandler(Wrapper* w, DBTable* dbTable);
    ~DBTableHandler();
 
-    DBTableHandler* load();
+    int load();
 	void drop();
 	DBObject* getInstance();
 	DBObject* getInstance(const String& id);

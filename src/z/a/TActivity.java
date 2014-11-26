@@ -77,17 +77,21 @@ public class TActivity extends Activity
 
     protected void onStop()
 	{
-        w.tVisitorApp.nRun(w.theta00);
+        w.tVisitorApp.nRun(w.eta00);
 	}
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
-    	String action = intent.getAction();
-
-    	if (action.equals(BluetoothAdapter.ACTION_REQUEST_ENABLE)) {
-        	w.tVisitorApp.nRun(w.xi00, 1, requestCode, resultCode, -1);
-    	} else if (action.equals(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)) {
-        	w.tVisitorApp.nRun(w.xi00, 2, requestCode, resultCode, intent.getIntExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, -1));
+    	if (intent != null && intent.getAction() != null) {
+	    	String action = intent.getAction();
+	
+	    	if (action.equals(BluetoothAdapter.ACTION_REQUEST_ENABLE)) {
+	        	w.tVisitorApp.nRun(w.theta00, 1, requestCode, resultCode, -1);
+	    	} else if (action.equals(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)) {
+	        	w.tVisitorApp.nRun(w.theta00, 2, requestCode, resultCode, intent.getIntExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, -1));
+	    	}
+    	} else {
+    		w.tVisitorApp.nRun(w.theta00, 2, requestCode, resultCode, -1);
     	}
     }
 
@@ -145,24 +149,26 @@ class TActivityReceiver extends BroadcastReceiver
 
     public void onReceive(Context context, Intent intent)
     {
-    	String action = intent.getAction();
-
-    	if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
-        	w.tVisitorApp.nRun(w.omicron00);
-    	} else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_STARTED)) {
-        	w.tVisitorApp.nRun(w.pi00);
-    	} else if (action.equals(BluetoothDevice.ACTION_FOUND)) {
-        	long n = w.tVisitorApp.nRun(w.rho00, 0);
-        	w.sObject.put("" + n, intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE));
-        	w.tVisitorApp.nRun(w.rho00, n);
-    	} else if (action.equals(BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED)) {
-    		String string = intent.getStringExtra(BluetoothAdapter.EXTRA_LOCAL_NAME);
-        	w.aObject.add(string);
-        	w.tVisitorApp.nRun(w.sigma00, w.aObject.lastIndexOf(string));
-    	} else if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
-        	w.tVisitorApp.nRun(w.tau00, intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, -1), intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_SCAN_MODE, -1));
-		} else if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
-        	w.tVisitorApp.nRun(w.upsilon00, intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1), intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_STATE, -1));
+    	if (intent != null && intent.getAction() != null) {
+	    	String action = intent.getAction();
+	
+	    	if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
+	        	w.tVisitorApp.nRun(w.omicron00);
+	    	} else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_STARTED)) {
+	        	w.tVisitorApp.nRun(w.pi00);
+	    	} else if (action.equals(BluetoothDevice.ACTION_FOUND)) {
+	        	long n = w.tVisitorApp.nRun(w.rho00, 0);
+	        	w.sObject.put("" + n, intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE));
+	        	w.tVisitorApp.nRun(w.rho00, n);
+	    	} else if (action.equals(BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED)) {
+	    		String string = intent.getStringExtra(BluetoothAdapter.EXTRA_LOCAL_NAME);
+	        	w.aObject.add(string);
+	        	w.tVisitorApp.nRun(w.sigma00, w.aObject.lastIndexOf(string));
+	    	} else if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
+	        	w.tVisitorApp.nRun(w.tau00, intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, -1), intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_SCAN_MODE, -1));
+			} else if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+	        	w.tVisitorApp.nRun(w.upsilon00, intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1), intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_STATE, -1));
+	    	}
     	}
     }
 }

@@ -7,16 +7,13 @@ namespace NSDEVICE
 class Wrapper : public NWrapper
 {
 public:
-    String sFileDir;
 	LinearLayout* layout;
-	NActivity* activity;
-
     DBHandler* dbh;
 
-    String mac;
-    String sServiceName;
-    String sUuid;
-    String sUuidSuffix;
+    std::string mac;
+    std::string sServiceName;
+    std::string sUuid;
+    std::string sUuidSuffix;
 	BluetoothAdapter* dBluetoothAdapter;
 	vector<BluetoothDevice*> aDiscoveredDevice;
 	unsigned long long cNextClientUuid;

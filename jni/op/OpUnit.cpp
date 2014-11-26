@@ -26,7 +26,7 @@ OpUnit* OpUnit::start()
 	if (mThread == nullptr) {
 		mAlive = true;
 		mThread = new std::thread(&OpUnit::onStart, this);
-		mThread->detach();
+		//mThread->detach();
 	}
 	return this;
 }
@@ -34,6 +34,7 @@ OpUnit* OpUnit::start()
 void OpUnit::onStart()
 {
 	run();
+	w->nFrame->tDetachCurrentThread();
 	mAlive = false;
 }
 

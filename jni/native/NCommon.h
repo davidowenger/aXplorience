@@ -17,7 +17,7 @@
 
 #include <android/log.h>
 
-#ifdef __cplusplus
+#ifndef __cplusplus
 #undef __cplusplus
 #define __cplusplus 201103L
 #endif
@@ -36,10 +36,10 @@
 #ifdef CONFIG_DEBUG
 
 #define DEBUG 1 // Set to 1 to enable debug log traces
-#define LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
-#define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
-#define LOGWI(...) __android_log_write(ANDROID_LOG_ERROR, LOG_TAG,__VA_ARGS__)
-#define LOGWE(...) __android_log_write(ANDROID_LOG_ERROR, LOG_TAG,__VA_ARGS__)
+#define LOGI(...)  __android_log_print(ANDROID_LOG_INFO,  LOG_TAG, __VA_ARGS__)
+#define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#define LOGWI(...) __android_log_write(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#define LOGWE(...) __android_log_write(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 #else // CONFIG_DEBUG
 
@@ -155,8 +155,8 @@ using NSNATIVE::NWrapper;
 #include "device/content/ContextWrapper.h"
 #include "device/view/ContextThemeWrapper.h"
 #include "device/view/View.h"
-#include "device/view/ViewGroup.h"
 #include "device/app/Activity.h"
+#include "device/view/ViewGroup.h"
 #include "device/io/InputStream.h"
 #include "device/io/OutputStream.h"
 #include "device/bluetooth/BluetoothSocket.h"

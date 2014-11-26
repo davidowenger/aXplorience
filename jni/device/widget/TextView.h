@@ -10,22 +10,22 @@ public:
 	TextView(Context* context)
 		: View(context)
 	{
-		NWrapper::w->nVisitorWidget->tRun(NWrapper::w->tau01, (NParam)this, (NParam)context);
+		NSDEVICE::Activity::kActivity->w->nVisitorWidget->tRun(NSDEVICE::Activity::kActivity->w->tau01, (NParam)this, (NParam)context);
 	}
 
 	virtual ~TextView()
 	{
-		NWrapper::w->nFrame->tRun(NWrapper::w->delta01, (NParam)this);
+		NSDEVICE::Activity::kActivity->w->nFrame->tRun(NSDEVICE::Activity::kActivity->w->delta01, (NParam)this);
 	}
 
 	void setTextSize(float size)
 	{
-		NWrapper::w->nVisitorWidget->tRun(NWrapper::w->upsilon01, (NParam)this, (NParam)size);
+		NSDEVICE::Activity::kActivity->w->nVisitorWidget->tRun(NSDEVICE::Activity::kActivity->w->upsilon01, (NParam)this, (NParam)size);
 	}
 
 	void setText(const String& text)
 	{
-		NWrapper::w->nVisitorWidget->tRun(NWrapper::w->phi01, (NParam)this, NParamBox(NWrapper::w, text).n);
+		NSDEVICE::Activity::kActivity->w->nVisitorWidget->tRun(NSDEVICE::Activity::kActivity->w->phi01, (NParam)this, NParamBox(NSDEVICE::Activity::kActivity->w, text).n);
 	}
 };
 

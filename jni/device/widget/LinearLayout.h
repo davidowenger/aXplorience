@@ -10,12 +10,12 @@ public:
 	LinearLayout(Context* context)
 		: ViewGroup(context)
 	{
-		NWrapper::w->nVisitorWidget->tRun(NWrapper::w->lambda00, (NParam)this, (NParam)context);
+		NSDEVICE::Activity::kActivity->w->nVisitorWidget->tRun(NSDEVICE::Activity::kActivity->w->lambda00, (NParam)this, (NParam)context);
 	}
 
 	virtual ~LinearLayout()
 	{
-		NWrapper::w->nFrame->tRun(NWrapper::w->delta00, (NParam)this);
+		NSDEVICE::Activity::kActivity->w->nFrame->tRun(NSDEVICE::Activity::kActivity->w->delta00, (NParam)this);
 	}
 };
 

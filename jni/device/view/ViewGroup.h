@@ -18,7 +18,7 @@ public:
 
 	void addView(View* view)
 	{
-		NWrapper::w->nVisitorView->tRun(NWrapper::w->alpha02, (NParam)this, (NParam)view);
+		NSDEVICE::Activity::kActivity->w->nVisitorView->tRun(NSDEVICE::Activity::kActivity->w->alpha02, (NParam)this, (NParam)view);
 	}
 };
 

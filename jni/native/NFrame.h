@@ -15,6 +15,7 @@ public:
 	virtual ~NFrame();
 
 	virtual NReturn nInit(NINIT cState) = 0;
+	virtual NReturn tDetachCurrentThread() = 0;
 	virtual NReturnObject tRunString(CharSequence boxed) = 0;
 	virtual String tGetString(NReturnObject tString) = 0;
 };

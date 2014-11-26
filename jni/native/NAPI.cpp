@@ -9,53 +9,83 @@ NReturn NAPI_nTerminate(NWrapper* w)
 	return 0;
 }
 
+JNIEnv* NAPI_tAttachCurrentThread(NWrapper* w)
+{
+	JNIEnv* jniEnv = nullptr;
+
+	if (w->vm->AttachCurrentThread(&jniEnv, NULL)) {
+		jniEnv = nullptr;
+	}
+	return jniEnv;
+}
+
+NReturn NAPI_tDetachCurrentThread(NWrapper* w)
+{
+	return (NReturn)w->vm->DetachCurrentThread();
+}
+
 NReturn NAPI_tRun(NWrapper* w, NParam nVisitor, NParam nElement, NParam a, NParam b, NParam c, NParam d)
 {
-	return (NReturn)w->env->CallLongMethod(w->tFrame, w->jmidTFrameTRun, nVisitor, nElement, a, b, c, d);
+	JNIEnv* jniEnv = NAPI_tAttachCurrentThread(w);
+	NReturn ret = (NReturn)jniEnv->CallLongMethod(w->tFrame, w->jmidTFrameTRun, nVisitor, nElement, a, b, c, d);
+	return ret;
 }
 
 NReturnObject NAPI_tRunObject(NWrapper* w, NParam a, NParam b)
 {
-	return (NReturnObject)w->env->CallObjectMethod(w->tFrame, w->jmidTFrameTRunObject, a, b);
+	JNIEnv* jniEnv = NAPI_tAttachCurrentThread(w);
+	NReturnObject ret = (NReturnObject)jniEnv->CallObjectMethod(w->tFrame, w->jmidTFrameTRunObject, a, b);
+	return ret;
 }
 
 NReturnObject NAPI_tRunString(NWrapper* w, CharSequence boxed)
 {
-	return (NReturnObject)w->env->NewStringUTF(boxed);
+	JNIEnv* jniEnv = NAPI_tAttachCurrentThread(w);
+	NReturnObject ret = (NReturnObject)jniEnv->NewStringUTF(boxed);
+	jniEnv->ExceptionClear();
+	return ret;
 }
 
 String NAPI_tGetString(NWrapper* w, NReturnObject tString)
 {
 	String sReturn("");
+	const char* aChar = nullptr;
+	JNIEnv* jniEnv = NAPI_tAttachCurrentThread(w);
+
 	if (tString) {
-		const char* aChar = w->env->GetStringUTFChars((jstring)tString, NULL);
+		aChar = jniEnv->GetStringUTFChars((jstring)tString, NULL);
+		jniEnv->ExceptionClear();
+	}
+	if (aChar) {
 		sReturn = String(aChar);
-		w->env->ReleaseStringUTFChars((jstring)tString, aChar);
+		jniEnv->ReleaseStringUTFChars((jstring)tString, aChar);
+		jniEnv->ExceptionClear();
 	}
 	return sReturn;
 }
 
-JNIEXPORT NReturn JNICALL Java_z_a_TFrame_nInit(JNIEnv* env, jobject tFrame, NParam nWrapper, NParam cState)
+JNIEXPORT NReturn JNICALL Java_z_a_TFrame_nInit(JNIEnv* env, jobject tFrame, NParam cState)
 {
 	jclass jclassTFrame = NULL;
-	NWrapper* w = (NWrapper*)nWrapper;
+	NSDEVICE::Activity* activity = NSDEVICE::Activity::kActivity;
 
-	if (w == NULL) {
-		w = NSDEVICE::Activity::kWrapper;
-		w->env = env;
-		w->tFrame = w->env->NewGlobalRef(tFrame);
-		w->nFrame = new NClozer(w);
+	if (!activity->w) {
+		activity->w = activity->getWrapper();
+		activity->w->env = env;
+		activity->w->tFrame = activity->w->env->NewGlobalRef(tFrame);
+		activity->w->nFrame = new NClozer(activity->w);
 
-		if (w->tFrame != NULL) {
-			jclassTFrame = (jclass)env->NewGlobalRef(env->GetObjectClass(w->tFrame));
+		if (activity->w->tFrame != NULL) {
+			jclassTFrame = (jclass)env->NewGlobalRef(env->GetObjectClass(activity->w->tFrame));
 		}
 		if (jclassTFrame != NULL) {
-			w->jmidTFrameTRun = w->env->GetMethodID(jclassTFrame, "tRun", "(JJJJJJ)J");
-			w->jmidTFrameTRunObject = w->env->GetMethodID(jclassTFrame, "tRunObject", "(JJ)Ljava/lang/Object;");
+			activity->w->jmidTFrameTRun = activity->w->env->GetMethodID(jclassTFrame, "tRun", "(JJJJJJ)J");
+			activity->w->jmidTFrameTRunObject = activity->w->env->GetMethodID(jclassTFrame, "tRunObject", "(JJ)Ljava/lang/Object;");
 		}
-		w->env->DeleteGlobalRef(jclassTFrame);
+		activity->w->env->DeleteGlobalRef(jclassTFrame);
+		activity->w->env->GetJavaVM(&activity->w->vm);
 	}
-	return w->nFrame->nInit((NINIT)cState);
+	return activity->w->nFrame->nInit((NINIT)cState);
 }
 
 JNIEXPORT NReturn JNICALL Java_z_a_TVisitor_nRun(JNIEnv* env, jobject obj, NParam nVisitor, NParam nElement, NParam a, NParam b, NParam c, NParam d)

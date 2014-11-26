@@ -6,7 +6,7 @@ namespace NSDEVICE
 BluetoothSocket* BluetoothServerSocket::accept()
 {
 	BluetoothSocket* dBluetoothSocket = new BluetoothSocket();
-	bool error = NWrapper::w->nVisitorBluetooth->tRun(NWrapper::w->alpha02, (NParam)this, (NParam)dBluetoothSocket);
+	bool error = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->alpha02, (NParam)this, (NParam)dBluetoothSocket);
 
 	if (error) {
 		delete dBluetoothSocket;
@@ -18,7 +18,7 @@ BluetoothSocket* BluetoothServerSocket::accept()
 BluetoothSocket* BluetoothServerSocket::accept(int timeout)
 {
 	BluetoothSocket* dBluetoothSocket = new BluetoothSocket();
-	bool error = NWrapper::w->nVisitorBluetooth->tRun(NWrapper::w->beta02, (NParam)this, (NParam)dBluetoothSocket, (NParam)timeout);
+	bool error = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->beta02, (NParam)this, (NParam)dBluetoothSocket, (NParam)timeout);
 
 	if (error) {
 		delete dBluetoothSocket;
@@ -29,7 +29,7 @@ BluetoothSocket* BluetoothServerSocket::accept(int timeout)
 
 void BluetoothServerSocket::close()
 {
-	NWrapper::w->nVisitorBluetooth->tRun(NWrapper::w->gamma02, (NParam)this);
+	NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->gamma02, (NParam)this);
 }
 
 } // End namespace

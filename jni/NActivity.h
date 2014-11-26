@@ -7,9 +7,11 @@ namespace NSDEVICE
 class NActivity : public Activity
 {
 public:
+	static Activity* getInstance();
+
+	NWrapper* getWrapper();
 	void onDrop();
 
-	Wrapper* w;
 	bool mAlive;
 
 protected:

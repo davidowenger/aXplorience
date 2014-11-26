@@ -11,6 +11,7 @@ public:
 	virtual ~NClozer();
 
 	NReturn nInit(NINIT cState);
+	NReturn tDetachCurrentThread();
 	NReturnObject tRunString(CharSequence boxed);
 	String tGetString(NReturnObject tString);
 

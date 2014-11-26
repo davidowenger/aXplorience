@@ -4,7 +4,7 @@ namespace NSDEVICE
 {
 
 OpUnitPeer::OpUnitPeer(Wrapper* w, BluetoothSocket* dPeerSocket, int cUuid)
-	: OpUnit(w), w(w)
+	: OpUnit(w)
 {
     mcUuid = cUuid;
 	mPeerSocket = dPeerSocket;
@@ -47,9 +47,9 @@ void OpUnitPeer::run()
     		mAlive = false;
     	}
     	if (!error) {
-			BODrop* boDrop = w->boHandlerDrop->unpack(buffer);
-			w->aBODrop.push_back(boDrop);
-			w->activity->send((NParam)w->alpha00, (NParam)boDrop);
+			BODrop* boDrop = ((Wrapper*)w)->boHandlerDrop->unpack(buffer);
+			((Wrapper*)w)->aBODrop.push_back(boDrop);
+			w->dActivity->send((NParam)w->alpha00, (NParam)boDrop);
 		}
     	this_thread::sleep_for(chrono::milliseconds(300));
     }

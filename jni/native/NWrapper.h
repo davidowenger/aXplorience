@@ -7,9 +7,7 @@ namespace NSNATIVE
 class NWrapper
 {
 public:
-	static NWrapper* const w;
-
-    static const nuint N_ELEMENT = 96;
+	static const nuint N_ELEMENT = 96;
 
 	nlong* apNElement;
 
@@ -113,6 +111,8 @@ public:
 	NElement* psi03;
 	NElement* omega03;
 
+    static const nuint N_VISITOR = 6;
+
     nlong* apNVisitor;
 
 	NFrame* nFrame;
@@ -122,11 +122,10 @@ public:
 	NVisitor* nVisitorView;
 	NVisitor* nVisitorWidget;
 
-    static const nuint N_VISITOR = 6;
-
     String sFileDir;
     NSDEVICE::Activity* dActivity;
 
+	JavaVM* vm;
 	JNIEnv* env;
 	jobject tFrame;
 	jmethodID jmidTFrameTRun;

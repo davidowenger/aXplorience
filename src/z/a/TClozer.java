@@ -161,25 +161,34 @@ public class TClozer extends TFrame
     	w.aObject.add(w.tActivity.getFilesDir().getAbsolutePath());
 
     	// Get native wrapper, visitors, elements, and activity
-    	w.n = nInit(0, GET_W);
-    	w.tFrame.n = nInit(w.n, GET_VISITOR);
+    	w.tFrame.n = nInit(GET_VISITOR);
     	w.sTVisitor.put("" + w.tFrame.n, this);
-    	w.alpha00.n = nInit(w.n, GET_ELEMENT);
+    	
+    	w.alpha00.n = nInit(GET_ELEMENT);
     	w.sTElement.put("" + w.alpha00.n, w.alpha00);
+    	
     	w.tActivity.n = nRun(w.alpha00);
     	w.sObject.put("" + w.tActivity.n, w.tActivity);
     }
 
 	public Object tRunObject(long a, long b)
 	{
-		Object o = w.aObject.get((int)a);
+		Object ret = null;
 
-		if (b < 0) {
-			w.aObject.remove((int)a);
-		} else {
-			o = ((LinkedList<?>)o).get((int)b);
+		try {
+			ret = w.aObject.get((int)a);
+	
+			if (b < 0) {
+				w.aObject.remove((int)a);
+			} else {
+				ret = ((LinkedList<?>)ret).get((int)b);
+			}
 		}
-		return  o;
+		catch (Exception e) {
+			e.printStackTrace();
+			ret = null;
+		}
+		return ret;
 	}
 
 	public long visit(TAlpha00 element, long a, long b, long c, long d)

@@ -3,11 +3,14 @@ NDK_TOOLCHAIN_VERSION := 4.8
 APP_ABI := armeabi-v7a
 APP_PLATFORM := android-9
 APP_OPTIM := debug
-APP_CFLAG := -g -ggdb -O0
-APP_CPPFLAGS += -std=gnu++11 \
-	-gdwarf-2
-APP_STL := gnustl_static
+APP_CFLAG += -g -ggdb -O0
+APP_CPPFLAGS += -std=gnu++11
+APP_STL := gnustl_shared
 
+
+
+
+#APP_CPPFLAGS += -gdwarf-2
 #APP_STL := c++_shared
 #APP_STL := gnustl_shared
 #APP_CFLAGS += -std=gnu++11

@@ -3,19 +3,24 @@
 namespace NSDEVICE
 {
 
-Activity* const Activity::kActivity = new NActivity();
-NWrapper* const Activity::kWrapper = new Wrapper();
+Activity* Activity::kActivity = new NActivity();
+
+NWrapper* NActivity::getWrapper()
+{
+	return new Wrapper();
+}
 
 void NActivity::onCreate()
 {
 	Activity::onCreate();
 
-	w = (Wrapper*)Activity::kWrapper;
-	w->dActivity = this;
-	w->cMaxOpUnit = 10;
-	w->opSquad = new OpSquad(w->cMaxOpUnit);
-	w->opUnitCore = new OpUnitCore(w);
-	w->opSquad->add(w->opUnitCore)->start();
+	((Wrapper*)w)->dBluetoothAdapter = new BluetoothAdapter();
+	((Wrapper*)w)->layout = new LinearLayout(w->dActivity);
+	((Wrapper*)w)->dActivity->setContentView((View*)((Wrapper*)w)->layout);
+	((Wrapper*)w)->cMaxOpUnit = 10;
+	((Wrapper*)w)->opSquad = new OpSquad(((Wrapper*)w)->cMaxOpUnit);
+	((Wrapper*)w)->opUnitCore = new OpUnitCore(((Wrapper*)w));
+	((Wrapper*)w)->opSquad->add(((Wrapper*)w)->opUnitCore)->start();
 
 	mAlive = true;
 }
@@ -25,7 +30,7 @@ void NActivity::onDrop()
 	TextView* wDrop = new TextView(this);
 	wDrop->setTextSize(20);
 	wDrop->setText("Hello World!");
-	w->layout->addView(wDrop);
+	((Wrapper*)w)->layout->addView(wDrop);
 }
 
 void NActivity::onPause()
@@ -48,7 +53,7 @@ void NActivity::onReceiveDiscoveryStarted()
 
 void NActivity::onReceiveFoundDevice(BluetoothDevice* dBluetoothDevice)
 {
-	w->aDiscoveredDevice.push_back(dBluetoothDevice);
+	((Wrapper*)w)->aDiscoveredDevice.push_back(dBluetoothDevice);
 }
 
 void NActivity::onReceiveLocalName(String localName)
@@ -65,7 +70,7 @@ void NActivity::onReceiveScanMode(int mode, int modePrevious)
 
 void NActivity::handleMessage(NParam a, NParam b, NParam c)
 {
-	w->opUnitCore->nRun((NElement*)a, b, c);
+	((Wrapper*)w)->opUnitCore->nRun((NElement*)a, b, c);
 }
 
 } // End namespace

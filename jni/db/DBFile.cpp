@@ -62,6 +62,8 @@ int DBFile::open()
 		ret = 1;
 	}
 	if (mFileStream) {
+		mFileStream->clear();
+		mFileStream->close();
 		mFileStream->open(w->sFileDir + "/" + msFileName, ios_base::in | ios_base::out);
 	}
 	if (mFileStream && !mFileStream->good()) {

@@ -13,9 +13,7 @@ public:
     void run();
     void cancel();
 
-    Wrapper* w;
-	bool mAlive;
-
+    Wrapper* mw;
 	BluetoothServerSocket* mServerSocket;
 	BluetoothSocket* mClientSocket;
 	OutputStream* mOutputStream;

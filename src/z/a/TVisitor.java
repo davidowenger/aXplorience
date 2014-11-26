@@ -5,12 +5,12 @@ public abstract class TVisitor implements INVisitor, ITVisitor
 	// Static initializer block
     static {
     	//System.loadLibrary("c++_shared");
-    	//System.loadLibrary("gnu00stl_shared");
+    	System.loadLibrary("gnustl_shared");
         System.loadLibrary("TActivity");
 		// Debug
         if (true) {
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -37,7 +37,16 @@ public abstract class TVisitor implements INVisitor, ITVisitor
 
 	public long tRun(long tVisitorN, long tElementN, long a, long b, long c, long d)
 	{
-		return ((TElement)w.sTElement.get("" + tElementN)).accept((TVisitor)w.sTVisitor.get("" + tVisitorN), a, b, c, d);
+		long ret = (-1 >>> 1) + 1;
+		
+		try {
+			ret = ((TElement)w.sTElement.get("" + tElementN)).accept((TVisitor)w.sTVisitor.get("" + tVisitorN), a, b, c, d);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			ret = (-1 >>> 1) + 1;
+		}
+		return ret;
 	}
 
 	public Object tRunObject(long a, long b)

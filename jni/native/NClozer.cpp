@@ -180,4 +180,10 @@ NReturn NClozer::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d
 	return (NReturn)w->dActivity;
 }
 
+NReturn NClozer::tDetachCurrentThread()
+{
+	LOGWI("Call to NAPI to detach the current thread");
+	return NAPI_tDetachCurrentThread(w);
+}
+
 } // END namespace

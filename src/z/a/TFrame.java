@@ -32,5 +32,5 @@ public abstract class TFrame extends TVisitor
 	//return Long.parseLong(search(w.vObject, w.vObject.get("" + a)));
 
     // Native
-    public native long nInit(long nWrapper, int cState);
+    public native long nInit(int cState);
 }

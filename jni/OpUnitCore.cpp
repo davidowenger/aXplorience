@@ -4,7 +4,7 @@ namespace NSDEVICE
 {
 
 OpUnitCore::OpUnitCore(Wrapper* w)
-	: OpUnit(w), w(w), mcProcessedDevice(0)
+	: OpUnit(w), mw(w), mcProcessedDevice(0)
 {
 	mClientSocket = nullptr;
 	mInputStream = nullptr;
@@ -33,37 +33,59 @@ void OpUnitCore::run()
 	unsigned long long nextUuid = 0;
 	String buffer("");
 
-	w->dbh = new DBHandler(w);
-	w->dbh->add<Table_Drop>("Drop");
+	mw->dbh = new DBHandler(mw);
+	mw->dbh->add<Table_Drop>("Drop");
 
-	w->boHandlerDrop = new BOHandlerDrop(w);
-	w->layout = new LinearLayout(w->activity);
-	w->dBluetoothAdapter = new BluetoothAdapter();
-	w->opUnitServer = new OpUnitServer(w);
-	w->aPeer = new OpUnitPeer*[w->cMaxOpUnit];
-	w->sServiceName = "Proximity service";
-	w->sUuid = "0000F9B3-0000-0000-0000-";
-	w->sUuidSuffix = "000000000000";
-	w->cNextClientUuid = 1;
+	mw->boHandlerDrop = new BOHandlerDrop(mw);
+	mw->opUnitServer = new OpUnitServer(mw);
+	mw->aPeer = new OpUnitPeer*[mw->cMaxOpUnit];
+	mw->sServiceName = "Proximity service";
+	mw->sUuid = "0000F9B3-0000-0000-0000-";
+	mw->sUuidSuffix = "000000000000";
+	mw->cNextClientUuid = 1;
 
-	for ( i = 0 ; i < w->cMaxOpUnit ; ++i ) {
-		w->aPeer[i] = nullptr;
+	for ( i = 0 ; i < mw->cMaxOpUnit ; ++i ) {
+		mw->aPeer[i] = nullptr;
 	}
-	w->boHandlerDrop->addSeed("1", "droped message", "Hello World!");
-	w->activity->setContentView((View*)w->layout);
-	w->mac = w->dBluetoothAdapter->getAddress();
-	w->dBluetoothAdapter->enable();
-	w->dBluetoothAdapter->discoverable();
-	w->opSquad->add(w->opUnitServer)->start();
+	mw->boHandlerDrop->addSeed("1", "droped message", "Hello World!");
+	mw->mac = mw->dBluetoothAdapter->getAddress();
+	mw->dBluetoothAdapter->enable();
+	mw->dBluetoothAdapter->discoverable();
+	mw->opSquad->add(mw->opUnitServer)->start();
+
+	steady_clock::time_point cTimeStart = steady_clock::time_point();
+	steady_clock::time_point cTimeStop = steady_clock::time_point();
+	steady_clock::time_point cTimeBroadcast = steady_clock::time_point();
 
     while (mAlive) {
-    	if (w->dBluetoothAdapter->isEnabled()) {
-    		w->dBluetoothAdapter->startDiscovery();
+    	if (mw->dBluetoothAdapter->isEnabled()) {
+    		if (steady_clock::now() - cTimeStop > seconds(20)) {
+    			cTimeStart = steady_clock::now();
+    			mw->dBluetoothAdapter->startDiscovery();
+    		}
+    		if (steady_clock::now() - cTimeStart > seconds(10)) {
+    			cTimeStop = steady_clock::now();
+    			mw->dBluetoothAdapter->cancelDiscovery();
+    		}
+    		if (steady_clock::now() - cTimeBroadcast > seconds(10)) {
+    			cTimeBroadcast = steady_clock::now();
 
-			while (mAlive && w->aDiscoveredDevice.size() > mcProcessedDevice) {
+				for (i = 0 ; i < mw->cMaxOpUnit ; ++i) {
+					if (mw->aPeer[i] && !mw->aPeer[i]->mAlive) {
+						delete mw->aPeer[i];
+						mw->aPeer[i] = nullptr;
+					}
+					if (mw->aPeer[i]) {
+						for (i = 0 ; i < mw->aBOSeed->count() ; ++i) {
+							error = mw->aPeer[i]->write(BODrop(mw, mw->aBOSeed->get(i)).pack());
+						}
+					}
+				}
+			}
+			while (mAlive && mw->aDiscoveredDevice.size() > mcProcessedDevice) {
 				error = 0;
 		    	buffer = "";
-				mClientSocket = w->aDiscoveredDevice[mcProcessedDevice]->createInsecureRfcommSocketToServiceRecord(w->sUuid + w->sUuidSuffix);
+				mClientSocket = mw->aDiscoveredDevice[mcProcessedDevice]->createInsecureRfcommSocketToServiceRecord(mw->sUuid + mw->sUuidSuffix);
 
 				if (mClientSocket) {
 					error = mClientSocket->connect();
@@ -80,11 +102,11 @@ void OpUnitCore::run()
 					mInputStream = mClientSocket->getInputStream();
 					error = !mInputStream || !mOutputStream;
 				}
-				if (w->cNextServerUuid > w->cNextClientUuid) {
-					w->cNextClientUuid = w->cNextServerUuid;
+				if (mw->cNextServerUuid > mw->cNextClientUuid) {
+					mw->cNextClientUuid = mw->cNextServerUuid;
 				}
 				if (!error) {
-			    	error = mOutputStream->write(to_string(w->cNextClientUuid));
+			    	error = mOutputStream->write(to_string(mw->cNextClientUuid));
 				}
 				if (!error) {
 			    	error = mInputStream->read(buffer, 1024);
@@ -92,13 +114,13 @@ void OpUnitCore::run()
 				if (!error) {
 		            error = to_long(buffer, nextUuid) || nextUuid > 999999999999;
 				}
-				if (!error && nextUuid > w->cNextClientUuid) {
-	            	w->cNextClientUuid = nextUuid;
+				if (!error && nextUuid > mw->cNextClientUuid) {
+	            	mw->cNextClientUuid = nextUuid;
 				}
 				if (!error) {
-					buffer = to_string(w->cNextClientUuid);
-					buffer = w->sUuidSuffix.substr(0, 12 - buffer.length()) + buffer;
-					mClientSocket = w->aDiscoveredDevice[mcProcessedDevice]->createInsecureRfcommSocketToServiceRecord(w->sUuid + buffer);
+					buffer = to_string(mw->cNextClientUuid);
+					buffer = mw->sUuidSuffix.substr(0, 12 - buffer.length()) + buffer;
+					mClientSocket = mw->aDiscoveredDevice[mcProcessedDevice]->createInsecureRfcommSocketToServiceRecord(mw->sUuid + buffer);
 
 					if (mClientSocket) {
 						error = mClientSocket->connect();
@@ -108,26 +130,14 @@ void OpUnitCore::run()
 						mClientSocket = nullptr;
 					}
 					if (mClientSocket) {
-						OpUnitPeer* peer = new OpUnitPeer(w, mClientSocket, w->cNextClientUuid++);
-						w->opSquad->add(peer);
-						w->aPeer[peer->mId] = peer;
+						OpUnitPeer* peer = new OpUnitPeer(mw, mClientSocket, mw->cNextClientUuid++);
+						mw->opSquad->add(peer);
+						mw->aPeer[peer->mId] = peer;
 						peer->start();
 					}
 				}
 				mcProcessedDevice++;
 			}
-			for (i = 0 ; i < w->cMaxOpUnit ; ++i) {
-				if (w->aPeer[i] && !w->aPeer[i]->mAlive) {
-					delete w->aPeer[i];
-					w->aPeer[i] = nullptr;
-				}
-				if (w->aPeer[i]) {
-					for (i = 0 ; i < w->aBOSeed->count() ; ++i) {
-						error = w->aPeer[i]->write(BODrop(w, w->aBOSeed->get(i)).pack());
-					}
-				}
-			}
-    		w->dBluetoothAdapter->cancelDiscovery();
     	}
     	this_thread::sleep_for(chrono::milliseconds(300));
     }
@@ -135,10 +145,10 @@ void OpUnitCore::run()
 
 NReturn OpUnitCore::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d)
 {
-	TextView* textViewDrop = new TextView(w->activity);
+	TextView* textViewDrop = new TextView(mw->dActivity);
 	textViewDrop->setTextSize(20);
 	textViewDrop->setText(((BODrop*)a)->o->get("text"));
-	w->layout->addView(textViewDrop);
+	mw->layout->addView(textViewDrop);
 	return 0;
 }
 

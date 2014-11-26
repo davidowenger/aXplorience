@@ -4,6 +4,7 @@
 #include "native/NCommon.h"
 #include <regex>
 
+using namespace std::chrono;
 using NSNATIVE::NWrapper;
 
 #include "device/widget/LinearLayout.h"

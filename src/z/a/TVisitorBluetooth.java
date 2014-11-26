@@ -151,7 +151,7 @@ public class TVisitorBluetooth extends TVisitor
 	public long visit(TSigma00 element, long a, long b, long c, long d)
 	{
 		Intent intentDiscoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-		intentDiscoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, a);
+		intentDiscoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, (int)a);
     	w.tActivity.startActivityForResult(intentDiscoverable, 1);
 		return 0;
 	}

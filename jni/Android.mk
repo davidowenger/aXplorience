@@ -19,7 +19,6 @@ LOCAL_SRC_FILES := \
 	native/NElement.cpp \
 	native/NVisitor.cpp \
 	native/NFrame.cpp \
-	native/NWrapper.cpp \
 	native/NClozer.cpp \
 	native/NAPI.cpp \
 	OpUnitPeer.cpp \

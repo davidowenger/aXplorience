@@ -14,8 +14,6 @@ public:
     int write(String packet);
     void cancel();
 
-    Wrapper* w;
-	bool mAlive;
 	int mcUuid;
 	int mcProcessedPacket;
 

@@ -17,8 +17,13 @@ DBTableHandler* DBHandler::get(const String& sTable)
 	if (!maTableHandler.count(sTable)) {
 		DBTable* dbTable = maTable[sTable]();
 		dbTable->table = sTable;
-		DBTableHandler* dbTableHandler = new DBTableHandler(w, dbTable->load());
-		maTableHandler[sTable] = dbTableHandler->load();
+		DBTableHandler* dbTableHandler = new DBTableHandler(w, dbTable);
+
+		if (dbTableHandler->load()) {
+			delete dbTableHandler;
+			dbTableHandler = nullptr;
+		}
+		maTableHandler[sTable] = dbTableHandler;
 	}
 	return maTableHandler[sTable];
 }
@@ -32,15 +37,15 @@ DBTableHandler::~DBTableHandler()
 {
 }
 
-DBTableHandler* DBTableHandler::load()
+int DBTableHandler::load()
 {
-	int i;
-	mDBFile = new DBFile(w, w->dbh->PREFIX + mDBTable->load()->table);
+	int i = 0;
 
 	for (i = 0 ; i < mDBTable->cField ; ++i ) {
 		maFieldIndex[mDBTable->aField[i]] = i;
 	}
-	return this;
+	mDBFile = new DBFile(w, w->dbh->PREFIX + mDBTable->load()->table);
+	return mDBFile->init();
 }
 
 DBObject* DBTableHandler::getInstance()
@@ -128,7 +133,13 @@ DBObject* DBObject::commit()
 		int i = 0;
 
 		if (mId == "" && mDBTableHandler->mDBFile->maData.size() > 0) {
-			mId = to_string(atoi((mDBTableHandler->mDBFile->maData.end()--)->second.c_str()) + 1);
+			//FIXME
+			map<String,String>::iterator it = mDBTableHandler->mDBFile->maData.end();
+			it--;
+			String str = it->second;
+			int prev = atoi(str.c_str());
+			mId = to_string(prev + 1);
+			//mId = to_string(atoi((mDBTableHandler->mDBFile->maData.end()--)->second.c_str()) + 1);
 		}
 		if (mId == "") {
 			mId = "1";
@@ -187,7 +198,7 @@ DBCollection* DBCollection::load()
 		map<String,String>::iterator it = mDBTableHandler->mDBFile->maData.begin();
 
 		for ( i = 0 ; i < mDBTableHandler->mDBFile->maData.size()/mDBTableHandler->mDBTable->cField && it != mDBTableHandler->mDBFile->maData.end() ; ++i ) {
-			advance (it,mDBTableHandler->mDBTable->cField);
+			advance(it, mDBTableHandler->mDBTable->cField);
 			DBObject* o = new DBObject(w, mDBTableHandler, it->second);
 
 			if (o->apply(mDBFiltre, true)) {
