@@ -1,6 +1,5 @@
 package z.a;
 
-
 public class TAndroid extends TFrame
 {
     public TAndroid(TWrapper w)
