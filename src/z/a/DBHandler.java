@@ -2,6 +2,9 @@ package z.a;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import android.content.Context;
@@ -94,6 +97,16 @@ class DBTableHandler
 		}
 		return ret;
 	}
+
+	public DBFilter f(DBFilter left, DBFilter right, String op)
+	{
+		return new DBFilter(left, right, op);
+	}
+
+	public DBFilter f(String left, String right, String op)
+	{
+		return new DBFilter(left, right, op);
+	}
 }
 
 class DBObject
@@ -111,18 +124,29 @@ class DBObject
 		maValue = null;
 	}
 
+	public DBObject(TWrapper w, DBTableHandler dbTableHandler, String id, String packed)
+	{
+		int i;
+		this.w = w;
+		mDBTableHandler = dbTableHandler;
+		maValue = new ArrayList<String>();
+		for ( i = 0 ; i < mDBTableHandler.mcField ; ++i ) {
+			maValue.add("");
+		}
+		unpack(packed);
+		mId = maValue.get(0);
+	}
+
 	public DBObject load()
 	{
 		if (maValue == null) {
 			int i;
-			String value = "";
 			maValue = new ArrayList<String>();
-
 			for ( i = 0 ; i < mDBTableHandler.mcField ; ++i ) {
-				if (mId != null) {
-					value = mDBTableHandler.mData.getString(mId + w.dbh.SEP + mDBTableHandler.mDBTable.aField[i], "");
-				}
-				maValue.add(value);
+				maValue.add("");
+			}
+			if (mId != null) {
+				unpack(mDBTableHandler.mData.getString(mId, ""));
 			}
 		}
 		return this;
@@ -136,6 +160,11 @@ class DBObject
 	public String get(String field)
 	{
 		return load().maValue.get(mDBTableHandler.maFieldIndex.get(field));
+	}
+
+	public String get(int index)
+	{
+		return load().maValue.get(index);
 	}
 
 	public DBObject set(String[] aValue)
@@ -172,18 +201,15 @@ class DBObject
 
 		if (mId == null) {
 			mId = "1";
-			ArrayList<Object> aRecord = new ArrayList<Object>(mDBTableHandler.mData.getAll().values());
+			ArrayList<String> aRecord = new ArrayList<String>(mDBTableHandler.mData.getAll().keySet());
 
-			if (aRecord.size() >= 1) {
-				mId = (String)aRecord.get((aRecord.size()/mDBTableHandler.mcField - 1)*mDBTableHandler.mcField);
-				mId = "" + (Integer.parseInt(mId) + 1);
+			if (aRecord.size() > 0) {
+				mId = "" + (Integer.parseInt(Collections.max(aRecord, new DBIdComparator())) + 1);
 			}
 		}
 		maValue.set(0, mId);
 
-		for ( i = 0 ; i < mDBTableHandler.mcField && i < maValue.size() ; ++i ) {
-			mDBTableHandler.mDataEditor.putString(mId + w.dbh.SEP + mDBTableHandler.mDBTable.aField[i], maValue.get(i));
-		}
+		mDBTableHandler.mDataEditor.putString(mId, pack());
 		mDBTableHandler.mDataEditor.apply();
 		return this;
 	}
@@ -213,6 +239,31 @@ class DBObject
 		}
 		return selected;
 	}
+	
+	public String pack()
+	{
+		int i;
+		String packed = "";
+		String first = "";
+		String[] aValue = get();
+
+		for (i = 0 ; i < aValue.length ; ++i) {
+			packed += first + aValue[i].replaceAll("(@|#)", "@\1");
+			first = "##";
+		}
+		return packed;
+	}
+	
+	public void unpack(String packed)
+	{
+		int i;
+    	String[] aValue = packed.split("##");
+
+    	for (i = 0 ; i < aValue.length ; ++i) {
+    		maValue.set(i, aValue[i].replaceAll("@(@|#)", "\1"));
+    	}
+	}
+
 }
 
 class DBCollection
@@ -237,8 +288,8 @@ class DBCollection
 			ArrayList<Object> arrayList = new ArrayList<Object>(mDBTableHandler.mData.getAll().values());
 			maDBObject = new ArrayList<DBObject>();
 
-			for (i = 0 ; i < arrayList.size()/mDBTableHandler.mcField ; ++i ) {
-				DBObject o = new DBObject(w, mDBTableHandler, (String)arrayList.get(i*mDBTableHandler.mcField));
+			for (i = 0 ; i < arrayList.size() ; ++i ) {
+				DBObject o = new DBObject(w, mDBTableHandler, "", (String)arrayList.get(i));
 
 				if (o.apply(mDBFiltre, true)) {
 					maDBObject.add(o);
@@ -268,6 +319,14 @@ class DBCollection
 	public int count()
 	{
 		return load().maDBObject.size();
+	}
+
+	public ArrayList<DBObject> sort(String field)
+	{
+		load();
+		int index = mDBTableHandler.maFieldIndex.get(field);
+		Collections.sort(maDBObject, new DBFieldComparator(index));
+		return maDBObject;
 	}
 }
 
@@ -299,3 +358,49 @@ class DBFilter
 	}
 }
 
+class DBFieldComparator implements Comparator<DBObject>
+{
+	public int mIndex;
+	
+	DBFieldComparator(int index)
+	{
+		mIndex = index;
+	}
+	
+	public int compare(DBObject o1, DBObject o2)
+	{
+		return o1.get(mIndex).compareTo(o2.get(mIndex));
+	}
+
+	public boolean equals(Object obj)
+	{
+		return this.equals(obj);
+	}
+}
+
+class DBIdComparator implements Comparator<String>
+{
+	public int mIndex;
+	
+	DBIdComparator()
+	{
+	}
+	
+	public int compare(String o1, String o2)
+	{
+		int ret = 0;
+		
+		if (Integer.parseInt(o1) < Integer.parseInt(o2)) {
+			ret = -1;
+		}
+		if (Integer.parseInt(o1) > Integer.parseInt(o2)) {
+			ret = +1;
+		}
+		return ret;
+	}
+
+	public boolean equals(Object obj)
+	{
+		return this.equals(obj);
+	}
+}

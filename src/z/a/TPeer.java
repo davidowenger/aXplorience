@@ -51,7 +51,7 @@ public class TPeer extends Thread
     {
     	BO_Drop boDrop = w.boSeed.unpack(packet);
     	w.aBODrop.add(boDrop);
-    	w.tAppHandler.obtainMessage(w.tAppHandler.DROP_RECEIVED, -1, -1, boDrop).sendToTarget();
+    	w.tAppHandler.obtainMessage(w.tAppHandler.DROP_IN, -1, -1, boDrop).sendToTarget();
     }
 
     public void cancel()

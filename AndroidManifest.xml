@@ -27,5 +27,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+		<activity
+			android:name="TAppEdit"
+			android:parentActivityName="z.a.TApp"
+		>
+			<!--  Use meta-data on API < 16 where parentActivityName is not known for default Up navigation -->  
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="z.a.TApp"
+			/>
+		</activity>
     </application>
 </manifest>

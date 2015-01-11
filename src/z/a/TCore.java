@@ -1,6 +1,7 @@
 package z.a;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothDevice;
@@ -21,6 +22,8 @@ public class TCore extends Thread
 		w.aTServer = new ArrayList<TServer>();
     	w.aBODrop = new ArrayList<BO_Drop>();
     	w.aBOSeed = new ArrayList<BO_Drop>();
+    	w.aMessage = new ArrayList<TWidgetMessage>();
+    	w.aMessageSelected = new ArrayList<TWidgetMessage>();
 		w.aTPeer = new ArrayList<TPeer>();
     	w.aDiscoveredDevice = new ArrayList<BluetoothDevice>();
     	w.aUUID = new UUID[] {
@@ -41,6 +44,27 @@ public class TCore extends Thread
 		w.tBluetooth.enable(30000);
 		w.tBluetooth.discoverable();
 
+		w.aBOSeed = w.boSeed.getSeeds();
+		w.aBODrop = w.boSeed.getDrops();
+		
+		if (w.aBOSeed.size() == 0) {
+			w.boSeed.addSeed("0", "", "This is 1 initial outbound message");
+			w.boSeed.addSeed("1", "", "This is 2 initial outbound message");
+			w.boSeed.addSeed("2", "", "This is 3 initial outbound message");
+			w.aBOSeed = w.boSeed.getSeeds();
+		}
+		if (w.aBODrop.size() == 0) {
+			Date date = new Date();
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##1##0##" + date.getTime() + "####1 initial inbound message##FALSE");
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##2##0##" + date.getTime() + "####2 initial inbound message##FALSE");
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##3##1##" + date.getTime() + "####3 initial inbound message##FALSE");
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##4##1##" + date.getTime() + "####4 initial inbound message##FALSE");
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##5##2##" + date.getTime() + "####5 initial inbound message##FALSE");
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##6##3##" + date.getTime() + "####6 initial inbound message##FALSE");
+			w.aBODrop = w.boSeed.getDrops();
+		}
+		w.tAppHandler.obtainMessage(w.tAppHandler.DROP_POPULATE, -1, -1, null).sendToTarget(); 
+		
 		for (i = 0 ; i < w.aUUID.length ; ++i) {
 			w.aTServer.add(factoryTServer(w.aUUID[i]));
 		}
@@ -50,7 +74,7 @@ public class TCore extends Thread
         System.out.println("waiting for new message");
 
         while (mAlive) {
-        	if (!w.tBluetooth.mConfig[w.tBluetooth.INDEX_ENABLED]) {
+        	if (!w.tBluetooth.isEnabled()) {
         		cancel();
         	}
         	if (w.aDiscoveredDevice.size() > mcProcessedDevice) {

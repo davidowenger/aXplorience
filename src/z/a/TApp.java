@@ -1,12 +1,11 @@
 package z.a;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,49 +13,80 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 
-
 public class TApp extends ActionBarActivity
 {
+    public final static String EXTRA_ID = "z.a.ID";
+    public final static String EXTRA_MESSAGE = "z.a.MESSAGE";
+    public final static String EXTRA_CATEGORY = "z.a.CATEGORY";
+
 	public TWrapper w;
 	public String[] maCategory;
+	public int[] maColor;
 	public String mInText;
 	public String mOutText;
-	public ScrollView mHome;
-	public LinearLayout mHomeContainer;
-	public LinearLayout[] maCategoryView;
+	public StateListDrawable mStateListDrawable;
+	public Resources mResources;
+	public Drawable[] maDrawable;
+	public LinearLayout mHome;
+	public LinearLayout mHomeBar;
+	public ScrollView mHomeScroll;
+	public LinearLayout mHomeContent;
 	public LinearLayout mSettings;
 	public LinearLayout mAbout;
-	public ArrayList<TextView> maText;
-	//public SimpleExpandableListAdapter mExpandableListView;
-	//public ArrayList<Map<String, Object>> mGroupData;
+	public ToggleButton mButtonAll;
+	public TButtonAllListener mButtonAllListener;
+	public Button mButtonEdit;
+	public TButtonEditListener mButtonEditListener;
+	public Button mButtonDelete;
+	public TButtonDeleteListener mButtonDeleteListener;
+	public Button mButtonAdd;
+	public TButtonAddListener mButtonAddListener;
+	public boolean mState;
 	
 	// Called when the activity is first created
 	protected void onCreate(Bundle savedInstanceState)
     {
     	super.onCreate(savedInstanceState);
 
-		int i;
-		
-        maText = new ArrayList<TextView>();
-		//mGroupData = new ArrayList<Map<String, Object>>();
-		mInText = "IN";
-		mOutText = "OUT";
+    	mState = false;
+		mResources = getResources();
+		maDrawable = new Drawable[] {
+				mResources.getDrawable(R.drawable.ic_visibility_grey600_48dp),
+				mResources.getDrawable(R.drawable.ic_visibility_black_48dp),
+				mResources.getDrawable(R.drawable.ic_visibility_green),
+				mResources.getDrawable(R.drawable.ic_left_black),
+				mResources.getDrawable(R.drawable.ic_left_green),
+				mResources.getDrawable(R.drawable.ic_right_black),
+				mResources.getDrawable(R.drawable.ic_right_green),
+				mResources.getDrawable(R.drawable.ic_action_edit),
+				mResources.getDrawable(R.drawable.ic_action_delete)
+		};
+		maColor = new int[] {
+			0xFF0099CC,
+			0xFF669900,
+			0xFFCC0000,
+			0xFFFF8A00,
+			0xFF9933CC,
+			0xFF99CC00, //green selected 
+			0xFFFFFFFF, //blank line 
+			0xFFE2F4FB, //line
+			0xFFFFFFFF, //home bar
+			0xFF000000,
+		};
 		maCategory = new String[] {
 			"listen to music",
 			"have a drink",
 			"play some game",
 			"see some event"
 		};
-		maCategoryView = new LinearLayout[maCategory.length];
 
         // Init
         w = new TWrapper();
@@ -64,42 +94,81 @@ public class TApp extends ActionBarActivity
         w.tFrame = new TAndroid(w);
 		w.tFrame.tInit();
 
-		mHome = new ScrollView(this);
-		mHomeContainer = new LinearLayout(this);
+		mHome = new LinearLayout(this);
+		mHomeBar = new LinearLayout(this);
+		mHomeScroll = new ScrollView(this);
+		mHomeContent = new LinearLayout(this);
 		mSettings = new LinearLayout(this);
 		mAbout = new LinearLayout(this);
 
-		mHomeContainer.setOrientation(LinearLayout.VERTICAL);
+		mHome.setOrientation(LinearLayout.VERTICAL);
+		mHomeBar.setOrientation(LinearLayout.HORIZONTAL);
+		mHomeContent.setOrientation(LinearLayout.VERTICAL);
 		mSettings.setOrientation(LinearLayout.VERTICAL);
 		mAbout.setOrientation(LinearLayout.VERTICAL);
 
-		mHome.setPadding(5,5,5,5);
-		mHomeContainer.setPadding(5,5,5,5);
-		mSettings.setPadding(5,5,5,5);
-		mAbout.setPadding(5,5,5,5);
+		mHomeBar.setPadding(0,0,0,0);
+		mHomeContent.setPadding(5,5,5,5);
+		mSettings.setPadding(0,0,0,0);
+		mAbout.setPadding(0,0,0,0);
+		
+		mHomeBar.setBackgroundColor(maColor[8]);
+		
+		mButtonAll = new ToggleButton(w.tApp);
+		mButtonAllListener = new TButtonAllListener(w);
 
-		for ( i = 0 ; i < maCategoryView.length ; ++i ) {
-			TextView title = new TextView(this);
-			title.setTextSize(20);
-			title.setGravity(Gravity.LEFT);
-			title.setPadding(5,5,5,5);
-			title.setBackgroundColor(0xFF9BAF6E); //0xEBECEC
-			title.setText(maCategory[i]);
-			maCategoryView[i] = new LinearLayout(this);
-			maCategoryView[i].setOrientation(LinearLayout.VERTICAL);
-			maCategoryView[i].setPadding(5,5,5,5);
-			maCategoryView[i].addView(title);
-			mHomeContainer.addView(maCategoryView[i]);
-		}
-		mHome.addView(mHomeContainer);
+		mButtonAll.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+		mButtonAll.setBackgroundColor(0x00000000);
+		mButtonAll.setTextSize(20);
+		mButtonAll.setGravity(Gravity.CENTER);
+		mButtonAll.setText("All");
+		mButtonAll.setTextOn("All");
+		mButtonAll.setTextOff("All");
+		mButtonAll.setOnClickListener(mButtonAllListener);
+
+		mButtonEdit = new Button(w.tApp);
+		mButtonEditListener = new TButtonEditListener(w);
+
+		mButtonEdit.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+		mButtonEdit.setBackgroundColor(0x00000000);
+		mButtonEdit.setTextSize(20);
+		mButtonEdit.setGravity(Gravity.CENTER);
+		mButtonEdit.setText("Edit");
+		mButtonEdit.setOnClickListener(mButtonEditListener);
+
+		mButtonDelete = new Button(w.tApp);
+		mButtonDeleteListener = new TButtonDeleteListener(w);
+
+		mButtonDelete.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+		mButtonDelete.setBackgroundColor(0x00000000);
+		mButtonDelete.setTextSize(20);
+		mButtonDelete.setGravity(Gravity.CENTER);
+		mButtonDelete.setText("Del");
+		mButtonDelete.setOnClickListener(mButtonDeleteListener);
+
+		mButtonAdd = new Button(w.tApp);
+		mButtonAddListener = new TButtonAddListener(w);
+
+		mButtonAdd.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+		mButtonAdd.setBackgroundColor(0x00000000);
+		mButtonAdd.setTextSize(20);
+		mButtonAdd.setGravity(Gravity.CENTER);
+		mButtonAdd.setText("Add");
+		mButtonAdd.setOnClickListener(mButtonAddListener);
+		mButtonAdd.setTextColor(w.tApp.maColor[5]);
+
+		mHomeBar.addView(mButtonAll);
+		mHomeBar.addView(mButtonEdit);
+		mHomeBar.addView(mButtonDelete);
+		mHomeBar.addView(mButtonAdd);
+
+		mHomeScroll.addView(mHomeContent);
+
+		mHome.addView(mHomeBar);
+		mHome.addView(mHomeScroll);
+
 		setContentView((View)mHome);
-
-        Date now = new Date();
-        String timestamp = "" + now.getTime();
-        addText("0", timestamp, "test 1");
-        addText("0", timestamp, "test 2");
-        addText("1", timestamp, "test 3");
-
+		
 		TextView settings = new TextView(this);
 		settings.setTextSize(20);
 		settings.setGravity(Gravity.LEFT);
@@ -113,57 +182,22 @@ public class TApp extends ActionBarActivity
 		mAbout.addView(about);
     }
 
-	public void addText(String id_cat,String date,String text)
+	public void addDropIn(BO_Drop drop) 
 	{
-		LinearLayout container = new LinearLayout(this);
-		container.setOrientation(LinearLayout.HORIZONTAL);
-		container.setGravity(Gravity.RIGHT);
-		container.setPadding(5,5,5,5);
-		container.setBackgroundColor(0xFFFFFFFF);
-
-		LinearLayout left = new LinearLayout(this);
-		left.setOrientation(LinearLayout.VERTICAL);
-		left.setPadding(5,5,5,5);
-
-		LinearLayout right = new LinearLayout(this);
-		right.setOrientation(LinearLayout.VERTICAL);
-		right.setPadding(5,5,5,5);
-
-		TextView text1 = new TextView(this);
-		text1.setTextSize(20);
-		text1.setGravity(Gravity.LEFT);
-		text1.setText(
-			mInText +
-			"  " +
-			DateFormat.getTimeInstance().format(new Date(Long.parseLong(date)))
-		);
-
-		TextView text2 = new TextView(this);
-		text2.setTextSize(20);
-		text2.setGravity(Gravity.LEFT);
-		text2.setText(
-			text
-		);
+		TWidgetMessage widget = new TWidgetInboundMessage(w, drop);
+		mHomeContent.addView(widget);
+		w.aMessage.add(widget);
 		
-		final Button button1 = new Button(this);
-		final Intent intent = new Intent(this, TAppEdit.class);
-		
-		button1.setTextSize(20);
-		text2.setGravity(Gravity.LEFT);
-		button1.setBackgroundColor(0xFFFFFFFF);
-		button1.setText("DELETE");
-		button1.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            	startActivity(intent);
-            }
-        });
+		// if all ...
+	}
 
-		left.addView(text1);
-		left.addView(text2);
-		right.addView(button1);
-		container.addView(left);
-		container.addView(right);
-		maCategoryView[Integer.parseInt(id_cat)].addView(container);
+	public void addDropOut(BO_Drop drop) 
+	{
+		TWidgetMessage widget = new TWidgetOutboundMessage(w, drop);
+		mHomeContent.addView(widget);
+		w.aMessage.add(widget);
+		
+		// if all ...
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -223,22 +257,45 @@ public class TApp extends ActionBarActivity
 		w.tFrame.tDestroy();
 		super.onDestroy();
     }
-}
 
-class TAppEdit extends ActionBarActivity
-{
-	public TWrapper w;
+	public void populate()
+	{
+		for (BO_Drop seed : w.aBOSeed) {
+			w.tApp.addDropOut(seed);
+		}
+		for (BO_Drop drop : w.aBODrop) {
+			w.tApp.addDropIn(drop);
+		}
+	}
+
+	public void setState()
+	{
+		mState = false;
+
+		if (w.aMessageSelected.size() == 0) {
+    		w.tApp.mButtonAll.setTextColor(w.tApp.maColor[9]);
+			w.tApp.mButtonEdit.setTextColor(w.tApp.maColor[9]);
+			w.tApp.mButtonDelete.setTextColor(w.tApp.maColor[9]);
+		} else {
+    		w.tApp.mButtonAll.setTextColor(w.tApp.maColor[9]);
+			w.tApp.mButtonEdit.setTextColor(w.tApp.maColor[5]);
+			w.tApp.mButtonDelete.setTextColor(w.tApp.maColor[5]);
 	
-	// Called when the activity is first created
-	protected void onCreate(Bundle savedInstanceState)
-    {
-    	super.onCreate(savedInstanceState);
-    }
+			if (w.aMessageSelected.size() == w.aMessage.size()) {
+	    		w.tApp.mButtonAll.setTextColor(w.tApp.maColor[5]);
+	    		mState = true;
+			}
+		}
+	}
 }
 
 class TAppHandler extends Handler
 {
-	public final int DROP_RECEIVED = 0;
+	public final int DROP = 0;
+	public final int DROP_IN = 1;
+	public final int DROP_OUT = 2;
+	public final int DROP_POPULATE = 3;
+	
 
 	public TWrapper w;
 	String mMessage;
@@ -252,9 +309,14 @@ class TAppHandler extends Handler
 	public void handleMessage(Message m)
 	{
 		switch (m.what) {
-		case DROP_RECEIVED:
-			BO_Drop drop = (BO_Drop)m.obj;
-			w.tApp.addText(drop.mDBObject.get("id_cat"),drop.mDBObject.get("date"), drop.mDBObject.get("text"));
+		case DROP_IN:
+			w.tApp.addDropIn((BO_Drop)m.obj);
+			break;
+		case DROP_OUT:
+			w.tApp.addDropOut((BO_Drop)m.obj);
+			break;
+		case DROP_POPULATE:
+			w.tApp.populate();
 			break;
 		default:
 			super.handleMessage(m);
@@ -263,16 +325,79 @@ class TAppHandler extends Handler
 	}
 }
 
-//mExpandableListView = new SimpleExpandableListAdapter(
-//		w.context
-//		mGroupData, 
-//		int expandedGroupLayout, 
-//		int collapsedGroupLayout, 
-//		String[] groupFrom, 
-//		int[] groupTo, 
-//		List<? extends List<? extends Map<String, ?>>> childData, 
-//		int childLayout, 
-//		String[] childFrom, 
-//		int[] childTo
-//);
+class TButtonAllListener implements View.OnClickListener
+{
+	public TWrapper w;
 
+	TButtonAllListener(TWrapper w)
+	{
+		this.w = w;
+	}
+
+    public void onClick(View view)
+    {
+		w.tApp.mState = !w.tApp.mState;
+		w.aMessageSelected.clear();
+		for (TWidgetMessage vTWidgetMessage : w.aMessage) {
+			vTWidgetMessage.setState(w.tApp.mState);
+		}
+    	w.tApp.setState();
+    }
+}
+
+class TButtonEditListener implements View.OnClickListener
+{
+	public TWrapper w;
+
+	TButtonEditListener(TWrapper w)
+	{
+		this.w = w;
+	}
+
+    public void onClick(View view)
+    {
+    	if (w.aMessageSelected.size() > 0) {
+    		Intent intent = new Intent(w.tApp, TAppEdit.class);
+            intent.putExtra(TApp.EXTRA_ID, w.aMessageSelected.get(0).mDBDrop.get("id"));
+            w.tApp.startActivity(intent);
+    	}
+    }
+}
+
+class TButtonDeleteListener implements View.OnClickListener
+{
+	public TWrapper w;
+
+	TButtonDeleteListener(TWrapper w)
+	{
+		this.w = w;
+	}
+
+    public void onClick(View view)
+    {
+		for (TWidgetMessage vTWidgetMessage : w.aMessageSelected) {
+			vTWidgetMessage.mDBDrop.set("archived", w.dbh.TRUE).commit();
+			w.aMessage.remove(vTWidgetMessage);
+			w.tApp.mHomeContent.removeView(vTWidgetMessage);
+		}
+		w.aMessageSelected.clear();
+		w.tApp.setState();
+    }
+}
+
+class TButtonAddListener implements View.OnClickListener
+{
+	public TWrapper w;
+
+	TButtonAddListener(TWrapper w)
+	{
+		this.w = w;
+	}
+
+    public void onClick(View view)
+    {
+		Intent intent = new Intent(w.tApp, TAppEdit.class);
+        intent.putExtra(TApp.EXTRA_ID, "");
+        w.tApp.startActivity(intent);
+    }
+}

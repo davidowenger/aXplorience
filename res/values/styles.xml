@@ -7,5 +7,5 @@
 	<style name="AppActionBarLogo" parent="Widget.AppCompat.Light.ActionBar">
 	    <item name="logo">@drawable/ic_launcher</item>
     </style>    
-
+    
 </resources>

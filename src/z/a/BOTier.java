@@ -26,12 +26,13 @@ class BO_Seed extends BOTier
 	{
 		this.w = w;
 		this.h = w.dbh.get("Drop");;
+		//h.delete("yes");
 	}
 
 	public ArrayList<BO_Drop> getSeeds()
 	{
 		int i;
-		DBCollection c = h.getCollection().filter("mac", w.mac, "=");
+		DBCollection c = h.getCollection().filter(f("mac", w.mac, "="), f("archived", w.dbh.FALSE, "="), "AND");
 		ArrayList<BO_Drop> aBODrop = new ArrayList<BO_Drop>();
 
 		for (i = 0 ; i < c.count() ; ++i) {
@@ -44,7 +45,7 @@ class BO_Seed extends BOTier
 	{
 		Date date = new Date();
 		DBObject o = h.getInstance().set(new String[] {
-		    w.tBluetooth.mBlueAdapter.getAddress(),
+		    w.mac,
 		    "",
 		    id_cat,
 		    "" + date.getTime(),
@@ -67,6 +68,17 @@ class BO_Seed extends BOTier
 		return aBODrop;
 	}
 
+	public BO_Drop getDrop(String id_drop)
+	{
+		int i;
+		DBCollection c = h.getCollection().filter(f("id_drop", id_drop, "="), f(f("mac", w.mac, "!="), f("archived", w.dbh.FALSE, "="), "AND"), "AND");
+    	DBObject o = h.getInstance();
+    	if (c.count() > 0) {
+    		o = c.get(0);
+    	};
+		return new BO_Drop(w, o);
+	}
+
 	public BO_Drop unpack(String packed)
 	{
 		int i;
@@ -81,7 +93,7 @@ class BO_Seed extends BOTier
     	if (c.count() > 0) {
     		o = c.get(0).set(aValue);
     	};
-		return new BO_Drop(w, o.set("archived", w.dbh.FALSE));
+		return new BO_Drop(w, o.set("archived", w.dbh.FALSE).commit());
 	}
 }
 
