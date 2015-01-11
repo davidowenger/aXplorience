@@ -32,7 +32,7 @@ class BO_Seed extends BOTier
 	public ArrayList<BO_Drop> getSeeds()
 	{
 		int i;
-		DBCollection c = h.getCollection().filter(f("mac", w.mac, "="), f("archived", w.dbh.FALSE, "="), "AND");
+		DBCollection c = h.getCollection().filter(f("mac", w.mac, "="), f("archived", w.dbh.FALSE, "="), "AND").sort("id_drop");
 		ArrayList<BO_Drop> aBODrop = new ArrayList<BO_Drop>();
 
 		for (i = 0 ; i < c.count() ; ++i) {
@@ -52,6 +52,9 @@ class BO_Seed extends BOTier
 		    title,
 		    text,
 		    w.dbh.FALSE,
+		    w.dbh.TRUE,
+		    w.dbh.FALSE,
+		    w.dbh.FALSE,
 		}).commit();
 		return new BO_Drop(w, o.set("id_drop", o.get("id")).commit());
 	}
@@ -59,7 +62,7 @@ class BO_Seed extends BOTier
 	public ArrayList<BO_Drop> getDrops()
 	{
 		int i;
-		DBCollection c = h.getCollection().filter(f("mac", w.mac, "!="), f("archived", w.dbh.FALSE, "="), "AND");
+		DBCollection c = h.getCollection().filter(f("mac", w.mac, "!="), f("archived", w.dbh.FALSE, "="), "AND").sort("id_drop");
 		ArrayList<BO_Drop> aBODrop = new ArrayList<BO_Drop>();
 
 		for (i = 0 ; i < c.count() ; ++i) {

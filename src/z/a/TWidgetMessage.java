@@ -17,8 +17,12 @@ import android.widget.ToggleButton;
 public class TWidgetMessage extends LinearLayout
 {
 	public TWrapper w;
+	public Button mButtonText;
+	public TButtonTextListener mTButtonTextListener;
 	public ToggleButton mButtonCheck;
+	public TButtonCheckListener mTButtonCheckListener;
 	public ToggleButton mButtonBuzz;
+	public TButtonBuzzListener mTButtonBuzzListener;
 	public StateListDrawable mStateListCheck;
 	public StateListDrawable mStateListBuzz;
 	public BO_Drop mBODrop;
@@ -47,17 +51,37 @@ public class TWidgetMessage extends LinearLayout
 	
 	public void init()
 	{
-		String id_cat = mBODrop.mDBObject.get("id_cat");
-		String date = mBODrop.mDBObject.get("date");
-		String text = mBODrop.mDBObject.get("text");
-		int nCat = Integer.parseInt(id_cat);
+//		String id_cat = mBODrop.mDBObject.get("id_cat");
+//		String date = mBODrop.mDBObject.get("date");
+//		String text = mBODrop.mDBObject.get("text");
+//		int nCat = Integer.parseInt(id_cat);
+//
+//		TextView text1 = new TextView(w.tApp);
+//		text1.setTextSize(20);
+//		text1.setGravity(Gravity.LEFT);
+//		text1.setText(
+//			DateFormat.getTimeInstance().format(new Date(Long.parseLong(date)))
+//		);
 
-		mStateListBuzz = new StateListDrawable();
-		mStateListBuzz.addState(new int[] { android.R.attr.state_enabled, android.R.attr.state_pressed }, w.tApp.maDrawable[2]);
-		mStateListBuzz.addState(new int[] { android.R.attr.state_enabled }, w.tApp.maDrawable[1]);
-		mStateListBuzz.addState(new int[0], w.tApp.maDrawable[0]);
+		mButtonText = new Button(w.tApp);
+		mTButtonTextListener = new TButtonTextListener(w, this);
 
-	    ToggleButton mButtonCheck = new ToggleButton(w.tApp);
+		mButtonText.setOnClickListener(mTButtonTextListener);
+		mButtonText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+		mButtonText.setBackgroundColor(0x00000000);
+		mButtonText.setTextSize(20);
+		mButtonText.setGravity(Gravity.LEFT);
+		mButtonText.setText("ALL");
+		mButtonText.setTextSize(20);
+		mButtonText.setGravity(Gravity.LEFT);
+		mButtonText.setText(
+			mDBDrop.get("text")
+		);
+		
+	    mButtonCheck = new ToggleButton(w.tApp);
+	    mTButtonCheckListener = new TButtonCheckListener(w, this);
+
+	    mButtonCheck.setOnClickListener(mTButtonCheckListener);
 	    mButtonCheck.setBackground(null);
 	    mButtonCheck.setButtonDrawable(mStateListCheck);
 	    mButtonCheck.setLayoutParams(new ViewGroup.LayoutParams(w.tApp.maDrawable[3].getIntrinsicWidth(), w.tApp.maDrawable[3].getIntrinsicHeight()));
@@ -68,7 +92,10 @@ public class TWidgetMessage extends LinearLayout
 	    mButtonCheck.setEnabled(true);
 	    mButtonCheck.setChecked(false);
 
-	    ToggleButton mButtonBuzz = new ToggleButton(w.tApp);
+	    mButtonBuzz = new ToggleButton(w.tApp);
+	    mTButtonBuzzListener = new TButtonBuzzListener(w, this);
+
+	    mButtonBuzz.setOnClickListener(mTButtonBuzzListener);
 	    mButtonBuzz.setBackground(null);
 	    mButtonBuzz.setButtonDrawable(mStateListBuzz);
 	    mButtonBuzz.setLayoutParams(new ViewGroup.LayoutParams(w.tApp.maDrawable[3].getIntrinsicWidth(), w.tApp.maDrawable[3].getIntrinsicHeight()));
@@ -91,29 +118,7 @@ public class TWidgetMessage extends LinearLayout
 		right.setGravity(Gravity.LEFT);
 		right.setPadding(0,0,0,0);
 
-		TextView text1 = new TextView(w.tApp);
-		text1.setTextSize(20);
-		text1.setGravity(Gravity.LEFT);
-		text1.setText(
-			DateFormat.getTimeInstance().format(new Date(Long.parseLong(date)))
-		);
-
-		Button buttonText = new Button(w.tApp);
-		TWidgetTextListener buttonTextListener = new TWidgetTextListener(w, this);
-
-		buttonText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-		buttonText.setBackgroundColor(0x00000000);
-		buttonText.setTextSize(20);
-		buttonText.setGravity(Gravity.LEFT);
-		buttonText.setText("ALL");
-		buttonText.setOnClickListener(buttonTextListener);
-		buttonText.setTextSize(20);
-		buttonText.setGravity(Gravity.LEFT);
-		buttonText.setText(
-			text
-		);
-		
-		left.addView(buttonText);
+		left.addView(mButtonText);
 		right.addView(mButtonCheck);
 		right.addView(mButtonBuzz);
 		addView(left);
@@ -146,6 +151,11 @@ class TWidgetInboundMessage extends TWidgetMessage
 		mStateListCheck = new StateListDrawable();
 		mStateListCheck.addState(new int[] { android.R.attr.state_enabled, android.R.attr.state_checked }, w.tApp.maDrawable[4]);
 		mStateListCheck.addState(new int[] { android.R.attr.state_enabled }, w.tApp.maDrawable[3]);
+		
+		mStateListBuzz = new StateListDrawable();
+		mStateListBuzz.addState(new int[] { android.R.attr.state_enabled }, w.tApp.maDrawable[2]);
+		mStateListBuzz.addState(new int[0], w.tApp.maDrawable[0]);
+
 		super.init();
 	}
 }
@@ -164,16 +174,23 @@ class TWidgetOutboundMessage extends TWidgetMessage
 		mStateListCheck.addState(new int[] { android.R.attr.state_enabled, android.R.attr.state_checked }, w.tApp.maDrawable[6]);
 		mStateListCheck.addState(new int[] { android.R.attr.state_enabled }, w.tApp.maDrawable[5]);
 
+		mStateListBuzz = new StateListDrawable();
+		mStateListBuzz.addState(new int[] { android.R.attr.state_enabled }, w.tApp.maDrawable[0]);
+		mStateListBuzz.addState(new int[0], w.tApp.maDrawable[0]);
+
 		super.init();
+
+		mButtonCheck.setChecked(true);
+		mButtonBuzz.setEnabled(true);
 	}
 }
 
-class TWidgetTextListener implements View.OnClickListener
+class TButtonTextListener implements View.OnClickListener
 {
 	public TWrapper w;
 	public TWidgetMessage mTWidgetMessage; 
 
-	TWidgetTextListener(TWrapper w, TWidgetMessage mTWidgetMessage)
+	TButtonTextListener(TWrapper w, TWidgetMessage mTWidgetMessage)
 	{
 		this.w = w;
 		this.mTWidgetMessage = mTWidgetMessage;
@@ -183,5 +200,38 @@ class TWidgetTextListener implements View.OnClickListener
     {
     	mTWidgetMessage.setState(!mTWidgetMessage.mState);
 		w.tApp.setState();
+    }
+}
+
+class TButtonCheckListener implements View.OnClickListener
+{
+	public TWrapper w;
+	public TWidgetMessage mTWidgetMessage;
+	
+	TButtonCheckListener(TWrapper w, TWidgetMessage mTWidgetMessage)
+	{
+		this.w = w;
+		this.mTWidgetMessage = mTWidgetMessage;
+	}
+
+    public void onClick(View view)
+    {
+    	mTWidgetMessage.mButtonBuzz.setEnabled(mTWidgetMessage.mButtonCheck.isChecked());
+    }
+}
+
+class TButtonBuzzListener implements View.OnClickListener
+{
+	public TWrapper w;
+	public TWidgetMessage mTWidgetMessage; 
+
+	TButtonBuzzListener(TWrapper w, TWidgetMessage mTWidgetMessage)
+	{
+		this.w = w;
+		this.mTWidgetMessage = mTWidgetMessage;
+	}
+
+    public void onClick(View view)
+    {
     }
 }

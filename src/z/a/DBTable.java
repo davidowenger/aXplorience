@@ -20,6 +20,9 @@ class Table_Drop extends DBTable
 			"title",
 			"text",
 			"archived",
+			"enabled",
+			"checked",
+			"buzzed",
 		};
 	}
 }

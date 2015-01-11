@@ -46,25 +46,22 @@ public class TCore extends Thread
 
 		w.aBOSeed = w.boSeed.getSeeds();
 		w.aBODrop = w.boSeed.getDrops();
-		
+
 		if (w.aBOSeed.size() == 0) {
-			w.boSeed.addSeed("0", "", "This is 1 initial outbound message");
-			w.boSeed.addSeed("1", "", "This is 2 initial outbound message");
-			w.boSeed.addSeed("2", "", "This is 3 initial outbound message");
+			w.boSeed.addSeed("2", "", "3 outbound message");
+			w.boSeed.addSeed("1", "", "2 outbound message");
+			w.boSeed.addSeed("0", "", "1 outbound message");
 			w.aBOSeed = w.boSeed.getSeeds();
 		}
 		if (w.aBODrop.size() == 0) {
 			Date date = new Date();
-			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##1##0##" + date.getTime() + "####1 initial inbound message##FALSE");
-			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##2##0##" + date.getTime() + "####2 initial inbound message##FALSE");
-			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##3##1##" + date.getTime() + "####3 initial inbound message##FALSE");
-			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##4##1##" + date.getTime() + "####4 initial inbound message##FALSE");
-			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##5##2##" + date.getTime() + "####5 initial inbound message##FALSE");
-			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##6##3##" + date.getTime() + "####6 initial inbound message##FALSE");
-			w.aBODrop = w.boSeed.getDrops();
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##1##0##" + date.getTime() + "####1 inbound message##FALSE##TRUE##FALSE##FALSE");
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##2##1##" + date.getTime() + "####2 inbound message##FALSE##TRUE##FALSE##FALSE");
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##3##2##" + date.getTime() + "####3 inbound message##FALSE##TRUE##FALSE##FALSE");
+			w.aBODrop = w.boSeed.getDrops(); 
 		}
 		w.tAppHandler.obtainMessage(w.tAppHandler.DROP_POPULATE, -1, -1, null).sendToTarget(); 
-		
+
 		for (i = 0 ; i < w.aUUID.length ; ++i) {
 			w.aTServer.add(factoryTServer(w.aUUID[i]));
 		}

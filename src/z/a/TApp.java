@@ -59,7 +59,7 @@ public class TApp extends ActionBarActivity
     	mState = false;
 		mResources = getResources();
 		maDrawable = new Drawable[] {
-				mResources.getDrawable(R.drawable.ic_visibility_grey600_48dp),
+				mResources.getDrawable(R.drawable.ic_visibility_grey),
 				mResources.getDrawable(R.drawable.ic_visibility_black_48dp),
 				mResources.getDrawable(R.drawable.ic_visibility_green),
 				mResources.getDrawable(R.drawable.ic_left_black),
@@ -80,6 +80,7 @@ public class TApp extends ActionBarActivity
 			0xFFE2F4FB, //line
 			0xFFFFFFFF, //home bar
 			0xFF000000,
+			0xFFE8E8E8 //greyed text
 		};
 		maCategory = new String[] {
 			"listen to music",
@@ -155,7 +156,6 @@ public class TApp extends ActionBarActivity
 		mButtonAdd.setGravity(Gravity.CENTER);
 		mButtonAdd.setText("Add");
 		mButtonAdd.setOnClickListener(mButtonAddListener);
-		mButtonAdd.setTextColor(w.tApp.maColor[5]);
 
 		mHomeBar.addView(mButtonAll);
 		mHomeBar.addView(mButtonEdit);
@@ -166,8 +166,9 @@ public class TApp extends ActionBarActivity
 
 		mHome.addView(mHomeBar);
 		mHome.addView(mHomeScroll);
-
-		setContentView((View)mHome);
+		
+		setState();
+		setContentView(mHome);
 		
 		TextView settings = new TextView(this);
 		settings.setTextSize(20);
@@ -181,6 +182,27 @@ public class TApp extends ActionBarActivity
 		about.setText("v0.1 Beta");
 		mAbout.addView(about);
     }
+
+	public void setState()
+	{
+		mState = false;
+		mButtonAdd.setTextColor(maColor[9]);
+
+		if (w.aMessageSelected.size() == 0) {
+    		mButtonAll.setTextColor(maColor[9]);
+			mButtonEdit.setTextColor(maColor[10]);
+			mButtonDelete.setTextColor(maColor[10]);
+		} else {
+    		mButtonAll.setTextColor(maColor[9]);
+			mButtonEdit.setTextColor(maColor[9]);
+			mButtonDelete.setTextColor(maColor[9]);
+	
+			if (w.aMessageSelected.size() == w.aMessage.size()) {
+	    		mButtonAll.setTextColor(maColor[5]);
+	    		mState = true;
+			}
+		}
+	}
 
 	public void addDropIn(BO_Drop drop) 
 	{
@@ -225,13 +247,13 @@ public class TApp extends ActionBarActivity
 	    // Handle presses on the action bar items
 	    switch (item.getItemId()) {
 	        case 1:
-	        	setContentView((View)mHome);
+	        	setContentView(mHome);
 	            break;
 	        case 2:
-	        	setContentView((View)mSettings);
+	        	setContentView(mSettings);
 	            break;
 	        case 3:
-	        	setContentView((View)mAbout);
+	        	setContentView(mAbout);
 	            break;
 	        default:
 	        	ret = super.onOptionsItemSelected(item);
@@ -267,26 +289,6 @@ public class TApp extends ActionBarActivity
 			w.tApp.addDropIn(drop);
 		}
 	}
-
-	public void setState()
-	{
-		mState = false;
-
-		if (w.aMessageSelected.size() == 0) {
-    		w.tApp.mButtonAll.setTextColor(w.tApp.maColor[9]);
-			w.tApp.mButtonEdit.setTextColor(w.tApp.maColor[9]);
-			w.tApp.mButtonDelete.setTextColor(w.tApp.maColor[9]);
-		} else {
-    		w.tApp.mButtonAll.setTextColor(w.tApp.maColor[9]);
-			w.tApp.mButtonEdit.setTextColor(w.tApp.maColor[5]);
-			w.tApp.mButtonDelete.setTextColor(w.tApp.maColor[5]);
-	
-			if (w.aMessageSelected.size() == w.aMessage.size()) {
-	    		w.tApp.mButtonAll.setTextColor(w.tApp.maColor[5]);
-	    		mState = true;
-			}
-		}
-	}
 }
 
 class TAppHandler extends Handler
@@ -295,7 +297,6 @@ class TAppHandler extends Handler
 	public final int DROP_IN = 1;
 	public final int DROP_OUT = 2;
 	public final int DROP_POPULATE = 3;
-	
 
 	public TWrapper w;
 	String mMessage;

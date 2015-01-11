@@ -321,12 +321,12 @@ class DBCollection
 		return load().maDBObject.size();
 	}
 
-	public ArrayList<DBObject> sort(String field)
+	public DBCollection sort(String field)
 	{
 		load();
 		int index = mDBTableHandler.maFieldIndex.get(field);
 		Collections.sort(maDBObject, new DBFieldComparator(index));
-		return maDBObject;
+		return this;
 	}
 }
 
