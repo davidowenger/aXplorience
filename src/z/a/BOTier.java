@@ -26,7 +26,6 @@ class BO_Seed extends BOTier
 	{
 		this.w = w;
 		this.h = w.dbh.get("Drop");;
-		//h.delete("yes");
 	}
 
 	public ArrayList<BO_Drop> getSeeds()
@@ -41,23 +40,43 @@ class BO_Seed extends BOTier
 		return aBODrop;
 	}
 
-	public BO_Drop addSeed(String id_cat, String title, String text)
-	{
-		Date date = new Date();
-		DBObject o = h.getInstance().set(new String[] {
-		    w.mac,
-		    "",
-		    id_cat,
-		    "" + date.getTime(),
-		    title,
-		    text,
-		    w.dbh.FALSE,
-		    w.dbh.TRUE,
-		    w.dbh.FALSE,
-		    w.dbh.FALSE,
-		}).commit();
-		return new BO_Drop(w, o.set("id_drop", o.get("id")).commit());
-	}
+    public BO_Drop addSeed(String id_cat, String title, String text, String link)
+    {
+        Date date = new Date();
+        DBObject o = h.getInstance().set(new String[] {
+            w.mac,
+            "",
+            id_cat,
+            "" + date.getTime(),
+            title,
+            text,
+            link,
+            w.dbh.FALSE,
+            w.dbh.TRUE,
+            w.dbh.FALSE,
+            w.dbh.FALSE,
+        }).commit();
+        return new BO_Drop(w, o.set("id_drop", o.get("id")).commit());
+    }
+
+    public BO_Drop setSeed(DBObject vDBObject, String id_cat, String title, String text, String link)
+    {
+        BO_Drop vBO_Drop;
+
+        if (!vDBObject.get("id").equals("")) {
+            Date vDate = new Date();
+            vDBObject.set("id_cat", id_cat);
+            vDBObject.set("date", "" + vDate.getTime());
+            vDBObject.set("title", title);
+            vDBObject.set("text", text);
+            vDBObject.set("link", link);
+            vDBObject.commit();
+            vBO_Drop = new BO_Drop(w, vDBObject);
+        } else {
+            vBO_Drop = addSeed(id_cat, title, text, link);
+        }
+        return vBO_Drop;
+    }
 
 	public ArrayList<BO_Drop> getDrops()
 	{
@@ -73,7 +92,6 @@ class BO_Seed extends BOTier
 
 	public BO_Drop getDrop(String id_drop)
 	{
-		int i;
 		DBCollection c = h.getCollection().filter(f("id_drop", id_drop, "="), f(f("mac", w.mac, "!="), f("archived", w.dbh.FALSE, "="), "AND"), "AND");
     	DBObject o = h.getInstance();
     	if (c.count() > 0) {

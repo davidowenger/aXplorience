@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import android.content.Context;
@@ -37,7 +36,7 @@ public class DBHandler
 				dbTable = (DBTable)m.newInstance();
 			}
 	        catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 	        }
 			maCacheTable.put(table, new DBTableHandler(w, dbTable));
 		}
@@ -54,12 +53,14 @@ class DBTableHandler
 	public ConcurrentSkipListMap<String, Integer> maFieldIndex;
 	public int mcField;
 	public int mLastID;
+	public boolean mIsNoCache;
 
 	public DBTableHandler(TWrapper w, DBTable dbTable)
 	{
 		int i;
 
 		this.w = w;
+		mIsNoCache = true;
 		mDBTable = dbTable;
 		mData = w.context.getSharedPreferences(w.dbh.PREFIX + mDBTable.table, Context.MODE_PRIVATE);
 		mDataEditor = mData.edit();
@@ -115,6 +116,7 @@ class DBObject
 	public DBTableHandler mDBTableHandler;
 	public String mId;
 	public ArrayList<String> maValue;
+	public boolean mIsCache;
 
 	public DBObject(TWrapper w, DBTableHandler dbTableHandler, String id)
 	{
@@ -122,6 +124,7 @@ class DBObject
 		mDBTableHandler = dbTableHandler;
 		mId = id;
 		maValue = null;
+		mIsCache = false;
 	}
 
 	public DBObject(TWrapper w, DBTableHandler dbTableHandler, String id, String packed)
@@ -139,7 +142,7 @@ class DBObject
 
 	public DBObject load()
 	{
-		if (maValue == null) {
+		if (maValue == null || !mIsCache) {
 			int i;
 			maValue = new ArrayList<String>();
 			for ( i = 0 ; i < mDBTableHandler.mcField ; ++i ) {
@@ -171,6 +174,7 @@ class DBObject
 	{
 		load();
 		int i;
+		mIsCache = true;
 
 		for ( i = 0 ; i < mDBTableHandler.mcField - 1 && i < aValue.length ; ++i ) {
 			set(i + 1, aValue[i]);
@@ -186,6 +190,7 @@ class DBObject
 	protected DBObject set(int index, String value)
 	{
 		String formatted = "";
+		mIsCache = true;
 
 		if (value != null) {
 			formatted = value;
@@ -197,7 +202,6 @@ class DBObject
 	public DBObject commit()
 	{
 		load();
-		int i;
 
 		if (mId == null) {
 			mId = "1";
@@ -211,6 +215,7 @@ class DBObject
 
 		mDBTableHandler.mDataEditor.putString(mId, pack());
 		mDBTableHandler.mDataEditor.apply();
+		mIsCache = false;
 		return this;
 	}
 
@@ -239,7 +244,7 @@ class DBObject
 		}
 		return selected;
 	}
-	
+
 	public String pack()
 	{
 		int i;
@@ -253,7 +258,7 @@ class DBObject
 		}
 		return packed;
 	}
-	
+
 	public void unpack(String packed)
 	{
 		int i;
@@ -361,12 +366,12 @@ class DBFilter
 class DBFieldComparator implements Comparator<DBObject>
 {
 	public int mIndex;
-	
+
 	DBFieldComparator(int index)
 	{
 		mIndex = index;
 	}
-	
+
 	public int compare(DBObject o1, DBObject o2)
 	{
 		return o1.get(mIndex).compareTo(o2.get(mIndex));
@@ -381,15 +386,15 @@ class DBFieldComparator implements Comparator<DBObject>
 class DBIdComparator implements Comparator<String>
 {
 	public int mIndex;
-	
+
 	DBIdComparator()
 	{
 	}
-	
+
 	public int compare(String o1, String o2)
 	{
 		int ret = 0;
-		
+
 		if (Integer.parseInt(o1) < Integer.parseInt(o2)) {
 			ret = -1;
 		}

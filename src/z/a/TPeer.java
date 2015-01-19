@@ -41,10 +41,10 @@ public class TPeer extends Thread
         		Thread.sleep(300);
         	}
     		catch (Exception e) {
-    			e.printStackTrace();
+    			//e.printStackTrace();
     		}
         }
-        mTPeerListener.cancel();
+        cancel();
 	}
 
     public void drop(String packet)

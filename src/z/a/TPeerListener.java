@@ -27,7 +27,7 @@ public class TPeerListener extends Thread
         	mOutStream = mPeerSocket.getOutputStream();
         }
         catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
         	mInStream = null;
         	mOutStream = null;
         }
@@ -46,7 +46,7 @@ public class TPeerListener extends Thread
                 maPacket.add(new String(Arrays.copyOf(buffer, bytes)));
             }
             catch (Exception e) {
-    			e.printStackTrace();
+    			//e.printStackTrace();
             	mAlive = false;
             }
         }
@@ -60,7 +60,7 @@ public class TPeerListener extends Thread
             mOutStream.write(packet.getBytes());
         }
         catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
             cancel();
         }
     }
@@ -73,7 +73,7 @@ public class TPeerListener extends Thread
             mPeerSocket.close();
         }
         catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
         }
     }
 }

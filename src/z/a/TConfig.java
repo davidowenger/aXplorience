@@ -3,7 +3,6 @@ package z.a;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.preference.PreferenceManager;
 
 public class TConfig
 {

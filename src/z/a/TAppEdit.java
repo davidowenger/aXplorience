@@ -5,19 +5,18 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class TAppEdit extends ActionBarActivity
+public class TAppEdit extends Activity
 {
 	public TWrapper w;
 	public BO_Drop mBODrop;
 	public DBObject mDBDrop;
 	public boolean mAlive;
-	
+
 	// Called when the activity is first created
 	protected void onCreate(Bundle savedInstanceState)
     {

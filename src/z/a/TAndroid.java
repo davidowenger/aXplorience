@@ -19,11 +19,14 @@ public class TAndroid extends TFrame
     	w.tCore = new TCore(w);
 		w.mac = w.tBluetooth.mac();
 
+		w.tConfig.init();
+		w.tBluetooth.init();
     	w.tCore.start();
     }
 
     public void tDestroy()
     {
     	w.tBluetooth.onDestroy();
+    	w.tCore.cancel();
     }
 }

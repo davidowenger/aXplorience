@@ -6,9 +6,15 @@ import java.util.UUID;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.view.Menu;
 
 public class TWrapper
 {
+    static final int ITEM_EDIT = 100001;
+    static final int ITEM_DELETE = 100002;
+    static final int ITEM_SAVE = 100003;
+    static final int ITEM_ADD = 100004;
+
 	int cAPI;
 	String mac;
 	String serviceName;
@@ -18,6 +24,7 @@ public class TWrapper
 	BO_Seed boSeed;
 
 	Context context;
+	Menu mMenu;
 	TApp tApp;
 	TAppHandler tAppHandler;
 	TFrame tFrame;

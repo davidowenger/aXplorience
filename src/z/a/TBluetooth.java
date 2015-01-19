@@ -116,7 +116,7 @@ public class TBluetooth
 			}
 			catch (Exception e) {
 				mBlueProxy = null;
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			mHasProxy = (mBlueProxy != null);
 	    }
@@ -132,7 +132,7 @@ public class TBluetooth
 			}
 			catch (Exception e) {
 		    	mMEnable = null;
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			try {
 				mMSetDiscoverableTimeout = mBlueProxy.getClass().getDeclaredMethod("setDiscoverableTimeout", new Class[] {int.class});
@@ -140,7 +140,7 @@ public class TBluetooth
 			}
 			catch (Exception e) {
 				mMSetDiscoverableTimeout = null;
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			try {
 				mMgetDiscoverableTimeout = mBlueProxy.getClass().getDeclaredMethod("getDiscoverableTimeout", new Class[] {});
@@ -148,7 +148,7 @@ public class TBluetooth
 			}
 			catch (Exception e) {
 				mMgetDiscoverableTimeout = null;
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 			try {
 				mMSetScanMode = mBlueProxy.getClass().getDeclaredMethod("setScanMode", new Class[] {int.class, int.class});
@@ -156,7 +156,7 @@ public class TBluetooth
 			}
 			catch (Exception e) {
 				mMSetScanMode = null;
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 		if (mHasProxy) {
@@ -166,12 +166,30 @@ public class TBluetooth
 
 	public void onDestroy()
     {
-		mBlueAdapter.cancelDiscovery();
-		w.tApp.unregisterReceiver(mReceiver[INDEX_ENABLED]);
-		w.tApp.unregisterReceiver(mReceiver[INDEX_DISCOVERABLE]);
-		w.tApp.unregisterReceiver(mReceiver[INDEX_CONNECTED]);
-		w.tApp.unregisterReceiver(mReceiver[INDEX_TIMEOUT]);
-		w.tApp.unregisterReceiver(mReceiver[INDEX_BLUETOOTH]);
+	    if (mBlueAdapter != null) {
+	        mBlueAdapter.cancelDiscovery();
+	        mBlueAdapter = null;
+	    }
+		if (mReceiver[INDEX_ENABLED] != null) {
+			w.tApp.unregisterReceiver(mReceiver[INDEX_ENABLED]);
+			mReceiver[INDEX_ENABLED] = null;
+		}
+		if (mReceiver[INDEX_DISCOVERABLE] != null) {
+			w.tApp.unregisterReceiver(mReceiver[INDEX_DISCOVERABLE]);
+			mReceiver[INDEX_DISCOVERABLE] = null;
+		}
+		if (mReceiver[INDEX_CONNECTED] != null) {
+			w.tApp.unregisterReceiver(mReceiver[INDEX_CONNECTED]);
+			mReceiver[INDEX_CONNECTED] = null;
+		}
+		if (mReceiver[INDEX_TIMEOUT] != null) {
+			w.tApp.unregisterReceiver(mReceiver[INDEX_TIMEOUT]);
+			mReceiver[INDEX_TIMEOUT] = null;
+		}
+		if (mReceiver[INDEX_BLUETOOTH] != null) {
+			w.tApp.unregisterReceiver(mReceiver[INDEX_BLUETOOTH]);
+			mReceiver[INDEX_BLUETOOTH] = null;
+		}
     }
 
 	public String mac()
@@ -179,7 +197,11 @@ public class TBluetooth
 		String mac = "";
 
 		if (mHasBluetooth) {
-			mac = mBlueAdapter.getAddress();
+		    try {
+		        mac = mBlueAdapter.getAddress();
+		    } catch (Exception e) {
+		        mac = "";
+		    }
 		}
 	    return mac;
     }
@@ -189,7 +211,11 @@ public class TBluetooth
 		boolean ret = false;
 
 		if (mHasBluetooth) {
-			ret = mBlueAdapter.isEnabled();
+            try {
+                ret = mBlueAdapter.isEnabled();
+            } catch (Exception e) {
+                ret = false;
+            }
 		}
 	    return ret;
     }
@@ -274,7 +300,7 @@ public class TBluetooth
 	    	}
 			catch (Exception e) {
 				ret = mState[INDEX_TIMEOUT];
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 	    }
 	    mState[INDEX_TIMEOUT] = ret;
@@ -300,7 +326,7 @@ public class TBluetooth
 		    	mMSetDiscoverableTimeout.invoke(mBlueProxy, new Object[] {discoverableTimeout});
 	    	}
 			catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 	    }
     }
@@ -317,7 +343,7 @@ public class TBluetooth
 	    	}
 			catch (Exception e) {
 	    		done = false;
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 	    }
 	    if (!done && isEnabled()) {
@@ -377,13 +403,9 @@ public class TBluetooth
 		try {
 			clientSocket = device.createInsecureRfcommSocketToServiceRecord(uuid);
 			clientSocket.connect();
-			//00001101-0000-1000-8000-00805F9B34FB
-			//tmp = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
-			//Method m = mDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
-			//tmp = (BluetoothSocket) m.invoke(mDevice, 1);
     	}
         catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			clientSocket = close(clientSocket);;
         }
 		return clientSocket;
@@ -424,7 +446,7 @@ class TBluetoothReceiver extends BroadcastReceiver
     		wait(durationToLock);
     	}
 		catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 

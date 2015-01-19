@@ -40,7 +40,7 @@ public class TServer extends Thread
 		        w.aTPeer.add(mCore.factoryTPeer(mClientSocket));
 	        }
 	        catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 	        }
         }
         System.out.println("BtServer thread ended - had client socket");
@@ -53,7 +53,7 @@ public class TServer extends Thread
         	mServerSocket.close();
         }
         catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
         }
     }
 }

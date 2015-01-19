@@ -6,6 +6,20 @@ public class DBTable
 	public String[] aField;
 }
 
+class Table_Thread extends DBTable
+{
+	public Table_Thread()
+	{
+		table = "Thread";
+		aField = new String[] {
+			"id",
+			"id_thread",
+			"id_type",
+			"date",
+		};
+	}
+}
+
 class Table_Drop extends DBTable
 {
 	public Table_Drop()
@@ -19,6 +33,7 @@ class Table_Drop extends DBTable
 			"date",
 			"title",
 			"text",
+			"link",
 			"archived",
 			"enabled",
 			"checked",

@@ -39,28 +39,25 @@ public class TCore extends Thread
 	{
 		int i;
 
-		w.tConfig.init();
-		w.tBluetooth.init();
 		w.tBluetooth.enable(30000);
 		w.tBluetooth.discoverable();
 
-		w.aBOSeed = w.boSeed.getSeeds();
-		w.aBODrop = w.boSeed.getDrops();
+		//w.dbh.get("Drop").delete("yes");
 
-		if (w.aBOSeed.size() == 0) {
-			w.boSeed.addSeed("2", "", "3 outbound message");
-			w.boSeed.addSeed("1", "", "2 outbound message");
-			w.boSeed.addSeed("0", "", "1 outbound message");
+		if (w.boSeed.getSeeds().size() == 0) {
+			w.boSeed.addSeed("2", "3 outbound message", "", "facebook.com");
+			w.boSeed.addSeed("1", "2 outbound message", "", "twitter.com");
+			w.boSeed.addSeed("0", "1 outbound message", "", "pinterest.com");
 			w.aBOSeed = w.boSeed.getSeeds();
 		}
-		if (w.aBODrop.size() == 0) {
+		if (w.boSeed.getDrops().size() == 0) {
 			Date date = new Date();
-			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##1##0##" + date.getTime() + "####1 inbound message##FALSE##TRUE##FALSE##FALSE");
-			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##2##1##" + date.getTime() + "####2 inbound message##FALSE##TRUE##FALSE##FALSE");
-			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##3##2##" + date.getTime() + "####3 inbound message##FALSE##TRUE##FALSE##FALSE");
-			w.aBODrop = w.boSeed.getDrops(); 
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##1##0##" + date.getTime() + "##1 inbound message####facebook.com##FALSE##TRUE##FALSE##FALSE");
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##2##1##" + date.getTime() + "##2 inbound message####twitter.com##FALSE##TRUE##FALSE##FALSE");
+			w.boSeed.unpack("AA:BB:CC:DD:EE:FF##3##2##" + date.getTime() + "##3 inbound message####pinterest.com##FALSE##TRUE##FALSE##FALSE");
+			w.aBODrop = w.boSeed.getDrops();
 		}
-		w.tAppHandler.obtainMessage(w.tAppHandler.DROP_POPULATE, -1, -1, null).sendToTarget(); 
+		w.tAppHandler.obtainMessage(w.tAppHandler.DROP_POPULATE, -1, -1, null).sendToTarget();
 
 		for (i = 0 ; i < w.aUUID.length ; ++i) {
 			w.aTServer.add(factoryTServer(w.aUUID[i]));
@@ -82,7 +79,7 @@ public class TCore extends Thread
         		Thread.sleep(300);
         	}
     		catch (Exception e) {
-    			e.printStackTrace();
+    			//e.printStackTrace();
     		}
         }
 	}
@@ -137,32 +134,3 @@ public class TCore extends Thread
     	mAlive = false;
     }
 }
-
-/*
-
-public class THandle extends Thread
-{
-	public Looper mLooper;
-
-	public TWrapper w;
-
-	public THandle(TWrapper w)
-	{
-		this.w = w;
-	}
-
-	public void run()
-	{
-        Looper.prepare();
-        mLooper = Looper.myLooper();
-        w.tHandler = new THandler(w);
-        Looper.loop();
-        System.out.println("Handler stopped");
-	}
-}
-
-        	if (w.tHandler.mMessage != msg) {
-        		msg = w.tHandler.mMessage;
-                System.out.println(msg);
-        	}
-*/

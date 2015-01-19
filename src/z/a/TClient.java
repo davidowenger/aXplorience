@@ -21,7 +21,7 @@ public class TClient extends Thread
 	    		sleep(10000);
 	    	}
 			catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 	    	w.tBluetooth.cancelDiscovery();
 
@@ -29,7 +29,7 @@ public class TClient extends Thread
 	     		sleep(50000);
 	     	}
 	 		catch (Exception e) {
-	 			e.printStackTrace();
+	 			//e.printStackTrace();
 	 		}
     	}
     }
