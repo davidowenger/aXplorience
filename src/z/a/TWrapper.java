@@ -15,6 +15,12 @@ public class TWrapper
     static final int ITEM_SAVE = 100003;
     static final int ITEM_ADD = 100004;
 
+    static final int SWIPE_MIN_DISTANCE = 120;
+    static final int SWIPE_MAX_OFF_PATH = 250;
+    static final int SWIPE_THRESHOLD_VELOCITY = 200;
+
+    static final String BASE_TAG = "BASE_TAG";
+
 	int cAPI;
 	String mac;
 	String serviceName;

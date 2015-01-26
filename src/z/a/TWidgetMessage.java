@@ -25,7 +25,8 @@ public class TWidgetMessage extends LinearLayout
 	public StateListDrawable mStateListCheck;
 	public StateListDrawable mStateListBuzz;
 	public BO_Drop mBODrop;
-	public DBObject mDBDrop;
+    public DBObject mDBObject;
+    public String mDBObjectId;
 	public boolean mIsSelected;
 	public boolean mIsEnabled;
 	public int mIdCategory;
@@ -36,8 +37,9 @@ public class TWidgetMessage extends LinearLayout
 
 		this.w = w;
 		mBODrop = drop;
-    	mDBDrop = mBODrop.mDBObject;
-    	mIdCategory = Integer.parseInt(mDBDrop.get("id_cat"));
+    	mDBObject = mBODrop.mDBObject;
+    	mDBObjectId = mDBObject.get("id");
+    	mIdCategory = Integer.parseInt(mDBObject.get("id_cat"));
     	mIsSelected = false;
 
 		setOrientation(LinearLayout.HORIZONTAL);
@@ -79,7 +81,7 @@ public class TWidgetMessage extends LinearLayout
         mButtonText.setGravity(Gravity.LEFT|Gravity.CLIP_HORIZONTAL);
 		mButtonText.setTextSize(w.tApp.mTextSize);
         mButtonText.setTextAppearance(w.tApp, android.R.attr.textAppearanceLarge);
-		mButtonText.setText(mDBDrop.get("title"));
+		mButtonText.setText(mDBObject.get("title"));
 
 	    mButtonCheck = new ToggleButton(w.tApp);
 	    mTButtonCheckListener = new TButtonCheckListener(w, this);
@@ -93,7 +95,7 @@ public class TWidgetMessage extends LinearLayout
 	    mButtonCheck.setTextOn("");
 	    mButtonCheck.setTextOff("");
 	    mButtonCheck.setEnabled(true);
-	    mButtonCheck.setChecked(mDBDrop.get("checked").equals(w.dbh.TRUE));
+	    mButtonCheck.setChecked(mDBObject.get("checked").equals(w.dbh.TRUE));
 
 	    mButtonBuzz = new ToggleButton(w.tApp);
 	    mTButtonBuzzListener = new TButtonBuzzListener(w, this);
@@ -107,7 +109,7 @@ public class TWidgetMessage extends LinearLayout
 	    mButtonBuzz.setTextOn("");
 	    mButtonBuzz.setTextOff("");
 	    mButtonBuzz.setEnabled(mButtonCheck.isChecked());
-	    mButtonBuzz.setChecked(mDBDrop.get("buzzed").equals(w.dbh.TRUE));
+	    mButtonBuzz.setChecked(mDBObject.get("buzzed").equals(w.dbh.TRUE));
 
 		LinearLayout left = new LinearLayout(w.tApp);
 		left.setLayoutParams(new TWidgetMessage.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
@@ -198,6 +200,9 @@ class TWidgetOutboundMessage extends TWidgetMessage
 
 		super.init();
 
+//        imageView.setOnClickListener(SelectFilterActivity.this);
+//        imageView.setOnTouchListener(gestureListener);
+
 		mButtonCheck.setChecked(true);
 		mButtonBuzz.setEnabled(true);
 	}
@@ -236,7 +241,7 @@ class TButtonTextListener implements View.OnClickListener
     {
     	//mTWidgetMessage.setState(!mTWidgetMessage.mIsSelected);
 		//w.tApp.setState();
-    	w.tApp.setView(TApp.VIEW_DETAILS, mTWidgetMessage.mDBDrop.get("id"));
+    	w.tApp.setView(TApp.VIEW_DETAILS, mTWidgetMessage.mDBObjectId);
     }
 }
 
@@ -254,9 +259,9 @@ class TButtonCheckListener implements View.OnClickListener
     public void onClick(View view)
     {
     	boolean checked = mTWidgetMessage.mButtonCheck.isChecked();
-		mTWidgetMessage.mButtonBuzz.setChecked(mTWidgetMessage.mDBDrop.get("buzzed").equals(w.dbh.TRUE));
+		mTWidgetMessage.mButtonBuzz.setChecked(mTWidgetMessage.mDBObject.get("buzzed").equals(w.dbh.TRUE));
     	mTWidgetMessage.mButtonBuzz.setEnabled(checked);
-    	mTWidgetMessage.mDBDrop.set("checked", ( checked ? w.dbh.TRUE : w.dbh.FALSE )).commit();
+    	mTWidgetMessage.mDBObject.set("checked", ( checked ? w.dbh.TRUE : w.dbh.FALSE )).commit();
     }
 }
 
@@ -274,7 +279,7 @@ class TButtonBuzzListener implements View.OnClickListener
     public void onClick(View view)
     {
         boolean checked = mTWidgetMessage.mButtonBuzz.isChecked();
-        mTWidgetMessage.mDBDrop.set("buzzed",  ( checked  ? w.dbh.TRUE : w.dbh.FALSE )).commit();
+        mTWidgetMessage.mDBObject.set("buzzed",  ( checked  ? w.dbh.TRUE : w.dbh.FALSE )).commit();
     	//mTWidgetMessage.mButtonBuzz.setChecked(false);
     }
 }

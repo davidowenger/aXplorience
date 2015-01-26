@@ -4,15 +4,20 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -20,12 +25,10 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class TFragmentDrop extends Fragment implements AdapterView.OnItemSelectedListener
+public class TFragmentDrop extends Fragment implements OnItemSelectedListener, OnGestureListener, OnTouchListener
 {
-    // setHasOptionsMenu() during onCreate() for onCreateOptionsMenu() and onOptionsItemSelected() to be called
-    // registerForContextMenu() for onCreateContextMenu() onContextItemSelected().
-    // API 13 void onViewCreated(View view, Bundle vBundle
     public TWrapper w;
     public TApp mTApp;
     public int mTFragmentViewType;
@@ -47,6 +50,8 @@ public class TFragmentDrop extends Fragment implements AdapterView.OnItemSelecte
     public ImageButton mButtonDelete;
     public ImageButton mButtonSave;
 
+    public GestureDetector mGestureDetector;
+
     public TFragmentDrop()
     {
         super();
@@ -58,152 +63,7 @@ public class TFragmentDrop extends Fragment implements AdapterView.OnItemSelecte
         mEdited = false;
     }
 
-    @Override
-    public void onAttach(Activity vActivity)
-    {
-        super.onAttach(vActivity);
-        initContext((TApp)vActivity);
-    }
-
-    @Override
-    public void onCreate(Bundle vBundle)
-    {
-        super.onCreate(vBundle);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parentView, Bundle vBundle)
-    {
-        // Input from init() or from Bundle is now ok
-        return mTFragmentView;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle vBundle)
-    {
-        // Members from Activity are now ok
-        super.onActivityCreated(vBundle);
-        initData(mTApp.w);
-        restore(vBundle);
-        initView();
-        save(vBundle);
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle vBundle)
-    {
-        super.onViewStateRestored(vBundle);
-    }
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-    }
-
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle vBundle)
-    {
-        super.onSaveInstanceState(vBundle);
-        save(vBundle);
-    }
-
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroyView()
-    {
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        menu.removeItem(TWrapper.ITEM_ADD);
-        menu.removeItem(TWrapper.ITEM_EDIT);
-        menu.removeItem(TWrapper.ITEM_DELETE);
-        menu.removeItem(TWrapper.ITEM_SAVE);
-
-        if (mTFragmentViewType == TApp.VIEW_DETAILS && w.tApp.mConfiguration.screenWidthDp >= 480) {
-            MenuItem vMenuItemAdd = menu.add(Menu.NONE, TWrapper.ITEM_ADD, 1, "Add");
-            vMenuItemAdd.setIcon(w.tApp.maDrawable[10]);
-            vMenuItemAdd.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        }
-        if (mTFragmentViewType == TApp.VIEW_DETAILS) {
-            MenuItem vDelete = menu.add(Menu.NONE, TWrapper.ITEM_DELETE, 1, "Delete");
-            vDelete.setIcon(w.tApp.maDrawable[8]);
-            vDelete.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-
-            MenuItem vEdit = menu.add(Menu.NONE, TWrapper.ITEM_EDIT, 1, "Edit");
-            vEdit.setIcon(w.tApp.maDrawable[7]);
-            vEdit.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        }
-        if (mTFragmentViewType == TApp.VIEW_EDIT || mTFragmentViewType == TApp.VIEW_ADD) {
-            MenuItem vSave = menu.add(Menu.NONE, TWrapper.ITEM_SAVE, 2, "Save");
-            vSave.setIcon(w.tApp.maDrawable[9]);
-            vSave.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        }
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu)
-    {
-        super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        int id = item.getItemId();
-        boolean ret = false;
-
-        if (id == TWrapper.ITEM_EDIT) {
-            w.tApp.setView(TApp.VIEW_EDIT, mDBObjectId);
-            ret = true;
-        }
-        if (id == TWrapper.ITEM_DELETE) {
-            deleteDBObject();
-            w.tApp.setView(TApp.VIEW_HOME, "");
-            ret = true;
-        }
-        if (id == TWrapper.ITEM_SAVE) {
-            saveDBObject();
-            w.tApp.setView(TApp.VIEW_DETAILS, mDBObjectId);
-            ret = true;
-        }
-        return ret || super.onOptionsItemSelected(item);
-    }
-
+    // Application
     public void deleteDBObject()
     {
         mDBObject.set("archived", w.dbh.TRUE);
@@ -243,10 +103,12 @@ public class TFragmentDrop extends Fragment implements AdapterView.OnItemSelecte
         if (mTFragmentViewType == TApp.VIEW_DETAILS && vIsIdOk) {
             // Create a view for the details of the message
             mTFragmentView.setId(0xFAE3);
+
             mCategory = new TextView(w.tApp);
             mTitle = new TextView(w.tApp);
             mText = new TextView(w.tApp);
             mLink = new TextView(w.tApp);
+            mGestureDetector = new GestureDetector(w.tApp, this);
 
             mCategory.setGravity(Gravity.START);
             mCategory.setPadding(vPadding, vPadding, vPadding, vPadding);
@@ -279,6 +141,7 @@ public class TFragmentDrop extends Fragment implements AdapterView.OnItemSelecte
             mTFragmentView.addView(mTitle);
             mTFragmentView.addView(mText);
             mTFragmentView.addView(mLink);
+            mTFragmentView.setOnTouchListener(this);
         }
         if (
             (mTFragmentViewType == TApp.VIEW_EDIT && vIsIdOk) ||
@@ -345,14 +208,6 @@ public class TFragmentDrop extends Fragment implements AdapterView.OnItemSelecte
         }
     }
 
-    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
-    {
-    }
-
-    public void onNothingSelected(AdapterView<?> parent)
-    {
-    }
-
     public int parse(String vString)
     {
         int ret = 0;
@@ -408,5 +263,237 @@ public class TFragmentDrop extends Fragment implements AdapterView.OnItemSelecte
         ).mDBObject;
         mDBObjectId = mDBObject.get("id");
         w.tApp.populate(w.tApp.getContentView());
+    }
+
+    //*******************************************************************************************//
+    //*********************************  Option Menu and Action Bar  ****************************//
+    //*******************************************************************************************//
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        menu.removeItem(TWrapper.ITEM_ADD);
+        menu.removeItem(TWrapper.ITEM_EDIT);
+        menu.removeItem(TWrapper.ITEM_DELETE);
+        menu.removeItem(TWrapper.ITEM_SAVE);
+
+        if (mTFragmentViewType == TApp.VIEW_DETAILS && w.tApp.mConfiguration.screenWidthDp >= 480) {
+            MenuItem vMenuItemAdd = menu.add(Menu.NONE, TWrapper.ITEM_ADD, 1, "Add");
+            vMenuItemAdd.setIcon(w.tApp.maDrawable[10]);
+            vMenuItemAdd.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        }
+        if (mTFragmentViewType == TApp.VIEW_DETAILS) {
+            MenuItem vDelete = menu.add(Menu.NONE, TWrapper.ITEM_DELETE, 1, "Delete");
+            vDelete.setIcon(w.tApp.maDrawable[8]);
+            vDelete.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+            MenuItem vEdit = menu.add(Menu.NONE, TWrapper.ITEM_EDIT, 1, "Edit");
+            vEdit.setIcon(w.tApp.maDrawable[7]);
+            vEdit.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        }
+        if (mTFragmentViewType == TApp.VIEW_EDIT || mTFragmentViewType == TApp.VIEW_ADD) {
+            MenuItem vSave = menu.add(Menu.NONE, TWrapper.ITEM_SAVE, 2, "Save");
+            vSave.setIcon(w.tApp.maDrawable[9]);
+            vSave.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        int id = item.getItemId();
+        boolean ret = false;
+
+        if (id == TWrapper.ITEM_EDIT) {
+            w.tApp.setView(TApp.VIEW_EDIT, mDBObjectId);
+            ret = true;
+        }
+        if (id == TWrapper.ITEM_DELETE) {
+            deleteDBObject();
+            w.tApp.setView(TApp.VIEW_HOME, "");
+            ret = true;
+        }
+        if (id == TWrapper.ITEM_SAVE) {
+            saveDBObject();
+            w.tApp.setView(TApp.VIEW_DETAILS, mDBObjectId);
+            ret = true;
+        }
+        return ret || super.onOptionsItemSelected(item);
+    }
+
+    //*******************************************************************************************//
+    //***********************************  OnItemSelectedListener  ******************************//
+    //*******************************************************************************************//
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
+    {
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
+    {
+    }
+
+    //*******************************************************************************************//
+    //**************************************  OnTouchListener  **********************************//
+    //*******************************************************************************************//
+    @Override
+    public boolean onTouch(View v, MotionEvent event)
+    {
+        return mGestureDetector.onTouchEvent(event);
+    }
+
+    //*******************************************************************************************//
+    //**************************************  OnGestureListener  ********************************//
+    //*******************************************************************************************//
+    @Override
+    public boolean onDown(MotionEvent e)
+    {
+        return true;
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float vVelocityX, float vVelocityY)
+    {
+        boolean ret  = false;
+        float vDiffX = e2.getX() - e1.getX();
+
+        if (
+            Math.abs(vDiffX)                > TWrapper.SWIPE_MIN_DISTANCE &&
+            Math.abs(vVelocityX)            > TWrapper.SWIPE_THRESHOLD_VELOCITY &&
+            Math.abs(e2.getY() - e1.getY()) < TWrapper.SWIPE_MAX_OFF_PATH
+        ) {
+            int vIndex = 0;
+            int vSize = w.aMessage.size();
+            String vNext = mDBObjectId;
+            ret = true;
+
+            for (vIndex = 0 ; vIndex < vSize - 1 && vNext.equals(mDBObjectId); ++vIndex) {
+                if (w.aMessage.get(vIndex).mDBObjectId.equals(mDBObjectId)) {
+                    vNext = w.aMessage.get((vIndex + vSize + ( vDiffX > 0 ? 1 : -1))%vSize).mDBObjectId;
+                }
+            }
+            w.tApp.setView(TApp.VIEW_DETAILS_NAVIGATION, vNext);
+        }
+        return ret;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e)
+    {
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
+    {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e)
+    {
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e)
+    {
+        return false;
+    }
+
+    //*******************************************************************************************//
+    //************************************  Fragment lifecycle  *********************************//
+    //*******************************************************************************************//
+    @Override
+    public void onAttach(Activity vActivity)
+    {
+        super.onAttach(vActivity);
+        initContext((TApp)vActivity);
+    }
+
+    @Override
+    public void onCreate(Bundle vBundle)
+    {
+        // Input from init() or from Bundle is now available
+        super.onCreate(vBundle);
+        // Allow onCreateOptionsMenu() and onOptionsItemSelected() to be called
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup parentView, Bundle vBundle)
+    {
+        return mTFragmentView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle vBundle)
+    {
+        // Members from Activity are now available
+        super.onActivityCreated(vBundle);
+        initData(mTApp.w);
+        restore(vBundle);
+        initView();
+        save(vBundle);
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle vBundle)
+    {
+        super.onViewStateRestored(vBundle);
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle vBundle)
+    {
+        super.onSaveInstanceState(vBundle);
+        save(vBundle);
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
     }
 }

@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
@@ -34,11 +33,12 @@ public class TApp extends Activity
     public final static String EXTRA_CATEGORY = "z.a.CATEGORY";
 
     public final static int VIEW_HOME = 0;
-    public final static int VIEW_SETTINGS = 1;
-    public final static int VIEW_ABOUT = 2;
-    public final static int VIEW_DETAILS = 3;
-    public final static int VIEW_EDIT = 4;
-    public final static int VIEW_ADD = 5;
+    public final static int VIEW_SETTINGS = VIEW_HOME + 1;
+    public final static int VIEW_ABOUT = VIEW_SETTINGS + 1;
+    public final static int VIEW_DETAILS = VIEW_ABOUT + 1;
+    public final static int VIEW_DETAILS_NAVIGATION = VIEW_DETAILS + 1;
+    public final static int VIEW_EDIT = VIEW_DETAILS_NAVIGATION + 1;
+    public final static int VIEW_ADD = VIEW_EDIT + 1;
 
 	public TWrapper w;
 	public int mIndex;
@@ -285,20 +285,43 @@ public class TApp extends Activity
         w.tFrame.tInit();
 
 		mConfiguration = mResources.getConfiguration();
-    	mAppHome = new DrawerLayout(this);
-        mLinearLayout = new LinearLayout(this);
-        mFrameLayoutLeft = new FrameLayout(this);
-        mFrameLayoutRight = new FrameLayout(this);
-    	mListView = new ListView(this);
-		mActionBar = getActionBar();
+        mFragmentManager = getFragmentManager();
 
-    	mAppHome.setId(1234);
-    	mAppHome.setLayoutParams(new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.MATCH_PARENT, DrawerLayout.LayoutParams.MATCH_PARENT, Gravity.LEFT));
+    	mAppHome = new DrawerLayout(this);
+        mListView = new ListView(this);
+        mLinearLayout = new LinearLayout(this);
+        mActionBar = getActionBar();
+        mActionBarDrawerToggle = new TActionBarDrawer(w, mAppHome, R.string.drawer_open, R.string.drawer_close);
+
+        mAppHome.setId(1234);
+        mAppHome.setLayoutParams(new DrawerLayout.LayoutParams(DrawerLayout.LayoutParams.MATCH_PARENT, DrawerLayout.LayoutParams.MATCH_PARENT, Gravity.LEFT));
+
+        mListView.setId(123456);
+        mListView.setLayoutParams(new DrawerLayout.LayoutParams((int)(240*mDensity), DrawerLayout.LayoutParams.MATCH_PARENT, Gravity.LEFT));
+        mListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        mListView.setDivider(new ColorDrawable(0x00000000));
+        mListView.setDividerHeight(0);
+        mListView.setBackground(new ColorDrawable(0xFFFFFFFF));
+        mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_items, maMenu));
+        mListView.setOnItemClickListener(new TDrawerItemClickListener(w));
 
         mLinearLayout.setId(12345);
         mLinearLayout.setGravity(Gravity.LEFT);
         mLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
         mLinearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+        mActionBar.setIcon(R.drawable.ic_launcher);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
+
+        mActionBarDrawerToggle.setDrawerIndicatorEnabled(false);
+
+        mAppHome.setDrawerListener(mActionBarDrawerToggle);
+        mAppHome.addView(mLinearLayout);
+        mAppHome.addView(mListView);
+
+        mFrameLayoutLeft = new FrameLayout(this);
+        mFrameLayoutRight = new FrameLayout(this);
 
         mFrameLayoutLeft.setId(0x1111);
         mFrameLayoutLeft.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
@@ -315,33 +338,8 @@ public class TApp extends Activity
             mFrameLayoutRight.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1));
             mFrameLayoutRight.setVisibility(View.VISIBLE);
         }
-    	mListView.setId(123456);
-    	mListView.setLayoutParams(new DrawerLayout.LayoutParams((int)(240*mDensity), DrawerLayout.LayoutParams.MATCH_PARENT, Gravity.LEFT));
-    	mListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-    	mListView.setDivider(new ColorDrawable(0x00000000));
-    	mListView.setDividerHeight(0);
-    	mListView.setBackground(new ColorDrawable(0xFFFFFFFF));
-
-    	mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_items, maMenu));
-    	mListView.setOnItemClickListener(new TDrawerItemClickListener(w));
-
-		mActionBar.setIcon(R.drawable.ic_launcher);
-		mActionBar.setDisplayHomeAsUpEnabled(true);
-		mActionBar.setHomeButtonEnabled(true);
-
-        mLinearLayout.addView(mFrameLayoutLeft);
-        mLinearLayout.addView(mFrameLayoutRight);
-    	mAppHome.addView(mLinearLayout);
-    	mAppHome.addView(mListView);
-
-    	mActionBarDrawerToggle = new TActionBarDrawer(w, mAppHome, R.string.drawer_open, R.string.drawer_close);
-        mActionBarDrawerToggle.setDrawerIndicatorEnabled(false);
-        mAppHome.setDrawerListener(mActionBarDrawerToggle);
-
-        mTFragmentHome = new TFragmentHome();
-        mTFragmentSettings = new TFragmentSettings();
-        mTFragmentAbout = new TFragmentAbout();
-        mFragmentManager = getFragmentManager();
+        mLinearLayout.addView(mFrameLayoutLeft, 0);
+        mLinearLayout.addView(mFrameLayoutRight, 1);
 
         setContentView(mAppHome);
 	}
@@ -413,17 +411,14 @@ public class TApp extends Activity
 	    switch (vIndex) {
     	case android.R.id.home:
             //System.out.println("android.R.id.home");
-            //System.out.println("android.R.id.home");
-            //System.out.println("android.R.id.home");
-    	    ret = mFragmentManager.popBackStackImmediate(); // || setView(VIEW_HOME, "");
+    	    // ret = mFragmentManager.popBackStackImmediate() || setView(VIEW_HOME, "");
+            mFragmentManager.popBackStack(TWrapper.BASE_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             break;
         case VIEW_HOME:
             //System.out.println("VIEW_HOME");
-            //System.out.println("VIEW_HOME");
-            //System.out.println("VIEW_HOME");
-            while (mFragmentManager.popBackStackImmediate()) {
-                // NOP
-            }
+            mFragmentManager.popBackStack(TWrapper.BASE_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            mTFragmentHome = new TFragmentHome();
+
             if (mConfiguration.screenWidthDp >= 480) {
                 mTFragmentAbout = new TFragmentAbout();
 
@@ -443,13 +438,9 @@ public class TApp extends Activity
             break;
         case VIEW_SETTINGS:
             //System.out.println("VIEW_SETTINGS");
-            //System.out.println("VIEW_SETTINGS");
-            //System.out.println("VIEW_SETTINGS");
+            mFragmentManager.popBackStack(TWrapper.BASE_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             mTFragmentSettings = new TFragmentSettings();
 
-            while (mFragmentManager.popBackStackImmediate()) {
-                // NOP
-            }
             if (mConfiguration.screenWidthDp >= 480) {
                 mFragmentTransaction = mFragmentManager.beginTransaction();
                 mFragmentTransaction.replace(mFrameLayoutLeft.getId(), mTFragmentHome);
@@ -465,21 +456,17 @@ public class TApp extends Activity
 
                 mFragmentTransaction = mFragmentManager.beginTransaction();
                 mFragmentTransaction.replace(mFrameLayoutRight.getId(), mTFragmentSettings);
-                mFragmentTransaction.addToBackStack(null);
+                mFragmentTransaction.addToBackStack(TWrapper.BASE_TAG);
                 mFragmentTransaction.commit();
     	    }
-            //mListView.setItemChecked(VIEW_SETTINGS, true);
             mIndex = vIndex;
             break;
         case VIEW_ABOUT:
             //System.out.println("VIEW_ABOUT");
-            //System.out.println("VIEW_ABOUT");
-            //System.out.println("VIEW_ABOUT");
+            mFragmentManager.popBackStack(TWrapper.BASE_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            mTFragmentHome = new TFragmentHome();
             mTFragmentAbout = new TFragmentAbout();
 
-            while (mFragmentManager.popBackStackImmediate()) {
-                // NOP
-            }
             if (mConfiguration.screenWidthDp >= 480) {
                 mFragmentTransaction = mFragmentManager.beginTransaction();
                 mFragmentTransaction.replace(mFrameLayoutLeft.getId(), mTFragmentHome);
@@ -495,26 +482,22 @@ public class TApp extends Activity
 
                 mFragmentTransaction = mFragmentManager.beginTransaction();
                 mFragmentTransaction.replace(mFrameLayoutRight.getId(), mTFragmentAbout);
-                mFragmentTransaction.addToBackStack(null);
+                mFragmentTransaction.addToBackStack(TWrapper.BASE_TAG);
                 mFragmentTransaction.commit();
     	    }
-            // mListView.setItemChecked(VIEW_ABOUT, true);
             mIndex = vIndex;
             break;
         case VIEW_DETAILS:
-            //System.out.println("VIEW_DETAILS");
-            //System.out.println("VIEW_DETAILS");
             //System.out.println("VIEW_DETAILS");
             mDBObjectId = vDBObjectId;
             mDBObject = w.dbh.get("Drop").getInstance(mDBObjectId);
 
             if (!mDBObject.get("id").equals("")) {
+                mFragmentManager.popBackStack(TWrapper.BASE_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                mTFragmentHome = new TFragmentHome();
                 mTFragmentDropDetails = new TFragmentDrop();
                 mTFragmentDropDetails.init(VIEW_DETAILS, mDBObjectId);
 
-                while (mFragmentManager.popBackStackImmediate()) {
-                    // NOP
-                }
                 if (mConfiguration.screenWidthDp >= 480) {
                     mFragmentTransaction = mFragmentManager.beginTransaction();
                     mFragmentTransaction.replace(mFrameLayoutLeft.getId(), mTFragmentHome);
@@ -530,10 +513,43 @@ public class TApp extends Activity
 
                     mFragmentTransaction = mFragmentManager.beginTransaction();
                     mFragmentTransaction.replace(mFrameLayoutRight.getId(), mTFragmentDropDetails);
-                    mFragmentTransaction.addToBackStack(null);
+                    mFragmentTransaction.addToBackStack(TWrapper.BASE_TAG);
                     mFragmentTransaction.commit();
                 }
-                // mListView.setItemChecked(VIEW_HOME, true);
+                mIndex = vIndex;
+            } else {
+                setView(VIEW_HOME, "");
+            }
+            break;
+        case VIEW_DETAILS_NAVIGATION:
+            //System.out.println("VIEW_DETAILS");
+            mDBObjectId = vDBObjectId;
+            mDBObject = w.dbh.get("Drop").getInstance(mDBObjectId);
+
+            if (!mDBObject.get("id").equals("")) {
+                mFragmentManager.popBackStack(TWrapper.BASE_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                mTFragmentHome = new TFragmentHome();
+                mTFragmentDropDetails = new TFragmentDrop();
+                mTFragmentDropDetails.init(VIEW_DETAILS, mDBObjectId);
+
+                if (mConfiguration.screenWidthDp >= 480) {
+                    mFragmentTransaction = mFragmentManager.beginTransaction();
+                    mFragmentTransaction.replace(mFrameLayoutLeft.getId(), mTFragmentHome);
+                    mFragmentTransaction.commit();
+
+                    mFragmentTransaction = mFragmentManager.beginTransaction();
+                    mFragmentTransaction.replace(mFrameLayoutRight.getId(), mTFragmentDropDetails);
+                    mFragmentTransaction.commit();
+                } else {
+                    mFragmentTransaction = mFragmentManager.beginTransaction();
+                    mFragmentTransaction.replace(mFrameLayoutRight.getId(), mTFragmentHome);
+                    mFragmentTransaction.commit();
+
+                    mFragmentTransaction = mFragmentManager.beginTransaction();
+                    mFragmentTransaction.replace(mFrameLayoutRight.getId(), mTFragmentDropDetails);
+                    mFragmentTransaction.addToBackStack(TWrapper.BASE_TAG);
+                    mFragmentTransaction.commit();
+                }
                 mIndex = vIndex;
             } else {
                 setView(VIEW_HOME, "");
@@ -541,19 +557,15 @@ public class TApp extends Activity
             break;
         case VIEW_EDIT:
             //System.out.println("VIEW_EDIT");
-            //System.out.println("VIEW_EDIT");
-            //System.out.println("VIEW_EDIT");
             mDBObjectId = vDBObjectId;
             mDBObject = w.dbh.get("Drop").getInstance(mDBObjectId);
 
-            while (mFragmentManager.popBackStackImmediate()) {
-                // NOP
-            }
             if (!mDBObject.get("id").equals("")) {
+                mFragmentManager.popBackStack(TWrapper.BASE_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                mTFragmentHome = new TFragmentHome();
                 mTFragmentDropDetails = new TFragmentDrop();
-                mTFragmentDropDetails.init(VIEW_DETAILS, mDBObjectId);
-
                 mTFragmentDropEdit = new TFragmentDrop();
+                mTFragmentDropDetails.init(VIEW_DETAILS, mDBObjectId);
                 mTFragmentDropEdit.init(VIEW_EDIT, mDBObjectId);
 
                 if (mConfiguration.screenWidthDp >= 480) {
@@ -567,7 +579,7 @@ public class TApp extends Activity
 
                     mFragmentTransaction = mFragmentManager.beginTransaction();
                     mFragmentTransaction.replace(mFrameLayoutRight.getId(), mTFragmentDropEdit);
-                    mFragmentTransaction.addToBackStack(null);
+                    mFragmentTransaction.addToBackStack(TWrapper.BASE_TAG);
                     mFragmentTransaction.commit();
                 } else {
                     mFragmentTransaction = mFragmentManager.beginTransaction();
@@ -576,7 +588,7 @@ public class TApp extends Activity
 
                     mFragmentTransaction = mFragmentManager.beginTransaction();
                     mFragmentTransaction.replace(mFrameLayoutRight.getId(), mTFragmentDropDetails);
-                    mFragmentTransaction.addToBackStack(null);
+                    mFragmentTransaction.addToBackStack(TWrapper.BASE_TAG);
                     mFragmentTransaction.commit();
 
                     mFragmentTransaction = mFragmentManager.beginTransaction();
@@ -584,7 +596,6 @@ public class TApp extends Activity
                     mFragmentTransaction.addToBackStack(null);
                     mFragmentTransaction.commit();
                 }
-                //mListView.setItemChecked(VIEW_HOME, true);
                 mIndex = vIndex;
             } else {
                 setView(VIEW_HOME, "");
@@ -592,15 +603,11 @@ public class TApp extends Activity
             break;
         case VIEW_ADD:
             //System.out.println("VIEW_ADD");
-            //System.out.println("VIEW_ADD");
-            //System.out.println("VIEW_ADD");
             mDBObjectId = vDBObjectId;
             mTFragmentDropADD = new TFragmentDrop();
             mTFragmentDropADD.init(VIEW_ADD, "");
+            mFragmentManager.popBackStack(TWrapper.BASE_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-            while (mFragmentManager.popBackStackImmediate()) {
-                // NOP
-            }
             if (mConfiguration.screenWidthDp >= 480) {
                 mFragmentTransaction = mFragmentManager.beginTransaction();
                 mFragmentTransaction.replace(mFrameLayoutLeft.getId(), mTFragmentHome);
@@ -616,10 +623,9 @@ public class TApp extends Activity
 
                 mFragmentTransaction = mFragmentManager.beginTransaction();
                 mFragmentTransaction.replace(mFrameLayoutRight.getId(), mTFragmentDropADD);
-                mFragmentTransaction.addToBackStack(null);
+                mFragmentTransaction.addToBackStack(TWrapper.BASE_TAG);
                 mFragmentTransaction.commit();
             }
-            //mListView.setItemChecked(VIEW_HOME, true);
             mIndex = vIndex;
             break;
         default:
@@ -711,9 +717,9 @@ class TButtonEditListener implements View.OnClickListener
     public void onClick(View view)
     {
     	if (w.aMessageSelected.size() > 0) {
-    		Intent intent = new Intent(w.tApp, TAppEdit.class);
-            intent.putExtra(TApp.EXTRA_ID, w.aMessageSelected.get(0).mDBDrop.get("id"));
-            w.tApp.startActivity(intent);
+//    		Intent intent = new Intent(w.tApp, TAppEdit.class);
+//            intent.putExtra(TApp.EXTRA_ID, w.aMessageSelected.get(0).mDBDrop.get("id"));
+//            w.tApp.startActivity(intent);
     	}
     }
 }
@@ -730,7 +736,7 @@ class TButtonDeleteListener implements View.OnClickListener
     public void onClick(View view)
     {
 		for (TWidgetMessage vTWidgetMessage : w.aMessageSelected) {
-			vTWidgetMessage.mDBDrop.set("archived", w.dbh.TRUE).commit();
+			vTWidgetMessage.mDBObject.set("archived", w.dbh.TRUE).commit();
 			w.aMessage.remove(vTWidgetMessage);
 		}
 		w.aMessageSelected.clear();
@@ -749,9 +755,9 @@ class TButtonAddListener implements View.OnClickListener
 
     public void onClick(View view)
     {
-		Intent intent = new Intent(w.tApp, TAppEdit.class);
-        intent.putExtra(TApp.EXTRA_ID, "");
-        w.tApp.startActivity(intent);
+//		Intent intent = new Intent(w.tApp, TAppEdit.class);
+//        intent.putExtra(TApp.EXTRA_ID, "");
+//        w.tApp.startActivity(intent);
     }
 }
 
@@ -782,13 +788,13 @@ class TActionBarDrawer extends ActionBarDrawerToggle
 
 class TDrawerItemClickListener implements ListView.OnItemClickListener
 {
-	public TWrapper w;
+    public TWrapper w;
 
-	public TDrawerItemClickListener(TWrapper w)
-	{
-		super();
-		this.w = w;
-	}
+    public TDrawerItemClickListener(TWrapper w)
+    {
+        super();
+        this.w = w;
+    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int vIndex, long id)
