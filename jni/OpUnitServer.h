@@ -8,17 +8,13 @@ class OpUnitServer : public OpUnit
 {
 public:
 	OpUnitServer(Wrapper* w);
-   ~OpUnitServer();
+	virtual ~OpUnitServer() override;
 
-    void run();
-    void cancel();
+    virtual void run() override;
+    virtual void cancel() override;
 
-    Wrapper* mw;
+    Wrapper* mWrapper;
 	BluetoothServerSocket* mServerSocket;
-	BluetoothSocket* mClientSocket;
-	OutputStream* mOutputStream;
-	InputStream* mInputStream;
-
 };
 
 } // End namespace

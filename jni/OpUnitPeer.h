@@ -7,22 +7,32 @@ namespace NSDEVICE
 class OpUnitPeer : public OpUnit
 {
 public:
-	OpUnitPeer(Wrapper* w, BluetoothSocket* dPeerSocket, int cNextUuid = 0);
-   ~OpUnitPeer();
+	OpUnitPeer(Wrapper* w, BluetoothSocket* dPeerSocket);
+	OpUnitPeer(Wrapper* const w, BluetoothDevice* dPeerDevice);
+	virtual ~OpUnitPeer() override;
 
-    void run();
+    virtual void run() override;
+    virtual void cancel() override;
+
+    virtual NReturn visit(NAlpha01* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
+    virtual NReturn visit(NBeta01* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
+    virtual NReturn visit(NAlpha03* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
+
     int write(String packet);
-    void cancel();
+    int waitMessage(String& vBuffer, TimeStamp vcSecondesTimeout);
 
-	int mcUuid;
-	int mcProcessedPacket;
+    Wrapper* mWrapper;
+	int mcOrigin;
+    String mUuid;
 
-	DBTableHandler* mDropHandler;
-	BluetoothSocket* mPeerSocket;
-	BluetoothDevice* mPeerDevice;
-	InputStream* mInputStream;
-	OutputStream* mOutputStream;
-	vector<String> maPacket;
+	BluetoothServerSocket* mServerSocket;
+    BluetoothSocket* mPeerSocket;
+    BluetoothDevice* mPeerDevice;
+    InputStream* mInputStream;
+    OutputStream* mOutputStream;
+    DBTableHandler* mDropHandler;
+    OpUnitListener* mOpUnitListener;
+    String msMac;
 };
 
 } // End namespace

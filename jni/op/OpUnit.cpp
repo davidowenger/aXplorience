@@ -3,81 +3,136 @@
 namespace NSDEVICE
 {
 
-OpUnit::OpUnit(NWrapper* w)
-	: NVisitor(w)
+OpUnit::OpUnit(Wrapper* vWrapper)
+	: NVisitor(vWrapper->w), mWrapper(vWrapper), mIdUnique(0)
 {
 	mId = -1;
-	mAlive = false;
+    mcUnitType = Wrapper::OPUNIT_TYPE_DEFAULT;
+    mAlive = true;
+    mAliveThread = true;
 	mOpSquad = nullptr;
 	mThread = nullptr;
-	maOp = nullptr;
-	maLast = nullptr;
+    mNEnv = nullptr;
 }
 
 OpUnit::~OpUnit()
 {
-	if (mThread != nullptr) {
-		delete mThread;
-	}
+    mAlive = false;
+    mAliveThread = false;
+
+    if (mThread != nullptr) {
+        delete mThread;
+    }
+}
+
+void OpUnit::init(OpSquad* vOpSquad)
+{
+    mOpSquad = vOpSquad;
+}
+
+void* OpUnit::getLocalStorage()
+{
+    //String sId = to_string(this_thread::get_id());
+    //TODO
+    return nullptr;
 }
 
 OpUnit* OpUnit::start()
 {
 	if (mThread == nullptr) {
-		mAlive = true;
-		mThread = new std::thread(&OpUnit::onStart, this);
-		//mThread->detach();
+		mThread = new thread(&OpUnit::onOpUnitStart, this);
 	}
 	return this;
 }
 
-void OpUnit::onStart()
+void OpUnit::onOpUnitStart()
 {
+	mNEnv = (NEnv*)w->nFrame->tAttachCurrentThread();
 	run();
+    mAlive = false;
+    //HINT: Prevent receiving too many additionnal Op since this thread is dead
+	mOpSquad->maOpUnitType[mId] = 0;
+    //HINT: Op sent AFTER clear() by some concurrent thread WILL be deleted when the OpSquad is deleted
+    mOpSquad->clear(mId);
 	w->nFrame->tDetachCurrentThread();
-	mAlive = false;
+    mAliveThread = false;
 }
 
-void OpUnit::send(OpUnit* unit, NElement* element, long a, long b, long c, long d)
+int getUnitType()
 {
-	Op* op = new Op(element, a, b, c, d);
-	maLast[unit->mId]->next = op;
-	maLast[unit->mId] = op;
-}
-
-Op* OpUnit::next()
-{
-	int id;
-	Op* op = nullptr;
-
-	for ( id = 0 ; id < mOpSquad->mcOpUnit && !op ; ++id) {
-		if (id != mId && mOpSquad->maOpUnit[id]->maOp[mId] != mOpSquad->maOpUnit[id]->maOp[mId]->next) {
-			op = mOpSquad->maOpUnit[id]->maOp[mId];
-			mOpSquad->maOpUnit[id]->maOp[mId] = op->next;
-			delete op;
-			op = mOpSquad->maOpUnit[id]->maOp[mId];
-		}
-	}
-	return op;
-}
-
-void OpUnit::listen()
-{
-	int id;
-	Op* op;
-
-	while (mAlive) {
-		op = next();
-
-		if (op) {
-			nRun(op->element, op->a, op->b, op->c, op->d);
-		}
-	}
+    return 0;
 }
 
 void OpUnit::run()
 {
-	mAlive = false;
+}
+
+void OpUnit::cancel()
+{
+    mAlive = false;
+}
+
+Op* OpUnit::nextOp()
+{
+    Op* vOp = nullptr;
+	int id = mOpSquad->mcMaxOpUnit;
+	while (--id >= 0 && !(vOp = mOpSquad->maCol[mId][id]->next())) { }
+	return vOp;
+}
+
+OpCallback* OpUnit::sendOp(int vcOpUnitId, NElement* vNElement, Op* vOp)
+{
+    OpCallback* vOpCallback = nullptr;
+
+    if (mOpSquad->maOpUnitType[vcOpUnitId]) {
+        vOp->mNElement = vNElement;
+        mOpSquad->maCol[vcOpUnitId][mId]->add(vOp);
+        vOpCallback = vOp->mOpCallback;
+    }
+    return vOpCallback;
+}
+
+void OpUnit::handleOp()
+{
+    Op* op;
+
+    while (mAlive) {
+        op = nextOp();
+
+        if (op) {
+            execOp(op);
+        } else {
+            this_thread::sleep_for(chrono::milliseconds(300));
+        }
+    }
+}
+
+bool OpUnit::waitOp(TimeStamp vcMilisecondes, NElement* vNElement)
+{
+    Op* vOp = nullptr;
+    bool vAlive = true;
+    TimeStamp vcTimeStampStart = steady_clock::now().time_since_epoch().count();
+    TimeStamp vcTimeStampNow;
+
+    while (vAlive && ((vcTimeStampNow = steady_clock::now().time_since_epoch().count()) - vcTimeStampStart < vcMilisecondes)) {
+        if ((vOp = nextOp()) && vOp->mNElement == vNElement) {
+            execOp(vOp);
+            vAlive = false;
+        } else {
+            this_thread::sleep_for(chrono::milliseconds(300));
+        }
+    }
+    return vAlive*1;
+}
+
+void OpUnit::execOp(Op* vOp)
+{
+    NReturn vNReturn = nRun(vOp->mNElement, vOp->a, vOp->b, vOp->c, vOp->d);
+
+    if (vOp->mOpCallback) {
+        *vOp->mOpCallback->mNReturn = vNReturn;
+        *vOp->mOpCallback->mDone = true;
+    }
 }
 
 } // End namespace

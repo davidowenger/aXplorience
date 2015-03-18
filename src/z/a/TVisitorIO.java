@@ -3,8 +3,7 @@ package z.a;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.io.UnsupportedEncodingException;
 
 public class TVisitorIO extends TVisitor
 {
@@ -17,37 +16,46 @@ public class TVisitorIO extends TVisitor
 	//*******************************************************************************
 
 	//void close();
-	public long visit(TAlpha00 element, long a, long b, long c, long d)
+	public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
 	{
 		long err = 0;
 		try {
 			((InputStream)w.sObject.get("" + a)).close();
 		}
-		catch (IOException e) {
-			if (w.doDebug) e.printStackTrace();
+		catch (IOException vException) {
+			if (w.doDebug) vException.printStackTrace();
 			err = -1;
 		}
 		return err;
 	}
 
 	//byte[] read(int byteCount);
-	public long visit(TBeta00 element, long a, long b, long c, long d)
+	public long visit(TBeta00 element, long a, long b, long c, long d, long e)
 	{
-		long err = -2;
+		long err = 0;
 		byte[] aByte = new byte[(int)b];
+        String vString = "";
 
 		try {
+		    // Blocks and returns the number of bytes read or -1 if end of the stream is reached
 			err = ((InputStream)w.sObject.get("" + a)).read(aByte);
 		}
-		catch (IOException e) {
-			if (w.doDebug) e.printStackTrace();
+		catch (IOException vException) {
+			if (w.doDebug) vException.printStackTrace();
 			err = -2;
 		}
 		if (err >= 0) {
-			LinkedList<byte[]> aListByte = (LinkedList<byte[]>)Arrays.asList(Arrays.copyOf(aByte, (int)err));
-			w.aObject.add(aListByte);
-			err = w.aObject.lastIndexOf(aListByte);
-		}
+		    try {
+		        vString = new String(aByte, "UTF-8");
+		    }
+		    catch (UnsupportedEncodingException vException) {
+	            if (w.doDebug) vException.printStackTrace();
+	            err = -3;
+            }
+        }
+        if (err >= 0) {
+            err = w.tFrame.putNext(vString);
+        }
 		return err;
 	}
 
@@ -56,28 +64,28 @@ public class TVisitorIO extends TVisitor
 	//*******************************************************************************
 
 	//void close();
-	public long visit(TAlpha01 element, long a, long b, long c, long d)
+	public long visit(TAlpha01 element, long a, long b, long c, long d, long e)
 	{
 		long err = 0;
 		try {
-			((InputStream)w.sObject.get("" + a)).close();
+			((OutputStream)w.sObject.get("" + a)).close();
 		}
-		catch (IOException e) {
-			if (w.doDebug) e.printStackTrace();
+		catch (IOException vException) {
+			if (w.doDebug) vException.printStackTrace();
 			err = -1;
 		}
 		return err;
 	}
 
 	//void write(String b)
-	public long visit(TBeta01 element, long a, long b, long c, long d)
+	public long visit(TBeta01 element, long a, long b, long c, long d, long e)
 	{
 		long err = 0;
 		try {
 			((OutputStream)w.sObject.get("" + a)).write(((String)w.tFrame.nRunObject(b)).getBytes());
 		}
-		catch (IOException e) {
-			if (w.doDebug) e.printStackTrace();
+		catch (IOException vException) {
+			if (w.doDebug) vException.printStackTrace();
 			err = -1;
 		}
 		return err;

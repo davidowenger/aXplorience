@@ -4,27 +4,26 @@
 namespace NSDEVICE
 {
 
-class NActivity : public Activity
+class NActivity : public Activity, OpUnit
 {
 public:
-	static Activity* getInstance();
+    NActivity(Wrapper* vWrapper);
+    virtual ~NActivity() override;
 
-	NWrapper* getWrapper();
-	void onDrop();
-
-	bool mAlive;
-
-protected:
-	void onCreate();
-	void onPause();
-	void onActivityResult(int action, int requestCode, int resultCode, int extra);
+    void handleMessage(NParam a = 0, NParam b = 0, NParam c = 0);
+    void onActivityResult(int action, int requestCode, int resultCode, int extra);
     void onReceiveDiscoveryFinished();
     void onReceiveDiscoveryStarted();
     void onReceiveFoundDevice(BluetoothDevice* dBluetoothDevice);
     void onReceiveLocalName(String localName);
     void onReceiveState(int state, int statePrevious);
     void onReceiveScanMode(int mode, int modePrevious);
-	void handleMessage(NParam a, NParam b, NParam c);
+    NReturn visit(NAlpha01* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0);
+
+protected:
+	void onCreate();
+    void onPause();
+    void onStop();
 };
 
 } // End namespace

@@ -7,13 +7,17 @@ namespace NSDEVICE
 class OpSquad
 {
 public:
-	OpSquad(int cMaxOpUnit);
+	OpSquad(Wrapper* vWrapper, int cMaxOpUnit);
 	~OpSquad();
-	OpUnit* add(OpUnit* opUnit);
+	OpUnit* add(OpUnit* opUnit, bool autoclean = true);
+	void clear(int vIdDead);
 
+    int mIdUnique;
 	int mcMaxOpUnit;
-	int mcOpUnit;
+	int* maOpUnitType;
+	Wrapper* mWrapper;
 	OpUnit** maOpUnit;
+    Col<Op*>*** maCol;
 };
 
 } // End namespace

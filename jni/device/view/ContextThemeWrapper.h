@@ -6,14 +6,18 @@ namespace NSDEVICE
 
 class ContextThemeWrapper : public ContextWrapper
 {
-public:
-	ContextThemeWrapper()
-	{
-	}
+friend NSNATIVE::NNoObject;
 
+public:
 	virtual ~ContextThemeWrapper()
 	{
 	}
+
+private:
+    ContextThemeWrapper(NNoObject* vNNoObject)
+        : ContextWrapper(NWrapper::w->mNNoObject->instance<ContextWrapper>())
+    {
+    }
 };
 
 } // End namespace

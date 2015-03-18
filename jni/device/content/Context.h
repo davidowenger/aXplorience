@@ -4,16 +4,19 @@
 namespace NSDEVICE
 {
 
-class Context
+class Context : public Object
 {
-public:
-	Context()
-	{
-	}
+friend NSNATIVE::NNoObject;
 
+public:
 	virtual ~Context()
 	{
 	}
+
+private:
+    Context(NNoObject* vNNoObject)
+    {
+    }
 };
 
 } // End namespace

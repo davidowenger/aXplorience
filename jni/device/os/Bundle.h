@@ -4,16 +4,25 @@
 namespace NSDEVICE
 {
 
-class Bundle
+class Bundle : public BaseBundle
 {
+friend NSNATIVE::NNoObject;
+
 public:
 	Bundle()
+        : BaseBundle(NWrapper::w->mNNoObject->instance<BaseBundle>())
 	{
 	}
 
 	virtual ~Bundle()
 	{
 	}
+
+protected:
+    Bundle(NNoObject* vNNoObject)
+        : BaseBundle(NWrapper::w->mNNoObject->instance<BaseBundle>())
+    {
+    }
 };
 
 } // End namespace

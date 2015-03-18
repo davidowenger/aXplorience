@@ -3,40 +3,69 @@
 namespace NSDEVICE
 {
 
-Activity* Activity::kActivity = new NActivity();
-
-NWrapper* NActivity::getWrapper()
+Activity* Activity::getInstance(NWrapper* const vNWrapper)
 {
-	return new Wrapper();
+    Wrapper* vWrapper = new Wrapper();
+    vWrapper->w = vNWrapper;
+	return new NActivity(vWrapper);
+}
+
+NActivity::NActivity(Wrapper* vWrapper)
+    : Activity(), OpUnit(vWrapper)
+{
+}
+
+NActivity::~NActivity()
+{
 }
 
 void NActivity::onCreate()
 {
 	Activity::onCreate();
 
-	((Wrapper*)w)->dBluetoothAdapter = new BluetoothAdapter();
-	((Wrapper*)w)->layout = new LinearLayout(w->dActivity);
-	((Wrapper*)w)->dActivity->setContentView((View*)((Wrapper*)w)->layout);
-	((Wrapper*)w)->cMaxOpUnit = 10;
-	((Wrapper*)w)->opSquad = new OpSquad(((Wrapper*)w)->cMaxOpUnit);
-	((Wrapper*)w)->opUnitCore = new OpUnitCore(((Wrapper*)w));
-	((Wrapper*)w)->opSquad->add(((Wrapper*)w)->opUnitCore)->start();
+	//todo
+	mWrapper->sFileDir = w->nFrame->tGetString(w->nFrame->tRunObject(1));
 
-	mAlive = true;
-}
+	mWrapper->dBluetoothAdapter = new BluetoothAdapter();
+	mWrapper->layout = new LinearLayout(this);
+	setContentView((View*)mWrapper->layout);
 
-void NActivity::onDrop()
-{
-	TextView* wDrop = new TextView(this);
-	wDrop->setTextSize(20);
-	wDrop->setText("Hello World!");
-	((Wrapper*)w)->layout->addView(wDrop);
+    //mWrapper->aDiscoveredDevice = new Col<BluetoothDevice*>();
+	mWrapper->cMaxOpUnit = 25;
+	mWrapper->opSquad = new OpSquad(mWrapper, mWrapper->cMaxOpUnit);
+	mWrapper->opUnitCore = new OpUnitCore(mWrapper);
+
+    mWrapper->opSquad->add(this);
+    mWrapper->opSquad->add(mWrapper->opUnitCore)->start();
 }
 
 void NActivity::onPause()
 {
-	//stop animations and other things that may be consuming CPU
-	Activity::onPause();
+    //stop animations and other things that may be consuming CPU
+    Activity::onPause();
+}
+
+void NActivity::onStop()
+{
+    //stop animations and other things that may be consuming CPU
+    delete mWrapper->opSquad;
+    Activity::onStop();
+}
+
+void NActivity::handleMessage(NParam a, NParam b, NParam c)
+{
+    nRun((NElement*)a, b, c);
+}
+
+// Display a Drop from a peer
+NReturn NActivity::visit(NAlpha01* element, NParam a, NParam b, NParam c, NParam d)
+{
+    DBObject* vDBObject = ((DBObject*)a);
+    TextView* vTextView = new TextView(this);
+    vTextView->setTextSize(20);
+    vTextView->setText(vDBObject->get("title"));
+    mWrapper->layout->addView(vTextView);
+    return 0;
 }
 
 void NActivity::onActivityResult(int action, int requestCode, int resultCode, int extra)
@@ -53,7 +82,7 @@ void NActivity::onReceiveDiscoveryStarted()
 
 void NActivity::onReceiveFoundDevice(BluetoothDevice* dBluetoothDevice)
 {
-	((Wrapper*)w)->aDiscoveredDevice.push_back(dBluetoothDevice);
+    sendOp(mWrapper->opUnitCore->mId, mWrapper->w->mNAlpha00, new OpParam((NParam)dBluetoothDevice));
 }
 
 void NActivity::onReceiveLocalName(String localName)
@@ -66,11 +95,6 @@ void NActivity::onReceiveState(int state, int statePrevious)
 
 void NActivity::onReceiveScanMode(int mode, int modePrevious)
 {
-}
-
-void NActivity::handleMessage(NParam a, NParam b, NParam c)
-{
-	((Wrapper*)w)->opUnitCore->nRun((NElement*)a, b, c);
 }
 
 } // End namespace
@@ -91,10 +115,10 @@ int to_long(const string& sLong, unsigned long long& cLong)
 		sRet += sLong.at(i++);
 	}
 	cRet = sRet.length();
-	i = cRet;
-	while (--i >= 0 && !error) {
+	long j = cRet;
+	while (--j >= 0 && !error) {
 		cLong += term;
-		term = (sRet.at(i) - '0')*cBase;
+		term = (sRet.at(j ) - '0')*cBase;
 		error = (unsigned long long)-1 - cLong < term;
 		cBase *= 10;
 	}
@@ -102,10 +126,11 @@ int to_long(const string& sLong, unsigned long long& cLong)
 		cLong += term;
 	}
     return error || !cRet;
-};
+}
 
 vector<string> split(const string& str, const string& delimiter)
 {
+    //FIXME: UTF8 compatibility
 	int i = 0;
 	int j = 0;
 	const char* sString = str.c_str();
@@ -130,7 +155,15 @@ vector<string> split(const string& str, const string& delimiter)
 		}
 	}
 	return result;
-};
+}
+
+int utf8len(const string& vString)
+{
+	int ret = 0;
+	const char* c = vString.c_str();
+	while (*c) ret += (*c++ & 0xc0) != 0x80;
+	return ret;
+}
 
 } // End namespace
 

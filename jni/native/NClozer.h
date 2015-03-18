@@ -11,11 +11,12 @@ public:
 	virtual ~NClozer();
 
 	NReturn nInit(NINIT cState);
+	NReturn tAttachCurrentThread();
 	NReturn tDetachCurrentThread();
-	NReturnObject tRunString(CharSequence boxed);
+	NReturnObject tRunString(const String& boxed);
 	String tGetString(NReturnObject tString);
 
-	NReturn visit(NAlpha00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0);
+	NReturn visit(NAlpha00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0);
 };
 
 } // END namespace

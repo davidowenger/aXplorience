@@ -6,82 +6,102 @@ namespace NSDEVICE
 
 class Activity : public ContextThemeWrapper
 {
-friend class NSNATIVE::NVisitorApp;
+friend NSNATIVE::NVisitorAppActivity;
+friend NSNATIVE::NNoObject;
 
 public:
-	static Activity* kActivity;
-
 	Activity()
+        : ContextThemeWrapper(NWrapper::w->mNNoObject->instance<ContextThemeWrapper>())
 	{
-		w = nullptr;
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNAlpha00, (NParam)this);
 	}
 
 	virtual ~Activity()
 	{
-		delete w;
 	}
 
-	virtual NWrapper* getWrapper()
-	{
-		return new NWrapper();
-	}
+	Activity* getInstance(NWrapper* const vNWrapper);
+
+    virtual ActionBar* getActionBar()
+    {
+
+        ActionBar* vActionBar = NWrapper::w->mNNoObject->pointer<ActionBar>();
+        bool error = NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNBeta00, (NParam)this, (NParam)vActionBar);
+        return ( error ? nullptr : vActionBar);
+    }
+
+    virtual Resources* getResources()
+    {
+        Resources* vResources = NWrapper::w->mNNoObject->pointer<Resources>();
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)vResources);
+        return vResources;
+    }
+
+    virtual FragmentManager* getFragmentManager()
+    {
+        FragmentManager* vFragmentManager = NWrapper::w->mNNoObject->pointer<FragmentManager>();
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDelta00, (NParam)this, (NParam)vFragmentManager);
+        return vFragmentManager;
+    }
 
 	virtual void setContentView(View* view)
 	{
-		NSDEVICE::Activity::kActivity->w->nVisitorApp->tRun(NSDEVICE::Activity::kActivity->w->theta00, (NParam)this, (NParam)view);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEpsilon00, (NParam)this, (NParam)view);
 	}
 
-	virtual void send(NParam a = 0, NParam b = 0, NParam c = 0)
+	virtual void sendMessage(NParam a = 0, NParam b = 0, NParam c = 0)
 	{
-		NSDEVICE::Activity::kActivity->w->nFrame->tRun(NSDEVICE::Activity::kActivity->w->iota00, (NParam)this, (NParam)a, (NParam)b, (NParam)c);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDzeta00, (NParam)this, (NParam)a, (NParam)b, (NParam)c);
 	}
-
-	NWrapper* w;
 
 protected:
+    //******************************************************************************************
+    //************************************* Activity events ************************************
+    //* This passes the call back to the default implementation if the method is not overriden *
+    //******************************************************************************************
 	virtual void onCreate()
 	{
-		NSDEVICE::Activity::kActivity->w->nVisitorApp->tRun(NSDEVICE::Activity::kActivity->w->alpha00, (NParam)this);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNAlpha03, (NParam)this);
 	}
 
 	virtual void onDestroy()
 	{
 		// Called only if the system must not recover memory in an emergency
 		// Clean memory here
-		NSDEVICE::Activity::kActivity->w->nVisitorApp->tRun(NSDEVICE::Activity::kActivity->w->beta00, (NParam)this);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNBeta03, (NParam)this);
 	}
 
 	virtual void onPause()
 	{
 		// This is the last method garanteed to be called before the process may be killed
 		// Stop things that may be consuming CPU (like animations) here
-		NSDEVICE::Activity::kActivity->w->nVisitorApp->tRun(NSDEVICE::Activity::kActivity->w->gamma00, (NParam)this);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNGamma03, (NParam)this);
 	}
 
 	virtual void onRestart()
 	{
-		NSDEVICE::Activity::kActivity->w->nVisitorApp->tRun(NSDEVICE::Activity::kActivity->w->delta00, (NParam)this);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDelta03, (NParam)this);
 	}
 
 	virtual void onResume()
 	{
 		// Resume here animations and other things that may be consuming CPU
-		NSDEVICE::Activity::kActivity->w->nVisitorApp->tRun(NSDEVICE::Activity::kActivity->w->epsilon00, (NParam)this);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEpsilon03, (NParam)this);
 	}
 
 	virtual void onStart()
 	{
-		NSDEVICE::Activity::kActivity->w->nVisitorApp->tRun(NSDEVICE::Activity::kActivity->w->dzeta00, (NParam)this);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDzeta03, (NParam)this);
 	}
 
 	virtual void onStop()
 	{
-		NSDEVICE::Activity::kActivity->w->nVisitorApp->tRun(NSDEVICE::Activity::kActivity->w->eta00, (NParam)this);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEta03, (NParam)this);
 	}
 
-	virtual void onActivityResult(int action, int requestCode, int resultCode, int extra)
-	{
-	}
+    virtual void onActivityResult(int action, int requestCode, int resultCode, int extra)
+    {
+    }
 
 	virtual void onReceiveDiscoveryFinished()
 	{
@@ -110,8 +130,20 @@ protected:
 	virtual void handleMessage(NParam a, NParam b, NParam c)
 	{
 	}
+
+private:
+    Activity(NNoObject* vNNoObject)
+        : ContextThemeWrapper(NWrapper::w->mNNoObject->instance<ContextThemeWrapper>())
+    {
+    }
 };
 
 } // End namespace
 
 #endif
+
+
+//HINT:
+// Methods requiring an xml resource ID as parameter will not be implemented, because there is no android xml parser on iOs
+// - inflater
+// - setTextAppearance(Context context, int resid)

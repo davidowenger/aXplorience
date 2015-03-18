@@ -11,6 +11,7 @@ LOCAL_SRC_FILES := \
 	op/OpSquad.cpp \
 	db/DBFile.cpp \
 	db/DBHandler.cpp \
+	device/graphics/Typeface.cpp \
 	device/bluetooth/BluetoothAdapter.cpp \
 	device/bluetooth/BluetoothDevice.cpp \
 	device/bluetooth/BluetoothSocket.cpp \
@@ -21,6 +22,10 @@ LOCAL_SRC_FILES := \
 	native/NFrame.cpp \
 	native/NClozer.cpp \
 	native/NAPI.cpp \
+	native/NWrapper.cpp \
+	BOMessage.cpp \
+	Network.cpp \
+	OpUnitListener.cpp \
 	OpUnitPeer.cpp \
 	OpUnitServer.cpp \
 	OpUnitCore.cpp \
@@ -28,9 +33,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_LDLIBS := \
 	-llog \
-	-ljnigraphics \
-	-lm \
-	-lGLESv2
+	-lm
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -40,3 +43,9 @@ include $(BUILD_SHARED_LIBRARY)
 #LOCAL_CPPFLAGS += -fexceptions
 #LOCAL_CPPFLAGS := -std=gnu++11
 #LOCAL_CPPFLAGS += -std=c++11
+
+#LOCAL_LDLIBS := \
+#	-llog \
+#	-ljnigraphics \
+#	-lm \
+#	-lGLESv2

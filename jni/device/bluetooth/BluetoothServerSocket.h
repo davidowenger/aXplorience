@@ -6,7 +6,7 @@ namespace NSDEVICE
 
 class BluetoothServerSocket
 {
-friend class NSNATIVE::NVisitorBluetooth;
+friend NSNATIVE::NVisitorBluetooth;
 
 public:
 	BluetoothSocket* accept();

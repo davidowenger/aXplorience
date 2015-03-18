@@ -5,43 +5,43 @@ namespace NSDEVICE
 
 int BluetoothSocket::connect()
 {
-	return NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->alpha03, (NParam)this);
+	return NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNAlpha03, (NParam)this);
 }
 
 int BluetoothSocket::close()
 {
-	return NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->beta03, (NParam)this);
+	return NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNBeta03, (NParam)this);
 }
 
 BluetoothDevice* BluetoothSocket::getRemoteDevice()
 {
 	BluetoothDevice* dBluetoothDevice = new BluetoothDevice();
-	NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->gamma03, (NParam)this, (NParam)dBluetoothDevice);
+	NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNGamma03, (NParam)this, (NParam)dBluetoothDevice);
 	return dBluetoothDevice;
 }
 
 InputStream* BluetoothSocket::getInputStream()
 {
-	InputStream* dInputStream = new InputStream();
-	bool error = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->delta03, (NParam)this, (NParam)dInputStream);
+    InputStream* vInputStream = NWrapper::w->mNNoObject->pointer<InputStream>();
+	bool error = NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNDelta03, (NParam)this, (NParam)vInputStream);
 
 	if (error) {
-		delete dInputStream;
-		dInputStream = nullptr;
+		delete vInputStream;
+		vInputStream = nullptr;
 	}
-	return dInputStream;
+	return vInputStream;
 }
 
 OutputStream* BluetoothSocket::getOutputStream()
 {
-	OutputStream* dOutputStream = new OutputStream();
-	bool error = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->epsilon03, (NParam)this, (NParam)dOutputStream);
+    OutputStream* vOutputStream = NWrapper::w->mNNoObject->pointer<OutputStream>();
+	bool error = NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNEpsilon03, (NParam)this, (NParam)vOutputStream);
 
 	if (error) {
-		delete dOutputStream;
-		dOutputStream = nullptr;
+		delete vOutputStream;
+		vOutputStream = nullptr;
 	}
-	return dOutputStream;
+	return vOutputStream;
 }
 
 } // END namespace

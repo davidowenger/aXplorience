@@ -1,7 +1,6 @@
 package z.a;
 
-import android.app.Activity;
-import android.view.View;
+import android.app.ActionBar;
 
 public class TVisitorApp extends TVisitor
 {
@@ -10,67 +9,27 @@ public class TVisitorApp extends TVisitor
 	}
 
 	//*******************************************************************************
-	//**************************** Activity *****************************************
+	//**************************** ActionBar ****************************************
 	//*******************************************************************************
 
-	//super.onCreate(Bundle* savedInstanceState)
-	public long visit(TAlpha00 element, long a, long b, long c, long d)
+    //void setIcon(int resId)
+	public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
 	{
-		((TActivity)w.sObject.get("" + a)).callOnCreate();
+		((ActionBar)w.sObject.get("" + a)).setIcon((int)b);
 		return 0;
 	}
 
-	//super.onDestroy()
-	public long visit(TBeta00 element, long a, long b, long c, long d)
+    //void setDisplayHomeAsUpEnabled(bool showHomeAsUp)
+	public long visit(TBeta00 element, long a, long b, long c, long d, long e)
 	{
-		((TActivity)w.sObject.get("" + a)).callOnDestroy();
+		((ActionBar)w.sObject.get("" + a)).setDisplayHomeAsUpEnabled(b != 0);
 		return 0;
 	}
 
-	//super.onDestroy()
-	public long visit(TGamma00 element, long a, long b, long c, long d)
+    //void setHomeButtonEnabled(bool enabled)
+	public long visit(TGamma00 element, long a, long b, long c, long d, long e)
 	{
-		((TActivity)w.sObject.get("" + a)).callOnPause();
-		return 0;
-	}
-
-	//super.onDestroy()
-	public long visit(TDelta00 element, long a, long b, long c, long d)
-	{
-		((TActivity)w.sObject.get("" + a)).callOnRestart();
-		return 0;
-	}
-
-	//super.onDestroy()
-	public long visit(TEpsilon00 element, long a, long b, long c, long d)
-	{
-		((TActivity)w.sObject.get("" + a)).callOnResume();
-		return 0;
-	}
-
-	//super.onDestroy()
-	public long visit(TDzeta00 element, long a, long b, long c, long d)
-	{
-		((TActivity)w.sObject.get("" + a)).callOnStart();
-		return 0;
-	}
-
-	//super.onDestroy()
-	public long visit(TEta00 element, long a, long b, long c, long d)
-	{
-		((TActivity)w.sObject.get("" + a)).callOnStop();
-		return 0;
-	}
-
-	public long visit(TTheta00 element, long a, long b, long c, long d)
-	{
-		((Activity)w.sObject.get("" + a)).setContentView((View)w.sObject.get("" + b));
-		return 0;
-	}
-
-	public long visit(TIota00 element, long a, long b, long c, long d)
-	{
-		w.tActivityHandler.obtainMessage(0, -1, -1, new long[]{b,c,d}).sendToTarget();
+		((ActionBar)w.sObject.get("" + a)).setHomeButtonEnabled(b != 0);
 		return 0;
 	}
 }

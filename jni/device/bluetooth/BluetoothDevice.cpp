@@ -26,61 +26,60 @@ const String BluetoothDevice::EXTRA_PREVIOUS_BOND_STATE = "android.bluetooth.dev
 
 bool BluetoothDevice::equals(BluetoothDevice* dBluetoothDevice)
 {
-	return NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->alpha01, (NParam)this, (NParam)dBluetoothDevice);
+	return NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNAlpha01, (NParam)this, (NParam)dBluetoothDevice);
 }
 
 int BluetoothDevice::hashCode()
 {
-	return NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->beta01, (NParam)this);
+	return NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNBeta01, (NParam)this);
 }
 
 String BluetoothDevice::toString()
 {
-	NReturn index = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->gamma01, (NParam)this);
-	return NSDEVICE::Activity::kActivity->w->nFrame->tGetString(NSDEVICE::Activity::kActivity->w->nFrame->tRunObject((NParam)index));
+	NReturn index = NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNGamma01, (NParam)this);
+	return NWrapper::getInstance()->nFrame->tGetString(NWrapper::getInstance()->nFrame->tRunObject((NParam)index));
 }
 
 int BluetoothDevice::describeContents()
 {
-	return NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->delta01, (NParam)this);
+	return NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNDelta01, (NParam)this);
 }
 
 void BluetoothDevice::writeToParcel(void* out, int flags)
 {
 	//TODO: implement
-	//NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->epsilon01, (NParam)this, (NParam)out, (NParam)flags);
+	//NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNepsilon01, (NParam)this, (NParam)out, (NParam)flags);
 }
 
 String BluetoothDevice::getAddress()
 {
-	NReturn index = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->dzeta01, (NParam)this);
-	return NSDEVICE::Activity::kActivity->w->nFrame->tGetString(NSDEVICE::Activity::kActivity->w->nFrame->tRunObject((NParam)index));
+	NReturn index = NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNDzeta01, (NParam)this);
+	return NWrapper::getInstance()->nFrame->tGetString(NWrapper::getInstance()->nFrame->tRunObject((NParam)index));
 }
 
 String BluetoothDevice::getName()
 {
-	NReturn index = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->eta01, (NParam)this);
-	return NSDEVICE::Activity::kActivity->w->nFrame->tGetString(NSDEVICE::Activity::kActivity->w->nFrame->tRunObject((NParam)index));
+	NReturn index = NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNEta01, (NParam)this);
+	return NWrapper::getInstance()->nFrame->tGetString(NWrapper::getInstance()->nFrame->tRunObject((NParam)index));
 }
 
 int BluetoothDevice::getBondState()
 {
-	return NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->theta01, (NParam)this);
+	return NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNTheta01, (NParam)this);
 }
 
 BluetoothClass* BluetoothDevice::getBluetoothClass()
 {
 	BluetoothClass* dBluetoothClass = new BluetoothClass();
-	NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->iota01, (NParam)this, (NParam)dBluetoothClass);
+	NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNIota01, (NParam)this, (NParam)dBluetoothClass);
 	return dBluetoothClass;
 }
 
 BluetoothSocket* BluetoothDevice::createRfcommSocketToServiceRecord(const String& uuid)
 {
 	BluetoothSocket* dBluetoothSocket = new BluetoothSocket();
-	bool error = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->kappa01, (NParam)this, (NParam)dBluetoothSocket, NParamBox(NSDEVICE::Activity::kActivity->w, uuid).n);
 
-	if (error) {
+	if (NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNKappa01, (NParam)this, (NParam)dBluetoothSocket, NParamBox(NWrapper::getInstance(), uuid).n)) {
 		delete dBluetoothSocket;
 		dBluetoothSocket = nullptr;
 	}
@@ -90,9 +89,8 @@ BluetoothSocket* BluetoothDevice::createRfcommSocketToServiceRecord(const String
 BluetoothSocket* BluetoothDevice::createInsecureRfcommSocketToServiceRecord(const String& uuid)
 {
 	BluetoothSocket* dBluetoothSocket = new BluetoothSocket();
-	bool error = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->lambda01, (NParam)this, (NParam)dBluetoothSocket, NParamBox(NSDEVICE::Activity::kActivity->w, uuid).n);
 
-	if (error) {
+	if (NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNLambda01, (NParam)this, (NParam)dBluetoothSocket, NParamBox(NWrapper::getInstance(), uuid).n)) {
 		delete dBluetoothSocket;
 		dBluetoothSocket = nullptr;
 	}

@@ -12,7 +12,7 @@ class DBTable
 {
 public:
 	DBTable()
-  	    : cField(0)
+  	    : table(), aField(), cField(0)
 	{
 	}
 
@@ -76,7 +76,6 @@ public:
 	DBTable* mDBTable;
 	DBFile* mDBFile;
 	unordered_map<string,int> maFieldIndex;
-	int mLastID;
 };
 
 class DBObject
@@ -98,6 +97,7 @@ public:
 	DBTableHandler* mDBTableHandler;
 	String mId;
 	String* maValue;
+	bool mIsCache;
 };
 
 class DBCollection
@@ -122,30 +122,44 @@ public:
 class DBFilter
 {
 public:
-	DBFilter(DBFilter* left, DBFilter* right, const String& op)
-	{
-		mLeft = left;
-		mRight = right;
-		mOp = op;
-	}
+    DBFilter(DBFilter* left, DBFilter* right, const String& op)
+    {
+        mLeft = left;
+        mRight = right;
+        mOp = op;
+    }
 
-	DBFilter(const String& left, const String& right, const String& op)
-	{
-		mLeft = new DBFilter(left);
-		mRight = new DBFilter(right);
-		mOp = op;
-	}
+    DBFilter(const String& left, const String& right, const String& op)
+    {
+        mLeft = new DBFilter(left);
+        mRight = new DBFilter(right);
+        mOp = op;
+    }
 
-	DBFilter(const String& string)
-	{
-		mLeft = nullptr;
-		mRight = nullptr;
-		mOp = string;
-	}
+    DBFilter(const String& string)
+    {
+        mLeft = nullptr;
+        mRight = nullptr;
+        mOp = string;
+    }
 
-	DBFilter* mLeft;
-	DBFilter* mRight;
-	String mOp;
+    DBFilter* mLeft;
+    DBFilter* mRight;
+    String mOp;
+};
+
+class DBHelper
+{
+public:
+    DBFilter* f(DBFilter* left, DBFilter* right, const String& op)
+    {
+        return new DBFilter(left, right, op);
+    }
+
+    DBFilter* f(const String& left, const String& right, const String& op)
+    {
+        return new DBFilter(left, right, op);
+    }
 };
 
 } // End namespace

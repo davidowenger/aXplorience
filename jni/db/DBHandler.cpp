@@ -4,12 +4,17 @@ namespace NSDEVICE
 {
 
 DBHandler::DBHandler(Wrapper* w)
-	: w(w), PREFIX("TABLE"), SEP("_"), TRUE("TRUE"), FALSE("FALSE")
+	: PREFIX("TABLE"), SEP("_"), TRUE("TRUE"), FALSE("FALSE"), w(w), maTableHandler(), maTable()
 {
 }
 
 DBHandler::~DBHandler()
 {
+    for (map<String, DBTableHandler*>::value_type vDBTableHandler : maTableHandler) {
+        if (vDBTableHandler.second) {
+            delete vDBTableHandler.second;
+        }
+    }
 }
 
 DBTableHandler* DBHandler::get(const String& sTable)
@@ -29,7 +34,7 @@ DBTableHandler* DBHandler::get(const String& sTable)
 }
 
 DBTableHandler::DBTableHandler(Wrapper* w, DBTable* dbTable)
-	: w(w), mDBTable(dbTable), mLastID(0), mDBFile(nullptr)
+	: w(w), mDBTable(dbTable), mDBFile(nullptr), maFieldIndex()
 {
 }
 
@@ -40,11 +45,12 @@ DBTableHandler::~DBTableHandler()
 int DBTableHandler::load()
 {
 	int i = 0;
+	mDBTable->load();
 
 	for (i = 0 ; i < mDBTable->cField ; ++i ) {
 		maFieldIndex[mDBTable->aField[i]] = i;
 	}
-	mDBFile = new DBFile(w, w->dbh->PREFIX + mDBTable->load()->table);
+	mDBFile = new DBFile(w, w->dbh->PREFIX + mDBTable->table);
 	return mDBFile->init();
 }
 
@@ -75,6 +81,7 @@ DBObject::DBObject(Wrapper* w, DBTableHandler* dbTableHandler, const String& id)
 	mDBTableHandler = dbTableHandler;
 	mId = id;
 	maValue = nullptr;
+	mIsCache = false;
 }
 
 DBObject::~DBObject()
@@ -83,13 +90,13 @@ DBObject::~DBObject()
 
 DBObject* DBObject::load()
 {
-	if (!maValue) {
+	if (!maValue || !mIsCache) {
 		int i;
 		String value = "";
 		maValue = new String[mDBTableHandler->mDBTable->cField];
 
 		for ( i = 0 ; i < mDBTableHandler->mDBTable->cField ; ++i ) {
-			maValue[i] = ( mId != "" ? mDBTableHandler->mDBFile->get(mId + w->dbh->SEP + mDBTableHandler->mDBTable->aField[i]) : value );
+			maValue[i] = ( mId != "" ? mDBTableHandler->mDBFile->get(mId + w->dbh->SEP + to_string(i)) : value );
 		}
 	}
 	return this;
@@ -123,6 +130,7 @@ DBObject* DBObject::set(const String& field, const String& value)
 
 DBObject* DBObject::set(int index, const String& value)
 {
+	mIsCache = true;
 	maValue[index] = value;
 	return this;
 }
@@ -136,7 +144,7 @@ DBObject* DBObject::commit()
 			//FIXME
 			map<String,String>::iterator it = mDBTableHandler->mDBFile->maData.end();
 			it--;
-			String str = it->second;
+			String str = it->first;
 			int prev = atoi(str.c_str());
 			mId = to_string(prev + 1);
 			//mId = to_string(atoi((mDBTableHandler->mDBFile->maData.end()--)->second.c_str()) + 1);
@@ -147,9 +155,10 @@ DBObject* DBObject::commit()
 		maValue[0] = mId;
 
 		for ( i = 0 ; i < mDBTableHandler->mDBTable->cField ; ++i ) {
-			mDBTableHandler->mDBFile->set(mId + w->dbh->SEP + mDBTableHandler->mDBTable->aField[i], maValue[i]);
+			mDBTableHandler->mDBFile->set(mId + w->dbh->SEP + to_string(i), maValue[i]);
 		}
 		mDBTableHandler->mDBFile->commit();
+		mIsCache = false;
 		return this;
 }
 
@@ -180,7 +189,7 @@ bool DBObject::apply(DBFilter* filtre, bool selected)
 }
 
 DBCollection::DBCollection(Wrapper* w, DBTableHandler* dbTableHandler)
-	: w(w), isLoaded(false)
+	: w(w), maDBObject(), isLoaded(false)
 {
 	mDBTableHandler = dbTableHandler;
 	mDBFiltre = new DBFilter("", "", w->dbh->TRUE);
@@ -194,16 +203,15 @@ DBCollection* DBCollection::load()
 {
 	if (!isLoaded) {
 		int i = 0;
-		mDBTableHandler->mDBFile->maData;
 		map<String,String>::iterator it = mDBTableHandler->mDBFile->maData.begin();
 
-		for ( i = 0 ; i < mDBTableHandler->mDBFile->maData.size()/mDBTableHandler->mDBTable->cField && it != mDBTableHandler->mDBFile->maData.end() ; ++i ) {
-			advance(it, mDBTableHandler->mDBTable->cField);
+		for ( i = 0 ; i < (int)mDBTableHandler->mDBFile->maData.size()/mDBTableHandler->mDBTable->cField && it != mDBTableHandler->mDBFile->maData.end() ; ++i ) {
 			DBObject* o = new DBObject(w, mDBTableHandler, it->second);
 
 			if (o->apply(mDBFiltre, true)) {
-				maDBObject[i] = o;
+				maDBObject.push_back(o);
 			}
+            advance(it, mDBTableHandler->mDBTable->cField);
 		}
 		isLoaded = true;
 	}

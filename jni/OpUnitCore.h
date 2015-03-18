@@ -7,17 +7,22 @@ namespace NSDEVICE
 class OpUnitCore : public OpUnit
 {
 public:
-	OpUnitCore(Wrapper* w);
+	OpUnitCore(Wrapper* const w);
    ~OpUnitCore();
 
-    void run();
-    NReturn visit(NAlpha00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0);
+    virtual void run() override;
+    virtual void cancel() override;
+    virtual void handleOp() override;
 
-    Wrapper* mw;
+    virtual NReturn visit(NAlpha00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
+    virtual NReturn visit(NBeta00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
+
+    String parseMac(const String& vMac);
+
+    Wrapper* mWrapper;
 	int mcProcessedDevice;
-	BluetoothSocket* mClientSocket;
-	OutputStream* mOutputStream;
-	InputStream* mInputStream;
+	TimeStamp mcTimeStampBroadcast;
+	unordered_set<String> maMac;
 };
 
 } // End namespace

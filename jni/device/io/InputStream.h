@@ -4,30 +4,35 @@
 namespace NSDEVICE
 {
 
-class InputStream
+class InputStream : public Object
 {
-friend class NSNATIVE::NVisitorIO;
+friend NSNATIVE::NNoObject;
 
 public:
 	int close()
 	{
-		return NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->alpha00, (NParam)this);
+		return NWrapper::getInstance()->mNVisitorIO->tRun(NWrapper::getInstance()->mNAlpha00, (NParam)this);
 	}
 
     int read(string& buffer, int cMaxByte)
     {
-		int err = (int)NSDEVICE::Activity::kActivity->w->nVisitorIO->tRun(NSDEVICE::Activity::kActivity->w->beta00, (NParam)this, (NParam)cMaxByte);
+    	// Blocks and returns the number of bytes read
+    	// -1 if end of the stream is reached
+    	// -2 if stream closed or another IO exception
+    	// -3 if UTF-8 is not supported
+		int err = (int)NWrapper::getInstance()->mNVisitorIO->tRun(NWrapper::getInstance()->mNBeta00, (NParam)this, (NParam)cMaxByte);
 
 		if (err >= 0) {
-			int cByte = NSDEVICE::Activity::kActivity->w->nFrame->tRun(NSDEVICE::Activity::kActivity->w->gamma00, (NParam)err, (NParam)-1, (NParam)-1);
-
-			while (--cByte >= 0) {
-				buffer += (char)NSDEVICE::Activity::kActivity->w->nFrame->tRun(NSDEVICE::Activity::kActivity->w->gamma00, (NParam)err, (NParam)cByte, (NParam)-1);
-			}
+			buffer += NWrapper::getInstance()->nFrame->tGetString(NWrapper::getInstance()->nFrame->tRunObject((NParam)err));
 			err = 0;
 		}
-		return err;
+		return -err;
 	}
+
+private:
+    InputStream(NNoObject* vNNoObject)
+    {
+    }
 };
 
 } // End namespace

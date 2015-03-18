@@ -2,18 +2,8 @@
 
     <string name="app_name">aXplorience</string>
 
-    <string-array name="Planets">
-        <item>Mercury</item>
-        <item>Venus</item>
-        <item>Earth</item>
-        <item>Mars</item>
-        <item>Jupiter</item>
-        <item>Saturn</item>
-        <item>Uranus</item>
-        <item>Neptune</item>
-        <item>Pluto</item>
-    </string-array>
-
-    <string name="planet_prompt">Select a planet</string>
+    <string name="drawer_open">Open</string>
+    
+    <string name="drawer_close">Close</string>
 
 </resources>

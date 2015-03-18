@@ -3,8 +3,8 @@
 namespace NSDEVICE
 {
 
-DBFile::DBFile(NWrapper* w, const String& fileName)
-	: NVisitor(w), msFileName(fileName)
+DBFile::DBFile(Wrapper* w, const String& fileName)
+	: w(w), msFileName(fileName), maData()
 {
 	mFileStream = new fstream();
 }
@@ -12,6 +12,7 @@ DBFile::DBFile(NWrapper* w, const String& fileName)
 DBFile::~DBFile()
 {
 	// Any open file is automatically closed when the fstream object is destroyed
+	//delete mFileStream;
 }
 
 int DBFile::init()
@@ -37,7 +38,7 @@ int DBFile::init()
 
 void DBFile::state(const String& mode)
 {
-	LOGWE(String(
+	LOGE(String(
 		"File [" + msFileName +
 		"] stream@[" + std::to_string(mFileStream) +
 		"] path[" + w->sFileDir  + "/"

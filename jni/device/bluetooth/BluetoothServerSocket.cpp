@@ -5,8 +5,9 @@ namespace NSDEVICE
 
 BluetoothSocket* BluetoothServerSocket::accept()
 {
+	// Blocks until a connection is established
 	BluetoothSocket* dBluetoothSocket = new BluetoothSocket();
-	bool error = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->alpha02, (NParam)this, (NParam)dBluetoothSocket);
+	bool error = NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNAlpha02, (NParam)this, (NParam)dBluetoothSocket);
 
 	if (error) {
 		delete dBluetoothSocket;
@@ -17,19 +18,20 @@ BluetoothSocket* BluetoothServerSocket::accept()
 
 BluetoothSocket* BluetoothServerSocket::accept(int timeout)
 {
+	// Blocks until a connection is established, up to timeout
 	BluetoothSocket* dBluetoothSocket = new BluetoothSocket();
-	bool error = NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->beta02, (NParam)this, (NParam)dBluetoothSocket, (NParam)timeout);
+	bool error = NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNBeta02, (NParam)this, (NParam)dBluetoothSocket, (NParam)timeout);
 
 	if (error) {
 		delete dBluetoothSocket;
-		dBluetoothSocket = NULL;
+		dBluetoothSocket = nullptr;
 	}
 	return dBluetoothSocket;
 }
 
 void BluetoothServerSocket::close()
 {
-	NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->gamma02, (NParam)this);
+	NWrapper::getInstance()->mNVisitorBluetooth->tRun(NWrapper::getInstance()->mNGamma02, (NParam)this);
 }
 
 } // End namespace

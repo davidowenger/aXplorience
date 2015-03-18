@@ -4,19 +4,24 @@
 namespace NSDEVICE
 {
 
-class OutputStream
+class OutputStream : public Object
 {
-friend class NSNATIVE::NVisitorIO;
+friend NSNATIVE::NNoObject;
 
 public:
 	int close()
 	{
-		return NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->alpha01, (NParam)this);
+		return NWrapper::getInstance()->mNVisitorIO->tRun(NWrapper::getInstance()->mNAlpha01, (NParam)this);
 	}
 
     int write(const string& packet)
     {
-		return NSDEVICE::Activity::kActivity->w->nVisitorBluetooth->tRun(NSDEVICE::Activity::kActivity->w->beta01, (NParam)this, NParamBox(NSDEVICE::Activity::kActivity->w, packet).n);
+		return NWrapper::getInstance()->mNVisitorIO->tRun(NWrapper::getInstance()->mNBeta01, (NParam)this, NParamBox(NWrapper::getInstance(), packet).n);
+    }
+
+private:
+    OutputStream(NNoObject* vNNoObject)
+    {
     }
 };
 

@@ -4,10 +4,10 @@
 namespace NSDEVICE
 {
 
-class DBFile : public NSNATIVE::NVisitor
+class DBFile
 {
 public:
-	DBFile(NWrapper* w, const String& fileName);
+	DBFile(Wrapper* w, const String& fileName);
    ~DBFile();
 
     String get(const String& key);
@@ -18,6 +18,7 @@ public:
     int open();
     void state(const String& mode);
 
+    Wrapper* w;
     String msFileName;
     fstream* mFileStream;
 	map<String,String> maData;

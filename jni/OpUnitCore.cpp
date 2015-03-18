@@ -3,153 +3,189 @@
 namespace NSDEVICE
 {
 
-OpUnitCore::OpUnitCore(Wrapper* w)
-	: OpUnit(w), mw(w), mcProcessedDevice(0)
+OpUnitCore::OpUnitCore(Wrapper* const w)
+	: OpUnit(w), mWrapper(w), mcProcessedDevice(0), mcTimeStampBroadcast(0), maMac()
 {
-	mClientSocket = nullptr;
-	mInputStream = nullptr;
-	mOutputStream = nullptr;
-	mAlive = false;
 }
 
 OpUnitCore::~OpUnitCore()
 {
+    delete mWrapper->dbh;
+    delete mWrapper->mBOHandlerMessage;
+    delete[] mWrapper->aPeer;
 }
 
 void OpUnitCore::run()
 {
 	//00000000-0000-07da-0000-0000000007d0
+    //00001101-0000-1000-8000-00805F9B34FB
 	//UUID(2010L,2000L);
-	//00000000-0000-07db-0000-0000000007d0
-	//UUID(2010L,2000L);
-	//00000000-0000-07dc-0000-0000000007d0
-	//00001101-0000-1000-8000-00805F9B34FB
-	//00001101-0000-1000-8000-00805F9B34FB
-	//00001101-0000-1000-8000-00805F9B34FB
-	//
 
-	int i = 0;
-	int error = 0;
-	unsigned long long nextUuid = 0;
-	String buffer("");
+    int i;
 
-	mw->dbh = new DBHandler(mw);
-	mw->dbh->add<Table_Drop>("Drop");
+    mWrapper->aDiscoveredDevice = Col<BluetoothDevice*>();
+    mWrapper->aBODrop = vector<DBObject*>();
 
-	mw->boHandlerDrop = new BOHandlerDrop(mw);
-	mw->opUnitServer = new OpUnitServer(mw);
-	mw->aPeer = new OpUnitPeer*[mw->cMaxOpUnit];
-	mw->sServiceName = "Proximity service";
-	mw->sUuid = "0000F9B3-0000-0000-0000-";
-	mw->sUuidSuffix = "000000000000";
-	mw->cNextClientUuid = 1;
+    mWrapper->mcTimeStampStart = 0;
+    mWrapper->mcTimeStampStop = steady_clock::now().time_since_epoch().count();
 
-	for ( i = 0 ; i < mw->cMaxOpUnit ; ++i ) {
-		mw->aPeer[i] = nullptr;
+    mWrapper->dbh = new DBHandler(mWrapper);
+	mWrapper->dbh->add<Table_Drop>("Drop");
+
+	mWrapper->mBOHandlerMessage = new BOHandlerMessage(mWrapper);
+	mWrapper->opUnitServer = new OpUnitServer(mWrapper);
+	mWrapper->aPeer = new OpUnitPeer*[mWrapper->cMaxOpUnit];
+
+    mWrapper->mBOHandlerMessage->h->drop();
+    mWrapper->aBOSeed  = mWrapper->mBOHandlerMessage->getSeeds();
+    mWrapper->mac = mWrapper->dBluetoothAdapter->getAddress();
+	mWrapper->sServiceName = "Proximity service";
+	mWrapper->sUuidService = "0000F9B3-";
+	mWrapper->sUuidPeer = "0000F9B4-";
+	mWrapper->sUuidSuffix = "0000-0000-0000-000000000000";
+    mWrapper->sUuidMacSuffix = parseMac(mWrapper->mac);
+
+    if (mWrapper->aBOSeed->count() == 0) {
+        DBObject* vDBObject;
+        vDBObject = mWrapper->mBOHandlerMessage->addSeed("1", "Outbound Title 1", "Outbound Text 1");
+        LOGE(vDBObject->get("title").c_str());
+        delete vDBObject;
+        vDBObject = mWrapper->mBOHandlerMessage->addSeed("2", "Outbound Title 2", "Outbound Text 2");
+        LOGE(vDBObject->get("text").c_str());
+        delete vDBObject;
+        mWrapper->aBOSeed  = mWrapper->mBOHandlerMessage->getSeeds();
+    }
+	for ( i = 0 ; i < mWrapper->cMaxOpUnit ; ++i ) {
+		mWrapper->aPeer[i] = nullptr;
 	}
-	mw->boHandlerDrop->addSeed("1", "droped message", "Hello World!");
-	mw->mac = mw->dBluetoothAdapter->getAddress();
-	mw->dBluetoothAdapter->enable();
-	mw->dBluetoothAdapter->discoverable();
-	mw->opSquad->add(mw->opUnitServer)->start();
+	mWrapper->dBluetoothAdapter->enable();
+    mWrapper->dBluetoothAdapter->discoverable();
+    mWrapper->opSquad->add(mWrapper->opUnitServer)->start();
 
-	steady_clock::time_point cTimeStart = steady_clock::time_point();
-	steady_clock::time_point cTimeStop = steady_clock::time_point();
-	steady_clock::time_point cTimeBroadcast = steady_clock::time_point();
+    //********************************************************************//
+    //**************** Critical Section Start : Discovery ****************//
+    //********************************************************************//
+    mWrapper->mMutexDiscovery.lock();
+    mWrapper->dBluetoothAdapter->startDiscovery();
+    mWrapper->mMutexDiscovery.unlock();
+    //********************************************************************//
+    //**************** Critical Section Stop : Discovery *****************//
+    //********************************************************************//
+
+	handleOp();
+
+    //********************************************************************//
+    //**************** Critical Section Start : Discovery ****************//
+    //********************************************************************//
+    mWrapper->mMutexDiscovery.lock();
+    mWrapper->dBluetoothAdapter->cancelDiscovery();
+    mWrapper->mMutexDiscovery.unlock();
+    //********************************************************************//
+    //**************** Critical Section Stop : Discovery *****************//
+    //********************************************************************//
+
+    cancel();
+}
+
+void OpUnitCore::handleOp()
+{
+    Op* op;
+    int i = 0;
+    int j = 0;
+    TimeStamp vc10Secondes = chrono::duration_cast<steady_clock::duration>(chrono::seconds(10)).count();
+    TimeStamp vcTimeStampNow;
 
     while (mAlive) {
-    	if (mw->dBluetoothAdapter->isEnabled()) {
-    		if (steady_clock::now() - cTimeStop > seconds(20)) {
-    			cTimeStart = steady_clock::now();
-    			mw->dBluetoothAdapter->startDiscovery();
-    		}
-    		if (steady_clock::now() - cTimeStart > seconds(10)) {
-    			cTimeStop = steady_clock::now();
-    			mw->dBluetoothAdapter->cancelDiscovery();
-    		}
-    		if (steady_clock::now() - cTimeBroadcast > seconds(10)) {
-    			cTimeBroadcast = steady_clock::now();
+        vcTimeStampNow = steady_clock::now().time_since_epoch().count();
 
-				for (i = 0 ; i < mw->cMaxOpUnit ; ++i) {
-					if (mw->aPeer[i] && !mw->aPeer[i]->mAlive) {
-						delete mw->aPeer[i];
-						mw->aPeer[i] = nullptr;
-					}
-					if (mw->aPeer[i]) {
-						for (i = 0 ; i < mw->aBOSeed->count() ; ++i) {
-							error = mw->aPeer[i]->write(BODrop(mw, mw->aBOSeed->get(i)).pack());
-						}
-					}
-				}
-			}
-			while (mAlive && mw->aDiscoveredDevice.size() > mcProcessedDevice) {
-				error = 0;
-		    	buffer = "";
-				mClientSocket = mw->aDiscoveredDevice[mcProcessedDevice]->createInsecureRfcommSocketToServiceRecord(mw->sUuid + mw->sUuidSuffix);
+        if (vcTimeStampNow - mcTimeStampBroadcast > vc10Secondes) {
+            mcTimeStampBroadcast = vcTimeStampNow;
 
-				if (mClientSocket) {
-					error = mClientSocket->connect();
-				}
-				if (error) {
-					mClientSocket->close();
-					mClientSocket = nullptr;
-				}
-				if (!mClientSocket) {
-					error = 1;
-				}
-				if (!error) {
-					mOutputStream = mClientSocket->getOutputStream();
-					mInputStream = mClientSocket->getInputStream();
-					error = !mInputStream || !mOutputStream;
-				}
-				if (mw->cNextServerUuid > mw->cNextClientUuid) {
-					mw->cNextClientUuid = mw->cNextServerUuid;
-				}
-				if (!error) {
-			    	error = mOutputStream->write(to_string(mw->cNextClientUuid));
-				}
-				if (!error) {
-			    	error = mInputStream->read(buffer, 1024);
-				}
-				if (!error) {
-		            error = to_long(buffer, nextUuid) || nextUuid > 999999999999;
-				}
-				if (!error && nextUuid > mw->cNextClientUuid) {
-	            	mw->cNextClientUuid = nextUuid;
-				}
-				if (!error) {
-					buffer = to_string(mw->cNextClientUuid);
-					buffer = mw->sUuidSuffix.substr(0, 12 - buffer.length()) + buffer;
-					mClientSocket = mw->aDiscoveredDevice[mcProcessedDevice]->createInsecureRfcommSocketToServiceRecord(mw->sUuid + buffer);
+            for (i = 0 ; i < mWrapper->aBOSeed->count() ; ++i) {
+                String vString = mWrapper->mBOHandlerMessage->pack(mWrapper->aBOSeed->get(i));
 
-					if (mClientSocket) {
-						error = mClientSocket->connect();
-					}
-					if (error) {
-						mClientSocket->close();
-						mClientSocket = nullptr;
-					}
-					if (mClientSocket) {
-						OpUnitPeer* peer = new OpUnitPeer(mw, mClientSocket, mw->cNextClientUuid++);
-						mw->opSquad->add(peer);
-						mw->aPeer[peer->mId] = peer;
-						peer->start();
-					}
-				}
-				mcProcessedDevice++;
-			}
-    	}
-    	this_thread::sleep_for(chrono::milliseconds(300));
+                for (j = 0 ; j < mWrapper->opSquad->mcMaxOpUnit ; ++j) {
+                    if (mWrapper->opSquad->maOpUnitType[j] == Wrapper::OPUNIT_TYPE_PEER) {
+                        OpCallback* cb = sendOp(j, w->mNBeta01, new OpMessageForResult(vString));
+                    }
+                }
+            }
+        }
+        op = nextOp();
+
+        if (op) {
+            execOp(op);
+            //HINT: use op->result here, before calling nextOp again
+        } else {
+            //TODO: check if condition needed
+            //if (mWrapper->dBluetoothAdapter->isEnabled()) {
+            //********************************************************************//
+            //**************** Critical Section Start : Discovery ****************//
+            //********************************************************************//
+            mWrapper->mMutexDiscovery.lock();
+            if (vcTimeStampNow - mWrapper->mcTimeStampStop > 1*vc10Secondes && vcTimeStampNow - mWrapper->mcTimeStampStart > 6*vc10Secondes) {
+                mWrapper->mcTimeStampStart = vcTimeStampNow;
+                mWrapper->dBluetoothAdapter->startDiscovery();
+            }
+            if (vcTimeStampNow - mWrapper->mcTimeStampStart > 5*vc10Secondes && vcTimeStampNow - mWrapper->mcTimeStampStop > 6*vc10Secondes) {
+                mWrapper->mcTimeStampStop = vcTimeStampNow;
+                mWrapper->dBluetoothAdapter->cancelDiscovery();
+            }
+            mWrapper->mMutexDiscovery.unlock();
+            //********************************************************************//
+            //**************** Critical Section Stop : Discovery *****************//
+            //********************************************************************//
+            this_thread::sleep_for(chrono::milliseconds(300));
+        }
     }
 }
 
-NReturn OpUnitCore::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d)
+// Add a new peer received from server
+NReturn OpUnitCore::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-	TextView* textViewDrop = new TextView(mw->dActivity);
-	textViewDrop->setTextSize(20);
-	textViewDrop->setText(((BODrop*)a)->o->get("text"));
-	mw->layout->addView(textViewDrop);
-	return 0;
+    BluetoothDevice* vBluetoothDevice = (BluetoothDevice*)a;
+    bool vIsAlive = (vBluetoothDevice != nullptr);
+
+    if (vIsAlive) {
+        vIsAlive &= maMac.emplace(parseMac(vBluetoothDevice->getAddress())).second;
+    }
+    if (vIsAlive) {
+        mWrapper->opSquad->add(new OpUnitPeer(mWrapper, vBluetoothDevice))->start();
+    }
+    return 0;
+}
+
+// Add a new peer received from server
+NReturn OpUnitCore::visit(NBeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    BluetoothSocket* vBluetoothSocket = (BluetoothSocket*)a;
+    bool vIsAlive = (vBluetoothSocket != nullptr);
+
+    if (vIsAlive) {
+        vIsAlive &= maMac.emplace(parseMac(vBluetoothSocket->getRemoteDevice()->getAddress())).second;
+    }
+    if (vIsAlive) {
+        mWrapper->opSquad->add(new OpUnitPeer(mWrapper, vBluetoothSocket))->start();
+    }
+    return 0;
+}
+
+String OpUnitCore::parseMac(const String& vMac)
+{
+    String vMacParsed;
+//    try {
+//      vMacParsed = regex_replace(vMac,regex("[^0123456789abcdefABCDEF]+"),String(""));
+//    }
+//    catch (regex_error& vError) {
+//        std::cerr << "Regex error with code: #" << (int)vError.code() << "\n";
+//    }
+    vMacParsed = vMac;
+    return vMacParsed;
+}
+
+void OpUnitCore::cancel()
+{
+	mAlive = false;
 }
 
 } // End namespace

@@ -7,23 +7,34 @@ namespace NSDEVICE
 class OpUnit : public NSNATIVE::NVisitor
 {
 public:
-	OpUnit(NWrapper* w);
-	~OpUnit();
+	static void* getLocalStorage();
 
+	OpUnit(Wrapper* vWrapper);
+	virtual ~OpUnit() override;
+
+	void init(OpSquad* vOpSquad);
 	OpUnit* start();
-	void onStart();
-	virtual void listen();
-	void send(OpUnit* unit, NElement* element = nullptr, long a = 0, long b = 0, long c = 0, long d = 0);
-	Op* next();
+	void onOpUnitStart();
+	OpCallback* sendOp(int vcOpUnitId, NElement* vNElement, Op* vOp);
+	Op* nextOp();
+	void cleanOp();
 
-	virtual void run() = 0;
+    virtual void run();
+    virtual void cancel();
+    virtual void handleOp();
+    virtual void execOp(Op* op);
+    virtual bool waitOp(TimeStamp vcMilisecondes, NElement* vNElement);
 
+	Wrapper* mWrapper;
 	int mId;
+	int mIdUnique;
+    int mcUnitType;
 	bool mAlive;
-	std::thread* mThread;
+	bool mAliveThread;
+
+    NEnv* mNEnv;
+	thread* mThread;
 	OpSquad* mOpSquad;
-	Op** maOp;
-	Op** maLast;
 };
 
 } // End namespace

@@ -7,13 +7,10 @@ namespace NSNATIVE
 class NParamBox
 {
 public:
-	NParamBox(NWrapper* w, CharSequence boxed);
-	NParamBox(NWrapper* w, const String& boxed);
+	NParamBox(NWrapper* const w, const String& boxed);
 	virtual ~NParamBox();
 
-	void set(CharSequence boxed);
-
-	NWrapper* w;
+	NWrapper* const w;
 	NParam n;
 	NReturnObject mTString;
 };
