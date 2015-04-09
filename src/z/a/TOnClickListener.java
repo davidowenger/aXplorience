@@ -9,22 +9,23 @@ import android.view.View;
 //*******************************************************************************************
 public class TOnClickListener implements View.OnClickListener
 {
-    public TWrapper w;
-    public long n;
+	public TWrapper w;
+	public long n;
 
-    public TOnClickListener(TWrapper w, long n)
-    {
-        this.w = w;
-        this.n = n;
-    }
+	public TOnClickListener(TWrapper w, long n)
+	{
+		this.w = w;
+		this.n = n;
+	}
 
-    @Override
-    public void onClick(View v)
-    {
-      w.mTVisitorView.nRun(w.mTAlpha03, n,
-          w.tFrame.putKey(w.mTVisitorView.nRun(w.mTAlpha03, n, -1, 1), v)
-      );
-    }
+	@Override
+	public void onClick(View v)
+	{
+		long vcKey;
+		w.mTVisitorViewView.nRun(w.mTAlpha03, n,
+			(vcKey = w.tFrame.getKey(v)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTAlpha03, n, -1, 1), v)
+		);
+	}
 }
 
 //*******************************************************************************************
@@ -32,22 +33,25 @@ public class TOnClickListener implements View.OnClickListener
 //*******************************************************************************************
 class TOnCreateContextMenuListener implements View.OnCreateContextMenuListener
 {
-    public TWrapper w;
-    public long n;
+	public TWrapper w;
+	public long n;
 
-    public TOnCreateContextMenuListener()
+	public TOnCreateContextMenuListener(TWrapper w, long n)
     {
+        this.w = w;
+        this.n = n;
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
-    {
-      w.mTVisitorView.nRun(w.mTBeta03, n,
-          w.tFrame.putKey(w.mTVisitorView.nRun(w.mTBeta03, n, -1, 3), menu),
-          w.tFrame.putKey(w.mTVisitorView.nRun(w.mTBeta03, n, -1, 2), v),
-          w.tFrame.putKey(w.mTVisitorView.nRun(w.mTBeta03, n, -1, 1), menuInfo)
-      );
-    }
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
+	{
+		long vcKey;
+		w.mTVisitorViewView.nRun(w.mTBeta03, n,
+			(vcKey = w.tFrame.getKey(menu)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTBeta03, n, -1, 3), menu),
+			(vcKey = w.tFrame.getKey(v)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTBeta03, n, -1, 2), v),
+			(vcKey = w.tFrame.getKey(menuInfo)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTBeta03, n, -1, 1), menuInfo)
+		);
+	}
 }
 
 //******************************************************************************************
@@ -55,19 +59,22 @@ class TOnCreateContextMenuListener implements View.OnCreateContextMenuListener
 //******************************************************************************************
 class TOnTouchListener implements View.OnTouchListener
 {
-    public TWrapper w;
-    public long n;
+	public TWrapper w;
+	public long n;
 
-    public TOnTouchListener()
+	public TOnTouchListener(TWrapper w, long n)
     {
+        this.w = w;
+        this.n = n;
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event)
-    {
-        return w.mTVisitorView.nRun(w.mTGamma03, n,
-            w.tFrame.putKey(w.mTVisitorView.nRun(w.mTGamma03, n, -1, 2), v),
-            w.tFrame.putKey(w.mTVisitorView.nRun(w.mTGamma03, n, -1, 1), event)
-        ) != 0;
-    }
+	@Override
+	public boolean onTouch(View v, MotionEvent event)
+	{
+        long vcKey;
+		return w.mTVisitorViewView.nRun(w.mTGamma03, n,
+			(vcKey = w.tFrame.getKey(v)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTGamma03, n, -1, 2), v),
+			(vcKey = w.tFrame.getKey(event)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTGamma03, n, -1, 1), event)
+		) != 0;
+	}
 }

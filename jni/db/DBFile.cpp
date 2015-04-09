@@ -28,9 +28,14 @@ int DBFile::init()
 			value.assign("");
 			getline(*mFileStream, key);
 			getline(*mFileStream, value);
-			maData[key] = value;
+
+			if (!key.empty()) {
+			    value = regex_replace(value, regex("n#"), String("\n"));
+			    value = regex_replace(value, regex("@(@|#)"), String("$1"));
+			    maData[to_long(key)] = value;
+			}
 		}
-		mFileStream->close();
+		close();
 		ret = 0;
 	}
 	return ret;
@@ -52,37 +57,47 @@ void DBFile::state(const String& mode)
 
 int DBFile::open()
 {
-	int ret = 0;
-	mFileStream->open(w->sFileDir + "/" + msFileName, ios_base::out | ios_base::app);
+    int ret = 0;
+    mFileStream->clear();
+    mFileStream->open(w->sFileDir + "/" + msFileName, ios_base::binary | ios_base::out | ios_base::app );
 
-	if (!mFileStream->good()) {
-		state("w+");
-		mFileStream->clear();
-		mFileStream->close();
-		mFileStream = nullptr;
-		ret = 1;
-	}
-	if (mFileStream) {
-		mFileStream->clear();
-		mFileStream->close();
-		mFileStream->open(w->sFileDir + "/" + msFileName, ios_base::in | ios_base::out);
-	}
-	if (mFileStream && !mFileStream->good()) {
-		state("rw");
-		mFileStream->clear();
-		mFileStream->close();
-		mFileStream = nullptr;
-		ret = 2;
-	}
-	return ret;
+    if (!mFileStream->good()) {
+        state("w+");
+        close();
+        mFileStream = nullptr;
+        ret = 1;
+    }
+    if (mFileStream) {
+        close();
+        mFileStream->clear();
+        mFileStream->open(w->sFileDir + "/" + msFileName, ios_base::binary| ios_base::out | ios_base::in );
+    }
+    if (mFileStream && !mFileStream->good()) {
+        state("rw");
+        close();
+        mFileStream = nullptr;
+        ret = 2;
+    }
+    return ret;
 }
 
-String DBFile::get(const String& key)
+int DBFile::close()
+{
+    nint ret = 1;
+    if (mFileStream) {
+        mFileStream->clear();
+        mFileStream->close();
+        ret = !mFileStream->good();
+    }
+    return ret;
+}
+
+String DBFile::get(nulong key)
 {
 	return maData[key];
 }
 
-void DBFile::set(const String& key, const String& value)
+void DBFile::set(nulong key, const String& value)
 {
 	maData[key] = value;
 }
@@ -90,15 +105,17 @@ void DBFile::set(const String& key, const String& value)
 int DBFile::commit()
 {
 	int ret = 1;
+    map<nulong,String>::iterator it;
+    String vStringLine;
 
 	if (open() == 0) {
-		map<String,String>::iterator it;
-
 		for ( it = maData.begin() ; it != maData.end() ; ++it ) {
-			*mFileStream << it->first << endl;
-			*mFileStream << it->second << endl;
+		    vStringLine = regex_replace(it->second , regex("(@|#)"), String("@$1"));
+            vStringLine = regex_replace(it->second, regex("\n"), String("n#"));
+			*mFileStream << to_string(it->first) << endl;
+			*mFileStream << vStringLine << endl;
 		}
-		mFileStream->close();
+		close();
 		ret = 0;
 	}
 	return ret;

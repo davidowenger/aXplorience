@@ -15,14 +15,14 @@ public:
 
     float getX()
     {
-        long vcX = NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNTheta00, (NParam)this);
-        return (float)(*reinterpret_cast<double*>(&vcX));
+        nlong vcX = NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNTheta00, (NParam)this);
+        return (nfloat)(*reinterpret_cast<ndouble*>(&vcX));
     }
 
     float getY()
     {
-        long vcY = NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNIota00, (NParam)this);
-        return (float)(*reinterpret_cast<double*>(&vcY));
+        nlong vcY = NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNIota00, (NParam)this);
+        return (nfloat)(*reinterpret_cast<ndouble*>(&vcY));
     }
 
 private:

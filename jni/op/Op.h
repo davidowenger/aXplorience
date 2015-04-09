@@ -17,21 +17,22 @@ public:
 class Op
 {
 public:
-    Op(NElement* vNElement = nullptr, NLong a = 0, NLong b = 0, NLong c = 0, NLong d = 0, OpCallback* vOpCallback = nullptr);
+    Op(NElement* vNElement = nullptr, nlong a = 0, nlong b = 0, nlong c = 0, nlong d = 0, nlong e = 0, OpCallback* vOpCallback = nullptr);
     virtual ~Op();
 
     NElement* mNElement;
     OpCallback* mOpCallback;
-    NLong a;
-    NLong b;
-    NLong c;
-    NLong d;
+    nlong a;
+    nlong b;
+    nlong c;
+    nlong d;
+    nlong e;
 };
 
 class OpParam : public Op
 {
 public:
-    OpParam(NLong a = 0, NLong b = 0, NLong c = 0, NLong d = 0);
+    OpParam(nlong a = 0, nlong b = 0, nlong c = 0, nlong d = 0, nlong e = 0);
     virtual ~OpParam() override;
 };
 
@@ -39,20 +40,27 @@ public:
 class OpMessage : public Op
 {
 public:
-    OpMessage(const String& vString);
+    OpMessage(const String& vStringA = "", const String& vStringB = "", const String& vStringC = "", const String& vStringD = "", const String& vStringE = "", nlong b = 0, nlong c = 0, nlong d = 0, nlong e = 0);
     virtual ~OpMessage() override;
 
-    String mString;
+    String mStringA;
+    String mStringB;
+    String mStringC;
+    String mStringD;
+    String mStringE;
 };
-
 
 class OpMessageForResult : public Op
 {
 public:
-    OpMessageForResult(const String& vString);
+    OpMessageForResult(const String& vStringA = "", const String& vStringB = "", const String& vStringC = "", const String& vStringD = "", const String& vStringE = "", nlong b = 0, nlong c = 0, nlong d = 0, nlong e = 0);
     virtual ~OpMessageForResult() override;
 
-    String mString;
+    String mStringA;
+    String mStringB;
+    String mStringC;
+    String mStringD;
+    String mStringE;
 };
 
 } // End namespace

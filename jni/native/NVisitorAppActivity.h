@@ -18,96 +18,97 @@ public:
 
 	NReturn visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onCreate();
-		return 0;
+        NReturn vcRet = 0;
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
+        if (b != -1) ((Activity*)a)->onCreate((Bundle*)b);
+        return vcRet;
 	}
 
 	NReturn visit(NBeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onDestroy();
-		return 0;
+        ((Activity*)a)->onRestart();
+        return 0;
 	}
 
 	NReturn visit(NGamma00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onPause();
+		((Activity*)a)->onStart();
 		return 0;
 	}
 
-	NReturn visit(NDelta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-	{
-		NWrapper::getInstance()->dActivity->onRestart();
-		return 0;
-	}
+    NReturn visit(NDelta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+    {
+        ((Activity*)a)->onResume();
+        return 0;
+    }
 
 	NReturn visit(NEpsilon00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onResume();
+		((Activity*)a)->onPause();
 		return 0;
 	}
 
-	NReturn visit(NDzeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-	{
-		NWrapper::getInstance()->dActivity->onStart();
-		return 0;
-	}
+    NReturn visit(NDzeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+    {
+        ((Activity*)a)->onStop();
+        return 0;
+    }
 
 	NReturn visit(NEta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onStop();
+		((Activity*)a)->onDestroy();
 		return 0;
 	}
 
+	//TODO: restore Android API
 	NReturn visit(NTheta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onActivityResult(a, b, c, d);
+		((Activity*)a)->onActivityResult((nint)b, (nint)c, (nint)d, (nint)e);
 		return 0;
 	}
 
 	NReturn visit(NOmicron00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onReceiveDiscoveryFinished();
+		((Activity*)a)->onReceiveDiscoveryFinished();
 		return 0;
 	}
 
 	NReturn visit(NPi00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onReceiveDiscoveryStarted();
+		((Activity*)a)->onReceiveDiscoveryStarted();
 		return 0;
 	}
 
 	NReturn visit(NRho00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-        //FIXME: This will leak memory if "onReceiveFoundDevice" is not overloaded by the user
-		if (!a) {
-			a = (NParam)(new NSDEVICE::BluetoothDevice());
-		} else {
-			NWrapper::getInstance()->dActivity->onReceiveFoundDevice((NSDEVICE::BluetoothDevice*)a);
-		}
-		return (NReturn)a;
+        NReturn vcRet = 0;
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<BluetoothDevice>();
+        if (b != -1) ((Activity*)a)->onReceiveFoundDevice((BluetoothDevice*)b);
+        return vcRet;
 	}
 
 	NReturn visit(NSigma00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onReceiveLocalName(NWrapper::getInstance()->nFrame->tGetString(NWrapper::getInstance()->nFrame->tRunObject((NParam)a)));
+		((Activity*)a)->onReceiveLocalName(NWrapper::w->nFrame->tGetString(NWrapper::w->nFrame->tRunObject((NParam)b)));
 		return 0;
 	}
 
 	NReturn visit(NTau00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onReceiveScanMode(a, b);
+		((Activity*)a)->onReceiveScanMode((nint)b, (nint)c);
 		return 0;
 	}
 
 	NReturn visit(NUpsilon00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->onReceiveState(a, b);
+		((Activity*)a)->onReceiveState((nint)b, (nint)c);
 		return 0;
 	}
 
 	NReturn visit(NPhi00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 	{
-		NWrapper::getInstance()->dActivity->handleMessage(a, b, c);
+	    w->nFrame->tAttachCurrentThread();
+		((Activity*)a)->handleMessage(b, c, d, e);
 		return 0;
 	}
 };

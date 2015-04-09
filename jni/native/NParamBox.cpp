@@ -12,14 +12,7 @@ NParamBox::NParamBox(NWrapper* const w, const String& boxed)
 
 NParamBox::~NParamBox()
 {
-    JNIEnv* jniEnv = nullptr;
-
-    if (w->vm->AttachCurrentThread(&jniEnv, NULL)) {
-        jniEnv = nullptr;
-    }
-    if (jniEnv && mTString) {
-        jniEnv->DeleteLocalRef(mTString);
-    }
+    w->nFrame->tDeleteGlobalRef(mTString);
 }
 
 } // END namespace

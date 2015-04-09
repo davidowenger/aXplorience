@@ -8,15 +8,16 @@ class NClozer : public NFrame
 {
 public:
 	NClozer(NWrapper* w);
-	virtual ~NClozer();
+	virtual ~NClozer() override;
 
-	NReturn nInit(NINIT cState);
-	NReturn tAttachCurrentThread();
-	NReturn tDetachCurrentThread();
-	NReturnObject tRunString(const String& boxed);
-	String tGetString(NReturnObject tString);
+	virtual NReturn nInit(nint cState) override;
+	virtual NReturn tAttachCurrentThread() override;
+	virtual NReturn tDetachCurrentThread() override;
+	virtual NReturnObject tRunString(const String& boxed) override;
+	virtual String tGetString(NReturnObject tString) override;
+    virtual NReturn tDeleteGlobalRef(NParamObject vGlobalRef) override;
 
-	NReturn visit(NAlpha00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0);
+	NReturn visit(NAlpha00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
 };
 
 } // END namespace

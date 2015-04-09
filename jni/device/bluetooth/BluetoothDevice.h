@@ -4,14 +4,19 @@
 namespace NSDEVICE
 {
 
-class BluetoothClass
+class BluetoothClass : public Object
 {
+friend NSNATIVE::NNoObject;
 
+private:
+    BluetoothClass(NNoObject* vNNoObject)
+    {
+    }
 };
 
-class BluetoothDevice
+class BluetoothDevice : public Object
 {
-friend class NSNATIVE::NVisitorBluetooth;
+friend NSNATIVE::NNoObject;
 
 public:
     static const int ERROR;
@@ -44,6 +49,12 @@ public:
     BluetoothClass* getBluetoothClass();
     BluetoothSocket* createRfcommSocketToServiceRecord(const String& uuid);
     BluetoothSocket* createInsecureRfcommSocketToServiceRecord(const String& uuid);
+    vector<ParcelUuid*> getUuids();
+
+private:
+    BluetoothDevice(NNoObject* vNNoObject)
+    {
+    }
 };
 
 } // End namespace

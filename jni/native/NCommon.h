@@ -24,23 +24,23 @@
 
 #ifdef TARGET_ANDROID
 
-#include <android/log.h>
-
 #include <cstdlib>
-#include <string>
+#include <cstring>
+#include <fstream>
 #include <sstream>
 #include <map>
 #include <vector>
 #include <unordered_map>
-#include <fstream>
 #include <thread>
-#include <jni.h>
 #include <new>
-//#include <assert.h>
-//#include <stdint.h>
-//#include <string.h>
-//#include <sys/types.h>
 
+#include <android/log.h>
+#include <jni.h>
+
+//#include <string>
+//#include <iostream>
+//#include <assert.h>
+//#include <sys/types.h>
 //#include <android/bitmap.h>
 
 #ifdef CONFIG_DEBUG
@@ -52,7 +52,9 @@
 #define LOGPRINTW(...)  __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
 #define LOGPRINTE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
+#define LOGV(...) __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define LOGI(...) __android_log_write(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGW(...) __android_log_write(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_write(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 #else // CONFIG_DEBUG
@@ -85,7 +87,7 @@ string to_string(T value)
     return os.str();
 }
 
-int to_long(const string& sLong, unsigned long long& cLong);
+long long int to_long(const string& vsLong, int* vcError = nullptr);
 
 vector<string> split(const string& str, const string& delimiter);
 
@@ -96,11 +98,24 @@ int utf8len(const string& vString);
 namespace NSNATIVE
 {
 
-typedef long long int NLong;
-typedef jobject NReturnObject;
-typedef jlong NReturn;
+typedef signed char nbyte;
+typedef signed int nint;
+typedef signed long long int nlong;
+
+typedef unsigned char nubyte;
+typedef unsigned int nuint;
+typedef unsigned long long int nulong;
+
+typedef float nfloat;
+typedef double ndouble;
+
 typedef jlong NParam;
+typedef jlong NReturn;
+typedef jobject NParamObject;
+typedef jobject NReturnObject;
 typedef JNIEnv NEnv;
+
+typedef std::string String;
 
 } // END namespace
 
@@ -118,9 +133,6 @@ typedef JNIEnv NEnv;
 //********************************* COMMON **************************************
 //*******************************************************************************
 
-#include <iostream>
-#include <cstring>
-
 using namespace std;
 
 namespace NSDEVICE
@@ -132,26 +144,14 @@ class FragmentManager;
 class Activity;
 class View;
 class ViewGroup;
-class LayoutParams;
 class BluetoothAdapter;
 class BluetoothDevice;
-class OpSquad;
-class DBHandler;
-class DBTable;
 
 } // END namespace
 
 namespace NSNATIVE
 {
 using namespace NSDEVICE;
-
-typedef unsigned int nuint;
-typedef long long nlong;
-typedef string String;
-typedef const char* CharSequence;
-typedef char byte;
-
-typedef nuint NINIT;
 
 class NVisitor;
 class NVisitorApp;
@@ -168,6 +168,7 @@ class NFrame;
 
 using namespace NSNATIVE;
 
+#include "CircularConcurrentList.h"
 #include "native/NNoObject.h"
 #include "native/NElement.h"
 #include "native/NWrapper.h"
@@ -185,17 +186,23 @@ using namespace NSNATIVE;
 #endif // TARGET_WINDOWSPHONE
 
 #include "device/lang/Object.h"
+#include "device/R.h"
 #include "device/util/DisplayMetrics.h"
 #include "device/os/BaseBundle.h"
 #include "device/os/Bundle.h"
-#include "device/content/Context.h"
-#include "device/content/ContextWrapper.h"
+#include "device/os/ParcelUuid.h"
 #include "device/graphics/drawable/Drawable.h"
+#include "device/graphics/drawable/ColorDrawable.h"
 #include "device/graphics/drawable/DrawableContainer.h"
 #include "device/graphics/drawable/StateListDrawable.h"
 #include "device/graphics/Typeface.h"
 #include "device/content/res/Configuration.h"
 #include "device/content/res/Resources.h"
+#include "device/content/Context.h"
+#include "device/content/ContextWrapper.h"
+#include "device/text/InputType.h"
+#include "device/view/inputmethod/EditorInfo.h"
+#include "device/view/Gravity.h"
 #include "device/view/InputEvent.h"
 #include "device/view/MotionEvent.h"
 #include "device/view/GestureDetector.h"
@@ -208,6 +215,7 @@ using namespace NSNATIVE;
 #include "device/view/View.h"
 #include "device/view/ViewGroup.h"
 #include "device/app/ActionBar.h"
+#include "device/app/Application.h"
 #include "device/app/Activity.h"
 #include "device/app/Fragment.h"
 #include "device/app/FragmentTransaction.h"
@@ -223,6 +231,7 @@ using namespace NSNATIVE;
 #include "device/widget/SpinnerAdapter.h"
 #include "device/widget/BaseAdapter.h"
 #include "device/widget/AdapterView.h"
+#include "device/widget/AbsListView.h"
 #include "device/widget/AbsSpinner.h"
 #include "device/widget/Spinner.h"
 #include "device/widget/TextView.h"
@@ -240,8 +249,10 @@ using namespace NSNATIVE;
 #include "native/NVisitorAppActivity.h"
 #include "native/NVisitorAppFragment.h"
 #include "native/NVisitorBluetooth.h"
+#include "native/NVisitorContent.h"
 #include "native/NVisitorContentRes.h"
 #include "native/NVisitorIO.h"
+#include "native/NVisitorOS.h"
 #include "native/NVisitorGraphics.h"
 #include "native/NVisitorUtil.h"
 #include "native/NVisitorView.h"

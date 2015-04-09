@@ -10,6 +10,7 @@ OpUnitListener::OpUnitListener(Wrapper* const w, OpUnit* vOpUnit, InputStream* v
     mOpUnitIdUnique = vOpUnit->mIdUnique;
 	mInputStream = vInputStream;
 	mcUnitType = Wrapper::OPUNIT_TYPE_LISTENER;
+	mOpUnitCoreId = mWrapper->opUnitCore->mId;
 }
 
 OpUnitListener::~OpUnitListener()
@@ -18,35 +19,31 @@ OpUnitListener::~OpUnitListener()
 
 void OpUnitListener::run()
 {
-    int vcStart;
     mAlive &= (mInputStream != nullptr);
-    String vBuffer = String("");
-    String vPacket = String("");
+    String vBuffer;
+    nint error;
 
     while (mAlive) {
-        vcStart = 0;
+        vBuffer.assign("");
+        error = mInputStream->read(vBuffer, 256);
 
-    	if (!mAlive || mInputStream->read(vBuffer, 1024)) {
+    	if (error < 0) {
+    	    LOGE(("Listener error while reading : " + to_string(error)).c_str());
     	    mAlive = false;
     	}
         if (mAlive && vBuffer.length()) {
-            while ((vcStart = vBuffer.find("2#")) >= 0) {
-                vPacket = vBuffer.substr(0, vcStart);
-                vBuffer = vBuffer.substr(vcStart + 2);
-
-                if (vcStart > 0) {
-                    sendOp(mOpUnitId, mWrapper->w->mNAlpha01, new OpMessage(vPacket));
-                }
-            }
+            sendOp(0, mOpUnitId, mWrapper->w->mNAlpha01, new OpMessage(vBuffer));
         }
         this_thread::sleep_for(chrono::milliseconds(300));
     }
 	cancel();
-    sendOp(mOpUnitId, mWrapper->w->mNAlpha03, new OpParam(mOpUnitIdUnique));
+    LOGV("Listener stopping");
+    sendOp(0, mOpUnitId, mWrapper->w->mNAlpha03, new OpParam(mOpUnitIdUnique));
 }
 
 void OpUnitListener::cancel()
 {
+    LOGV("Listener canceled");
 	mAlive = false;
 	mInputStream->close();
 }

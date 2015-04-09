@@ -15,7 +15,7 @@ public:
 
     virtual void setSelection(int position)
     {
-        NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNAlpha00, (NParam)this);
+        NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNAlpha00, (NParam)this, (NParam)position);
     }
 
 private:

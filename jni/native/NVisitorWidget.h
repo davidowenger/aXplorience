@@ -12,21 +12,21 @@ public:
 	{
 	}
 
-   ~NVisitorWidget()
+    virtual ~NVisitorWidget()
 	{
 	}
 
     //*******************************************************************************************
-    //********************************** BaseAdapter events *************************************
+    //**********************************  events *************************************
     //*******************************************************************************************
     // int getCount()
-    virtual long visit(NAlpha01* element, long a, long b, long c, long d, long e)
+    virtual NReturn visit(NAlpha01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         return ((BaseAdapter*)a)->getCount();
     }
 
     // View getDropDownView(int position, View convertView, ViewGroup parent)
-    virtual long visit(NBeta01* element, long a, long b, long c, long d, long e)
+    virtual NReturn visit(NBeta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
         if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<View>();
@@ -36,19 +36,19 @@ public:
     }
 
     // Object getItem(int position)
-    virtual long visit(NGamma01* element, long a, long b, long c, long d, long e)
+    virtual NReturn visit(NGamma01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         return (NReturn)((BaseAdapter*)a)->getItem((int)b);
     }
 
     // long getItemId(int position)
-    virtual long visit(NDelta01* element, long a, long b, long c, long d, long e)
+    virtual NReturn visit(NDelta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         return (NReturn)((BaseAdapter*)a)->getItemId((int)b);
     }
 
     // View getView(int position, View convertView, ViewGroup parent)
-    virtual long visit(NEpsilon01* element, long a, long b, long c, long d, long e)
+    virtual NReturn visit(NEpsilon01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
         if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<View>();

@@ -15,26 +15,25 @@ public:
     {
     }
 
+    virtual FragmentTransaction* beginTransaction()
+    {
+        FragmentTransaction* b = NWrapper::w->mNNoObject->pointer<FragmentTransaction>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNAlpha02, (NParam)this, (NParam)b));
+    }
+
+    virtual int getBackStackEntryCount()
+    {
+        return (nint)NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNBeta02, (NParam)this);
+    }
+
     virtual void popBackStack()
     {
-        NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNAlpha02, (NParam)this);
+        NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNGamma02, (NParam)this);
     }
 
     virtual void popBackStack(const String& name, int flags)
     {
-        NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNBeta02, (NParam)this, NParamBox(NWrapper::w, name).n, (NParam)flags);
-    }
-
-    virtual FragmentTransaction* beginTransaction()
-    {
-        FragmentTransaction* vFragmentTransaction = NWrapper::w->mNNoObject->pointer<FragmentTransaction>();
-        bool error = NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNGamma02, (NParam)this, (NParam)vFragmentTransaction);
-
-        if (error) {
-            delete vFragmentTransaction;
-            vFragmentTransaction = nullptr;
-        }
-        return vFragmentTransaction;
+        NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNDelta02, (NParam)this, NParamBox(NWrapper::w, name).n, (NParam)flags);
     }
 
 private:

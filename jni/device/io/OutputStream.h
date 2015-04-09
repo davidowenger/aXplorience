@@ -11,12 +11,12 @@ friend NSNATIVE::NNoObject;
 public:
 	int close()
 	{
-		return NWrapper::getInstance()->mNVisitorIO->tRun(NWrapper::getInstance()->mNAlpha01, (NParam)this);
+		return (nint)NWrapper::w->mNVisitorIO->tRun(NWrapper::w->mNAlpha01, (NParam)this);
 	}
 
     int write(const string& packet)
     {
-		return NWrapper::getInstance()->mNVisitorIO->tRun(NWrapper::getInstance()->mNBeta01, (NParam)this, NParamBox(NWrapper::getInstance(), packet).n);
+		return (nint)NWrapper::w->mNVisitorIO->tRun(NWrapper::w->mNBeta01, (NParam)this, NParamBox(NWrapper::w, packet).n);
     }
 
 private:

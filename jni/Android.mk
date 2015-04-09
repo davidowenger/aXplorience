@@ -16,6 +16,9 @@ LOCAL_SRC_FILES := \
 	device/bluetooth/BluetoothDevice.cpp \
 	device/bluetooth/BluetoothSocket.cpp \
 	device/bluetooth/BluetoothServerSocket.cpp \
+	device/view/GestureDetector.cpp \
+	device/view/viewGroup.cpp \
+	device/view/view.cpp \
 	native/NParamBox.cpp \
 	native/NElement.cpp \
 	native/NVisitor.cpp \
@@ -23,7 +26,24 @@ LOCAL_SRC_FILES := \
 	native/NClozer.cpp \
 	native/NAPI.cpp \
 	native/NWrapper.cpp \
+	native/NVisitorView.cpp \
 	BOMessage.cpp \
+	WidgetMessageEdit.cpp \
+	WidgetMessageDetails.cpp \
+	WidgetMessage.cpp \
+	WidgetSettings.cpp \
+	WidgetAbout.cpp \
+	WidgetHome.cpp \
+	FragmentViewEdit.cpp \
+	FragmentViewDetails.cpp \
+	FragmentViewSettings.cpp \
+	FragmentViewAbout.cpp \
+	FragmentViewHome.cpp \
+	FragmentLevel.cpp \
+	FragmentLevel2.cpp \
+	FragmentLevel1.cpp \
+	FragmentLevel0.cpp \
+	RootLayout.cpp \
 	Network.cpp \
 	OpUnitListener.cpp \
 	OpUnitPeer.cpp \

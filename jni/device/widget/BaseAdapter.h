@@ -23,12 +23,10 @@ public:
     //********************************** BaseAdapter events ************************************
     //* This passes the call back to the default implementation if the method is not overriden *
     //******************************************************************************************
-    View* getDropDownView(int position, View* convertView, ViewGroup* parent)
+    virtual View* getDropDownView(int position, View* convertView, ViewGroup* parent)
     {
-        View* vView = NWrapper::w->mNNoObject->pointer<View>();
-        View* vRet = (View*)NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)vView, (NParam)position, (NParam)convertView, (NParam)parent);
-        if (!vRet) delete vView;
-        return vRet;
+        View* b = NWrapper::w->mNNoObject->pointer<View>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)b, (NParam)position, (NParam)convertView, (NParam)parent));
     }
 };
 

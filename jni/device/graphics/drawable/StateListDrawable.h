@@ -21,14 +21,13 @@ public:
 
     void addState(vector<int> stateSet, Drawable* drawable)
     {
-        long vcKey = 0;
-        long vcSize = stateSet.size();
+        long vcKey = NWrapper::w->nFrame->tRun(NWrapper::w->mNBeta01, 0, stateSet.size());
         long vcIndex = 0;
 
         for (int vcState : stateSet) {
-            vcKey = NWrapper::w->nFrame->tRun(NWrapper::w->mNBeta01, vcKey, vcIndex++, vcState, vcSize);
+            NWrapper::w->nFrame->tRun(NWrapper::w->mNBeta01, vcKey, vcIndex++, vcState);
         }
-        NWrapper::w->mNVisitorGraphics->tRun(NWrapper::w->mNEpsilon00, (NParam)this, (NParam)vcKey, (NParam)drawable);
+        NWrapper::w->mNVisitorGraphics->tRun(NWrapper::w->mNBeta00, (NParam)this, (NParam)vcKey, (NParam)drawable);
     }
 
 private:

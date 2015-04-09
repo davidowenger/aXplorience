@@ -25,7 +25,7 @@ public:
         NReturn vcRet = 0;
         if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<AdapterView>();
         if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<View>();
-        if (b != -1) ((AdapterView::OnItemSelectedListener*)a)->onItemSelected((AdapterView*)b, (View*)c, (int)d, e);
+        if (b != -1) ((AdapterView::OnItemSelectedListener*)a)->onItemSelected((AdapterView*)b, (View*)c, (nint)d, (nlong)e);
         return vcRet;
     }
 
@@ -47,7 +47,7 @@ public:
         NReturn vcRet = 0;
         if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<AdapterView>();
         if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<View>();
-        if (b != -1) ((AdapterView::OnItemSelectedListener*)a)->onItemSelected((AdapterView*)b, (View*)c, (int)d, e);
+        if (b != -1) ((AdapterView::OnItemSelectedListener*)a)->onItemSelected((AdapterView*)b, (View*)c, (nint)d, (nlong)e);
         return vcRet;
     }
 };

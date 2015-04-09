@@ -15,7 +15,8 @@ public:
 	void init(OpSquad* vOpSquad);
 	OpUnit* start();
 	void onOpUnitStart();
-	OpCallback* sendOp(int vcOpUnitId, NElement* vNElement, Op* vOp);
+	OpCallback* sendOp(int vcOpUnitType, int vcOpUnitId, NElement* vNElement, Op* vOp);
+	NReturn sendOpForResult(int vcOpUnitType, int vcOpUnitId, NElement* vNElement, Op* vOp);
 	Op* nextOp();
 	void cleanOp();
 

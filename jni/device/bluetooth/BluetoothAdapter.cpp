@@ -3,18 +3,15 @@
 namespace NSDEVICE
 {
 
-BluetoothAdapter::BluetoothAdapter()
+BluetoothAdapter* BluetoothAdapter::getDefaultAdapter()
 {
-	//const int BluetoothAdapter::ERROR = -1 >> 1;
-	//const int BluetoothAdapter::STATE_OFF = 10;
-	//const int BluetoothAdapter::STATE_TURNING_ON = 11;
-	//const int BluetoothAdapter::STATE_ON = 12;
-	//const int BluetoothAdapter::STATE_TURNING_OFF = 13;
-	//const int BluetoothAdapter::SCAN_MODE_NONE = 20;
-	//const int BluetoothAdapter::SCAN_MODE_CONNECTABLE = 21;
-	//const int BluetoothAdapter::SCAN_MODE_CONNECTABLE_DISCOVERABLE = 23;
+    BluetoothAdapter* b = NWrapper::w->mNNoObject->pointer<BluetoothAdapter>();
+    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNAlpha00, (NParam)b));
+}
 
-	NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNAlpha00, (NParam)this);
+bool BluetoothAdapter::checkBluetoothAddress(const String& address)
+{
+    return (bool)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNRho00, NParamBox(NWrapper::w, address).n);
 }
 
 BluetoothAdapter::~BluetoothAdapter()
@@ -23,9 +20,8 @@ BluetoothAdapter::~BluetoothAdapter()
 
 BluetoothDevice* BluetoothAdapter::getRemoteDevice(const String& address)
 {
-	BluetoothDevice* dBluetoothDevice = new BluetoothDevice();
-	NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNBeta00, (NParam)this, (NParam)dBluetoothDevice, NParamBox(NWrapper::w, address).n);
-	return dBluetoothDevice;
+    BluetoothDevice* b = NWrapper::w->mNNoObject->pointer<BluetoothDevice>();
+    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNBeta00, (NParam)this, (NParam)b, NParamBox(NWrapper::w, address).n));
 }
 
 bool BluetoothAdapter::isEnabled()
@@ -62,27 +58,27 @@ String BluetoothAdapter::getName()
 
 bool BluetoothAdapter::setName(const String& name)
 {
-	return NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNIota00, (NParam)this, NParamBox(NWrapper::w, name).n);
+	return (bool)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNIota00, (NParam)this, NParamBox(NWrapper::w, name).n);
 }
 
 int BluetoothAdapter::getScanMode()
 {
-	return NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNKappa00, (NParam)this);
+	return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNKappa00, (NParam)this);
 }
 
 bool BluetoothAdapter::startDiscovery()
 {
-	return NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNLambda00, (NParam)this);
+	return (bool)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNLambda00, (NParam)this);
 }
 
 bool BluetoothAdapter::cancelDiscovery()
 {
-	return NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNMu00, (NParam)this);
+	return (bool)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNMu00, (NParam)this);
 }
 
 bool BluetoothAdapter::isDiscovering()
 {
-	return NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNNu00, (NParam)this);
+	return (bool)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNNu00, (NParam)this);
 }
 
 void* BluetoothAdapter::getBondedDevices()
@@ -95,33 +91,15 @@ void* BluetoothAdapter::getBondedDevices()
 
 BluetoothServerSocket* BluetoothAdapter::listenUsingRfcommWithServiceRecord(const String& name, const String& uuid)
 {
-	BluetoothServerSocket* dBluetoothServerSocket = new BluetoothServerSocket();
-	bool error = NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNOmicron00, (NParam)this, (NParam)dBluetoothServerSocket, NParamBox(NWrapper::w, name).n, NParamBox(NWrapper::w, uuid).n);
-
-	if (error) {
-		delete dBluetoothServerSocket;
-		dBluetoothServerSocket = nullptr;
-	}
-	return dBluetoothServerSocket;
+    BluetoothServerSocket* b = NWrapper::w->mNNoObject->pointer<BluetoothServerSocket>();
+    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNOmicron00, (NParam)this, (NParam)b, NParamBox(NWrapper::w, name).n, NParamBox(NWrapper::w, uuid).n));
 }
 
 BluetoothServerSocket* BluetoothAdapter::listenUsingInsecureRfcommWithServiceRecord(const String& name, const String& uuid)
 {
-	BluetoothServerSocket* dBluetoothServerSocket = new BluetoothServerSocket();
-	bool error = NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNPi00, (NParam)this, (NParam)dBluetoothServerSocket, NParamBox(NWrapper::w, name).n, NParamBox(NWrapper::w, uuid).n);
-
-	if (error) {
-		delete dBluetoothServerSocket;
-		dBluetoothServerSocket = nullptr;
-	}
-	return dBluetoothServerSocket;
+    BluetoothServerSocket* b = NWrapper::w->mNNoObject->pointer<BluetoothServerSocket>();
+    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNPi00, (NParam)this, (NParam)b, NParamBox(NWrapper::w, name).n, NParamBox(NWrapper::w, uuid).n));
 }
-
-bool BluetoothAdapter::checkBluetoothAddress(const String& address)
-{
-	return NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNRho00, NParamBox(NWrapper::w, address).n);
-}
-
 void BluetoothAdapter::discoverable()
 {
 	discoverable(0);

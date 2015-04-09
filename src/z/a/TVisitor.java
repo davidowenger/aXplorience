@@ -10,7 +10,7 @@ public abstract class TVisitor implements INVisitor, ITVisitor
 		// Debug
         if (true) {
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -40,7 +40,7 @@ public abstract class TVisitor implements INVisitor, ITVisitor
 		long ret = (-1 >>> 1) + 1;
 
 		try {
-			ret = ((TElement)w.sTElement.get("" + tElementN)).accept((TVisitor)w.sTVisitor.get("" + tVisitorN), a, b, c, d, e);
+			ret = ((TElement)w.sTElement.get(tElementN)).accept((TVisitor)w.sTVisitor.get(tVisitorN), a, b, c, d, e);
 		}
 		catch (Exception vException) {
 			vException.printStackTrace();
@@ -184,10 +184,10 @@ public abstract class TVisitor implements INVisitor, ITVisitor
         return nRun(this.n, tElement.n, a.longValue(), b.longValue(), c.longValue(), d.longValue(), e.longValue());
     }
 
-	public Object nRunObject(Number a)
-	{
-		return nRunObject(a.longValue(), -1);
-	}
+    public Object nRunObject(Number a)
+    {
+        return nRunObject(a.longValue(), -1);
+    }
 
 	public Object nRunObject(Number a, Number b)
 	{

@@ -13,6 +13,12 @@ public:
 	{
 	}
 
+    virtual Resources* getResources()
+    {
+        Resources* b = NWrapper::w->mNNoObject->pointer<Resources>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNKappa00, (NParam)this, (NParam)b));
+    }
+
 private:
     ContextThemeWrapper(NNoObject* vNNoObject)
         : ContextWrapper(NWrapper::w->mNNoObject->instance<ContextWrapper>())

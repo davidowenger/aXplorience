@@ -19,7 +19,7 @@ public:
         return this;
     }
 
-    virtual FragmentTransaction* addToBackStack(const String& name)
+    virtual FragmentTransaction* addToBackStack(const String& name = "")
     {
         NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNBeta03, (NParam)this, NParamBox(NWrapper::w, name).n);
         return this;

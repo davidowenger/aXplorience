@@ -4,7 +4,7 @@ namespace NSDEVICE
 {
 
 DBHandler::DBHandler(Wrapper* w)
-	: PREFIX("TABLE"), SEP("_"), TRUE("TRUE"), FALSE("FALSE"), w(w), maTableHandler(), maTable()
+	: PREFIX("TABLE"), TRUE("1"), FALSE("0"), w(w), maTableHandler(), maTable()
 {
 }
 
@@ -12,6 +12,7 @@ DBHandler::~DBHandler()
 {
     for (map<String, DBTableHandler*>::value_type vDBTableHandler : maTableHandler) {
         if (vDBTableHandler.second) {
+            delete vDBTableHandler.second->mDBTable;
             delete vDBTableHandler.second;
         }
     }
@@ -19,15 +20,19 @@ DBHandler::~DBHandler()
 
 DBTableHandler* DBHandler::get(const String& sTable)
 {
-	if (!maTableHandler.count(sTable)) {
-		DBTable* dbTable = maTable[sTable]();
-		dbTable->table = sTable;
-		DBTableHandler* dbTableHandler = new DBTableHandler(w, dbTable);
+    if (!maTableHandler.count(sTable)) {
+        DBTableHandler* dbTableHandler = nullptr;
 
-		if (dbTableHandler->load()) {
-			delete dbTableHandler;
-			dbTableHandler = nullptr;
-		}
+	    if (maTable.count(sTable)) {
+            DBTable* dbTable = maTable[sTable]();
+            dbTable->table = sTable;
+            dbTableHandler = new DBTableHandler(w, dbTable);
+
+            if (dbTableHandler->load()) {
+                delete dbTableHandler;
+                dbTableHandler = nullptr;
+            }
+	    }
 		maTableHandler[sTable] = dbTableHandler;
 	}
 	return maTableHandler[sTable];
@@ -40,11 +45,14 @@ DBTableHandler::DBTableHandler(Wrapper* w, DBTable* dbTable)
 
 DBTableHandler::~DBTableHandler()
 {
+	if (mDBFile) {
+		delete mDBFile;
+	}
 }
 
-int DBTableHandler::load()
+nint DBTableHandler::load()
 {
-	int i = 0;
+	nuint i = 0;
 	mDBTable->load();
 
 	for (i = 0 ; i < mDBTable->cField ; ++i ) {
@@ -76,27 +84,26 @@ void DBTableHandler::drop()
 }
 
 DBObject::DBObject(Wrapper* w, DBTableHandler* dbTableHandler, const String& id)
-	: w(w)
+	: w(w), mDBTableHandler(dbTableHandler), mId(id), maValue(nullptr), mIsCache(false)
 {
-	mDBTableHandler = dbTableHandler;
-	mId = id;
-	maValue = nullptr;
-	mIsCache = false;
 }
 
 DBObject::~DBObject()
 {
+	if (maValue) {
+		delete[] maValue;
+	}
 }
 
 DBObject* DBObject::load()
 {
 	if (!maValue || !mIsCache) {
-		int i;
+		nuint i;
 		String value = "";
 		maValue = new String[mDBTableHandler->mDBTable->cField];
 
 		for ( i = 0 ; i < mDBTableHandler->mDBTable->cField ; ++i ) {
-			maValue[i] = ( mId != "" ? mDBTableHandler->mDBFile->get(mId + w->dbh->SEP + to_string(i)) : value );
+			maValue[i] = ( mId != "" ? mDBTableHandler->mDBFile->get((to_long(mId)<<32) + i) : value );
 		}
 	}
 	return this;
@@ -109,13 +116,23 @@ String* DBObject::get()
 
 String DBObject::get(const String& field)
 {
-	return load()->maValue[mDBTableHandler->maFieldIndex[field]];
+    return load()->maValue[mDBTableHandler->maFieldIndex[field]];
 }
 
-DBObject* DBObject::set(String* aValue, int count)
+nlong DBObject::count(const String& field)
+{
+    return to_long(load()->maValue[mDBTableHandler->maFieldIndex[field]]);
+}
+
+bool DBObject::is(const String& field)
+{
+    return load()->maValue[mDBTableHandler->maFieldIndex[field]] == w->dbh->TRUE;
+}
+
+DBObject* DBObject::set(String* aValue, nuint count)
 {
 	load();
-	int i;
+	nuint i;
 
 	for ( i = 0 ; i < mDBTableHandler->mDBTable->cField - 1 && i < count ; ++i ) {
 		set(i + 1, aValue[i]);
@@ -125,10 +142,15 @@ DBObject* DBObject::set(String* aValue, int count)
 
 DBObject* DBObject::set(const String& field, const String& value)
 {
-	return load()->set(mDBTableHandler->maFieldIndex[field], value);
+    return load()->set(mDBTableHandler->maFieldIndex[field], value);
 }
 
-DBObject* DBObject::set(int index, const String& value)
+DBObject* DBObject::set(const String& field, nlong value)
+{
+    return load()->set(mDBTableHandler->maFieldIndex[field], to_string(value));
+}
+
+DBObject* DBObject::set(nint index, const String& value)
 {
 	mIsCache = true;
 	maValue[index] = value;
@@ -137,29 +159,33 @@ DBObject* DBObject::set(int index, const String& value)
 
 DBObject* DBObject::commit()
 {
-		load();
-		int i = 0;
+    load();
+    DBObject* vDBObject = this;
+    nuint i = 0;
 
-		if (mId == "" && mDBTableHandler->mDBFile->maData.size() > 0) {
-			//FIXME
-			map<String,String>::iterator it = mDBTableHandler->mDBFile->maData.end();
-			it--;
-			String str = it->first;
-			int prev = atoi(str.c_str());
-			mId = to_string(prev + 1);
-			//mId = to_string(atoi((mDBTableHandler->mDBFile->maData.end()--)->second.c_str()) + 1);
-		}
-		if (mId == "") {
-			mId = "1";
-		}
-		maValue[0] = mId;
+    if (mId == "" && mDBTableHandler->mDBFile->maData.size() > 0) {
+        nulong vId = mDBTableHandler->mDBFile->maData.rbegin()->first>>32;
+        if (vId < 0xFFFFFFFF) {
+            mId = to_string(vId + 1);
+        } else {
+            LOGE("Error: index overflow on DBObject commit");
+            mId = "overflow";
+            vDBObject = nullptr;
+        }
+    }
+    if (mId == "") {
+        mId = "1";
+    }
+    if (mId != "overflow") {
+        maValue[0] = mId;
 
-		for ( i = 0 ; i < mDBTableHandler->mDBTable->cField ; ++i ) {
-			mDBTableHandler->mDBFile->set(mId + w->dbh->SEP + to_string(i), maValue[i]);
-		}
-		mDBTableHandler->mDBFile->commit();
-		mIsCache = false;
-		return this;
+        for ( i = 0 ; i < mDBTableHandler->mDBTable->cField ; ++i ) {
+            mDBTableHandler->mDBFile->set((to_long(mId)<<32) + i, maValue[i]);
+        }
+        mDBTableHandler->mDBFile->commit();
+        mIsCache = false;
+    }
+    return vDBObject;
 }
 
 bool DBObject::apply(DBFilter* filtre, bool selected)
@@ -197,15 +223,19 @@ DBCollection::DBCollection(Wrapper* w, DBTableHandler* dbTableHandler)
 
 DBCollection::~DBCollection()
 {
+	for (DBObject* vDBObject : maDBObject) {
+		delete vDBObject;
+	}
+	delete mDBFiltre;
 }
 
 DBCollection* DBCollection::load()
 {
 	if (!isLoaded) {
-		int i = 0;
-		map<String,String>::iterator it = mDBTableHandler->mDBFile->maData.begin();
+		nuint i = 0;
+		map<nulong,String>::iterator it = mDBTableHandler->mDBFile->maData.begin();
 
-		for ( i = 0 ; i < (int)mDBTableHandler->mDBFile->maData.size()/mDBTableHandler->mDBTable->cField && it != mDBTableHandler->mDBFile->maData.end() ; ++i ) {
+		for ( i = 0 ; i < (nuint)mDBTableHandler->mDBFile->maData.size()/mDBTableHandler->mDBTable->cField && it != mDBTableHandler->mDBFile->maData.end() ; ++i ) {
 			DBObject* o = new DBObject(w, mDBTableHandler, it->second);
 
 			if (o->apply(mDBFiltre, true)) {
@@ -218,15 +248,45 @@ DBCollection* DBCollection::load()
 	return this;
 }
 
-DBObject* DBCollection::get(int index)
+DBCollection* DBCollection::sort(const String& field, bool ascending)
+{
+	load();
+	multimap<String,DBObject*> vaDBObjectSorted;
+
+	for (DBObject* vDBObject : maDBObject) {
+		vaDBObjectSorted.emplace(vDBObject->get(field), vDBObject);
+	}
+	maDBObject.clear();
+
+	if (ascending) {
+		for (multimap<String,DBObject*>::value_type vPairSorted : vaDBObjectSorted) {
+			maDBObject.push_back(vPairSorted.second);
+		}
+	} else {
+		multimap<String,DBObject*>::reverse_iterator rit;
+
+		for (rit = vaDBObjectSorted.rbegin() ; rit != vaDBObjectSorted.rend() ; ++rit) {
+			maDBObject.push_back((*rit).second);
+		}
+	}
+	return this;
+}
+
+DBObject* DBCollection::get(nint index)
 {
 	return load()->maDBObject[index];
 }
 
 DBCollection* DBCollection::filter(const String& field, const String& value, const String& op)
 {
-	mDBFiltre = new DBFilter(mDBFiltre, new DBFilter(field, value, op), "AND");
-	return this;
+    mDBFiltre = new DBFilter(mDBFiltre, new DBFilter(field, value, op), "AND");
+    return this;
+}
+
+DBCollection* DBCollection::filter(const String& field, nlong value, const String& op)
+{
+    mDBFiltre = new DBFilter(mDBFiltre, new DBFilter(field, value, op), "AND");
+    return this;
 }
 
 DBCollection* DBCollection::filter(DBFilter* left, DBFilter* right, const String& op)
@@ -235,7 +295,7 @@ DBCollection* DBCollection::filter(DBFilter* left, DBFilter* right, const String
 	return this;
 }
 
-int DBCollection::count()
+nint DBCollection::count()
 {
 	return load()->maDBObject.size();
 }

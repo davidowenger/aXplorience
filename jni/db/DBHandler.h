@@ -31,14 +31,13 @@ public:
 
 	String table;
 	vector<String> aField;
-	int cField;
+	nuint cField;
 };
 
 class DBHandler
 {
 public:
 	const String PREFIX;
-	const String SEP;
 	const String TRUE;
 	const String FALSE;
 
@@ -66,7 +65,7 @@ public:
 	DBTableHandler(Wrapper* w, DBTable* dbTable);
    ~DBTableHandler();
 
-    int load();
+    nint load();
 	void drop();
 	DBObject* getInstance();
 	DBObject* getInstance(const String& id);
@@ -75,7 +74,7 @@ public:
 	Wrapper* w;
 	DBTable* mDBTable;
 	DBFile* mDBFile;
-	unordered_map<string,int> maFieldIndex;
+	unordered_map<string,nint> maFieldIndex;
 };
 
 class DBObject
@@ -87,9 +86,12 @@ public:
 	DBObject* load();
 	String* get();
 	String get(const String& field);
-	DBObject* set(String* aValue, int count);
+    nlong count(const String& field);
+    bool is(const String& field);
+	DBObject* set(String* aValue, nuint count);
 	DBObject* set(const String& field, const String& value);
-	DBObject* set(int index, const String& value);
+    DBObject* set(const String& field, nlong value);
+	DBObject* set(nint index, const String& value);
 	DBObject* commit();
 	bool apply(DBFilter* filtre, bool selected);
 
@@ -107,10 +109,12 @@ public:
    ~DBCollection();
 
 	DBCollection* load();
-	DBObject* get(int index);
-	DBCollection* filter(const String& field, const String& value, const String& op);
+	DBObject* get(nint index);
+	DBCollection* sort(const String& field, bool ascending = true);
+    DBCollection* filter(const String& field, const String& value, const String& op);
+    DBCollection* filter(const String& field, nlong value, const String& op);
 	DBCollection* filter(DBFilter* left, DBFilter* right, const String& op);
-	int count();
+	nint count();
 
 	Wrapper* w;
 	DBTableHandler* mDBTableHandler;
@@ -122,6 +126,13 @@ public:
 class DBFilter
 {
 public:
+    DBFilter()
+    {
+        mLeft = nullptr;
+        mRight = nullptr;
+        mOp = "";
+    }
+
     DBFilter(DBFilter* left, DBFilter* right, const String& op)
     {
         mLeft = left;
@@ -136,11 +147,35 @@ public:
         mOp = op;
     }
 
+    DBFilter(const String& left, nlong right, const String& op)
+    {
+        mLeft = new DBFilter(left);
+        mRight = new DBFilter(right);
+        mOp = op;
+    }
+
     DBFilter(const String& string)
     {
         mLeft = nullptr;
         mRight = nullptr;
         mOp = string;
+    }
+
+    DBFilter(nlong value)
+    {
+        mLeft = nullptr;
+        mRight = nullptr;
+        mOp = to_string(value);
+    }
+
+    virtual ~DBFilter()
+    {
+    	if (mLeft) {
+    		delete mLeft;
+    	}
+    	if (mRight) {
+    		delete mRight;
+    	}
     }
 
     DBFilter* mLeft;
@@ -157,6 +192,11 @@ public:
     }
 
     DBFilter* f(const String& left, const String& right, const String& op)
+    {
+        return new DBFilter(left, right, op);
+    }
+
+    DBFilter* f(const String& left, nlong right, const String& op)
     {
         return new DBFilter(left, right, op);
     }

@@ -106,31 +106,35 @@ NClozer::NClozer(NWrapper* w)
 		(nlong)(w->mNPhi03 = new NPhi03()),
 		(nlong)(w->mNKhi03 = new NKhi03()),
 		(nlong)(w->mNPsi03 = new NPsi03()),
-		(nlong)(w->mNOmega03 = new NOmega03()),
+		(nlong)(w->mNOmega03 = new NOmega03())
 	};
-    w->apNVisitor = new nlong[w->N_VISITOR] {
+    w->mcNVisitor = 17;
+    w->maNVisitor = new nlong[w->mcNVisitor] {
         (nlong)(this),
         (nlong)(w->mNVisitorApp = new NVisitorApp(w)),
         (nlong)(w->mNVisitorAppActivity = new NVisitorAppActivity(w)),
         (nlong)(w->mNVisitorAppFragment = new NVisitorAppFragment(w)),
         (nlong)(w->mNVisitorBluetooth = new NVisitorBluetooth(w)),
+        (nlong)(w->mNVisitorContent = new NVisitorContent(w)),
         (nlong)(w->mNVisitorContentRes = new NVisitorContentRes(w)),
-        (nlong)(w->mNVisitorIO = new NVisitorIO(w)),
         (nlong)(w->mNVisitorGraphics = new NVisitorGraphics(w)),
+        (nlong)(w->mNVisitorIO = new NVisitorIO(w)),
+        (nlong)(w->mNVisitorOS = new NVisitorOS(w)),
         (nlong)(w->mNVisitorUtil = new NVisitorUtil(w)),
         (nlong)(w->mNVisitorView = new NVisitorView(w)),
         (nlong)(w->mNVisitorViewView = new NVisitorViewView(w)),
         (nlong)(w->mNVisitorViewViewGroup = new NVisitorViewViewGroup(w)),
         (nlong)(w->mNVisitorWidget = new NVisitorWidget(w)),
         (nlong)(w->mNVisitorWidgetLayout = new NVisitorWidgetLayout(w)),
-        (nlong)(w->mNVisitorWidgetView = new NVisitorWidgetView(w)),
+        (nlong)(w->mNVisitorWidgetView = new NVisitorWidgetView(w))
     };
 }
 
 NClozer::~NClozer()
 {
-	NAPI_nTerminate(w);
+    delete w->dActivity;
 
+    //TODO
     delete w->mNVisitorApp;
     delete w->mNVisitorAppActivity;
     delete w->mNVisitorAppFragment;
@@ -139,7 +143,7 @@ NClozer::~NClozer()
     delete w->mNVisitorIO;
     delete w->mNVisitorView;
 	delete w->mNVisitorWidget;
-	delete[] w->apNVisitor;
+	delete[] w->maNVisitor;
 
 	//TODO
 	delete w->mNAlpha00;
@@ -150,7 +154,7 @@ NClozer::~NClozer()
     delete w->mNNoObject;
 }
 
-NReturn NClozer::nInit(NINIT cState)
+NReturn NClozer::nInit(nint cState)
 {
 	NReturn ret = 0;
 
@@ -170,14 +174,20 @@ NReturn NClozer::nInit(NINIT cState)
 
 NReturnObject NClozer::tRunString(const String& boxed)
 {
-	LOGPRINTI("Call to NAPI for a new string from char sequence : %s", boxed.c_str());
+	LOGPRINTD("Call to NAPI for a new string from char sequence : %s", boxed.c_str());
 	return NAPI_tRunString(w, boxed);
 }
 
 String NClozer::tGetString(NReturnObject tString)
 {
-    LOGPRINTI("Call to NAPI to get the string from jstring : %llu", (unsigned long long)tString);
-	return NAPI_tGetString(w, tString);
+    LOGPRINTV("Call to NAPI to get the string from jstring : %llu", (unsigned long long)tString);
+    return NAPI_tGetString(w, tString);
+}
+
+NReturn NClozer::tDeleteGlobalRef(NParamObject vGlobalRef)
+{
+    LOGPRINTV("Call to NAPI to delete the global reference : %llu", (unsigned long long)vGlobalRef);
+    return NAPI_tDeleteGlobalRef(w, vGlobalRef);
 }
 
 NReturn NClozer::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
@@ -187,9 +197,15 @@ NReturn NClozer::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d
 	for (index = 1 ; index < w->N_ELEMENT; ++index) {
 		tRun(w->mNAlpha00, (NParam)w->apNElement[index], index);
 	}
-	for (index = 1 ; index < w->N_VISITOR; ++index) {
-		tRun(w->mNBeta00, (NParam)w->apNVisitor[index], index);
+	for (index = 1 ; index < w->mcNVisitor; ++index) {
+		tRun(w->mNBeta00, (NParam)w->maNVisitor[index], index);
 	}
+	Typeface::DEFAULT = Typeface::create("", Typeface::NORMAL);
+	Typeface::DEFAULT_BOLD = Typeface::create("", Typeface::BOLD);
+	Typeface::SANS_SERIF = Typeface::create("sans-serif", Typeface::NORMAL);
+	Typeface::SERIF = Typeface::create("serif", Typeface::NORMAL);
+	Typeface::MONOSPACE = Typeface::create("monospace", Typeface::NORMAL);
+
 	w->dActivity = NWrapper::w->mNNoObject->instance<Activity>().getInstance(w);
 
 	return (NReturn)w->dActivity;

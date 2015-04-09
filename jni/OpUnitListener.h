@@ -13,8 +13,9 @@ public:
     virtual void run() override;
     virtual void cancel() override;
 
-    int mOpUnitId;
-    int mOpUnitIdUnique;
+    nint mOpUnitId;
+    nint mOpUnitIdUnique;
+    nint mOpUnitCoreId;
     Wrapper* mWrapper;
     InputStream* mInputStream;
 };

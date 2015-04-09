@@ -52,9 +52,14 @@ public:
 	{
 	}
 
+    virtual int getSelectedItemPosition()
+    {
+        return (nint)NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNOmega00, (NParam)this);
+    }
+
     virtual void setOnItemSelectedListener(OnItemSelectedListener* listener)
     {
-        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNBeta00, (NParam)this);
+        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNBeta00, (NParam)this, (NParam)listener);
     }
 
 private:

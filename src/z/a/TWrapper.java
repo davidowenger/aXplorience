@@ -3,13 +3,14 @@ package z.a;
 import java.util.Hashtable;
 
 import android.content.Context;
-import android.os.Bundle;
 
 public class TWrapper
 {
-	long n;
+    static TWrapper w;
 
-	TElement[] aTElement;
+    long n;
+
+    TElement[] aTElement;
 
     TAlpha00   mTAlpha00;
     TBeta00    mTBeta00;
@@ -111,37 +112,40 @@ public class TWrapper
     TPsi03     mTPsi03;
     TOmega03   mTOmega03;
 
-	TVisitor[] aTVisitor;
-	TClozer tFrame;
-	TVisitor mTVisitorApp;
+    TVisitor[] aTVisitor;
+    TClozer tFrame;
+    TVisitor mTVisitorApp;
     TVisitor mTVisitorAppActivity;
     TVisitor mTVisitorAppFragment;
-	TVisitor mTVisitorBluetooth;
+    TVisitor mTVisitorBluetooth;
+    TVisitor mTVisitorContent;
     TVisitor mTVisitorContentRes;
     TVisitor mTVisitorGraphics;
-	TVisitor mTVisitorIO;
+    TVisitor mTVisitorIO;
+    TVisitor mTVisitorOS;
     TVisitor mTVisitorUtil;
     TVisitor mTVisitorView;
     TVisitor mTVisitorViewView;
     TVisitor mTVisitorViewViewGroup;
-	TVisitor mTVisitorWidget;
+    TVisitor mTVisitorWidget;
     TVisitor mTVisitorWidgetLayout;
     TVisitor mTVisitorWidgetView;
 
-	Hashtable<String,TElement> sTElement;
-	Hashtable<String,TVisitor> sTVisitor;
-	Hashtable<String,Object> sObject;
+    Hashtable<Long,TElement> sTElement;
+    Hashtable<Long,TVisitor> sTVisitor;
+    Hashtable<Long,Object> sObject;
+  //Hashtable<String,Hashtable<Long,Object>> iObject;
     Hashtable<Integer,Object> aObject;
     int cObjectIndex;
 
-	Bundle bundle;
-	Context context;
-	TActivity tActivity;
-	TActivityHandler tActivityHandler;
-	String[] aAction;
-	TActivityReceiver[] tActivityReceiver;
+    Context context;
+    TActivity tActivity;
+    TActivityHandler tActivityHandler;
+    String[] aAction;
+    TActivityReceiver[] tActivityReceiver;
 
-	int cAPI00;
-	boolean doDebug;
-	TAndroid tAndroid;
+    int cAPI00;
+    boolean doDebug;
+    boolean isStrict;
+    TAndroid tAndroid;
 }

@@ -9,6 +9,14 @@ class LinearLayout : public ViewGroup
 friend NSNATIVE::NNoObject;
 
 public:
+	static const int HORIZONTAL = 0;
+	static const int VERTICAL = HORIZONTAL + 1;
+
+	static const int SHOW_DIVIDER_NONE = 0;
+	static const int SHOW_DIVIDER_BEGINNING = SHOW_DIVIDER_NONE + 1;
+	static const int SHOW_DIVIDER_MIDDLE = SHOW_DIVIDER_BEGINNING + 1;
+	static const int SHOW_DIVIDER_END = SHOW_DIVIDER_MIDDLE + 1;
+
     class LayoutParams : public ViewGroup::MarginLayoutParams
     {
     friend NSNATIVE::NNoObject;
@@ -23,8 +31,8 @@ public:
         LayoutParams(int width, int height, float weight)
             : ViewGroup::MarginLayoutParams(NWrapper::w->mNNoObject->instance<ViewGroup::MarginLayoutParams>())
         {
-            double vcWeight = weight;
-            NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNBeta01, (NParam)this, (NParam)width, (NParam)height, (NParam)*reinterpret_cast<long*>(&vcWeight));
+            ndouble vcWeight = weight;
+            NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNBeta01, (NParam)this, (NParam)width, (NParam)height, *reinterpret_cast<NParam*>(&vcWeight));
         }
 
         virtual ~LayoutParams()
@@ -41,7 +49,9 @@ public:
 	LinearLayout(Context* context)
         : ViewGroup(NWrapper::w->mNNoObject->instance<ViewGroup>())
 	{
-		NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)context);
+	    NParam a = (NParam)this;
+        NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNGamma00, a, (NParam)context);
+        //NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)context);
 	}
 
 	virtual ~LinearLayout()

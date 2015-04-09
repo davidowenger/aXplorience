@@ -1,4 +1,5 @@
 #include "Common.h"
+#include "Theme.h"
 
 namespace NSDEVICE
 {
@@ -11,32 +12,140 @@ Activity* Activity::getInstance(NWrapper* const vNWrapper)
 }
 
 NActivity::NActivity(Wrapper* vWrapper)
-    : Activity(), OpUnit(vWrapper)
+    : Activity(), OpUnit(vWrapper), mcView(0), mState(7)
 {
 }
 
 NActivity::~NActivity()
 {
+    //TODO: delete widgets
+    delete mWrapper;
 }
 
-void NActivity::onCreate()
+void NActivity::onCreate(Bundle* savedInstanceState)
 {
-	Activity::onCreate();
+    nuint i;
+
+    Activity::onCreate(savedInstanceState);
+
+    mWrapper->mNActivity = this;
+    mWrapper->mApplication = getApplication();
+    mWrapper->mFragmentManager = getFragmentManager();
+    mWrapper->mResources = mWrapper->mApplication->getResources();
+    mWrapper->mDisplayMetrics = mWrapper->mResources->getDisplayMetrics();
+    mWrapper->mConfiguration = mWrapper->mResources->getConfiguration();
+    mWrapper->mcDensity = mWrapper->mDisplayMetrics->getDensity();
+    mWrapper->mcWidthDp = mWrapper->mConfiguration->getScreenWidthDp();
+    mWrapper->maColor = new nuint[25] {
+        0x00FFFFFF, //transparent
+        0xFF000000, //black
+        0xFFFFFFFF, //white
+        0xFFE8E8E8, //grey 1
+        0x75E8E8E8, //grey 2
+        0x50E8E8E8, //grey
+        0xFFFFE4E4, //red 1
+        0xFFFFCACA, //red 2
+        0xFFCC0000, //red
+        0xFFF0F8DB, //green 1
+        0xFFE2F0B6, //green 2 // 10
+        0xFF669900, //green
+        0xFFE2F4FB, //blue 1
+        0xFFC5EAF8, //blue 2
+        0xFF0099CC, //blue
+        0xFFFFF6DF, //yellow 1
+        0xFFFFECC0, //yellow 2
+        0xFFFF8A00, //yellow
+        0xFFF5EAFA, //purple 1
+        0xFFE5CAF2, //purple 2
+        0xFF9933CC, //purple  // 20
+        0xFFFFEED5, //orange 1
+        0xFFFF8F76, //orange 2
+        0xFFFF4E00, //orange
+        0xFF99CC00, //green selected
+    };
+    mWrapper->mcRootLayoutItem = 9;
+    mWrapper->maRootLayoutItem = new RootLayoutItem[mWrapper->mcRootLayoutItem];
+    mWrapper->maRootLayoutItem[Wrapper::kViewNone] =     {0, {{0,0,0}, {0,0,0}, {0,0,0}}};
+    mWrapper->maRootLayoutItem[Wrapper::kViewHome] =     {0, {{0,0,2}, {0,0,0}, {0,0,0}}};
+    mWrapper->maRootLayoutItem[Wrapper::kViewAbout] =    {1, {{0,0,1}, {1,1,2}, {0,0,0}}};
+    mWrapper->maRootLayoutItem[Wrapper::kViewSettings] = {1, {{0,0,1}, {2,0,2}, {0,0,0}}};
+    mWrapper->maRootLayoutItem[Wrapper::kViewDetails] =  {1, {{0,0,2}, {3,1,2}, {0,0,0}}};
+    mWrapper->maRootLayoutItem[Wrapper::kViewEdit] =     {2, {{0,0,2}, {3,1,2}, {4,1,2}}};
+    mWrapper->maRootLayoutItem[Wrapper::kViewAdd] =      {1, {{0,0,2}, {4,1,2}, {0,0,0}}};
+    mWrapper->maRootLayoutItem[Wrapper::kViewDelete] =   {0, {{0,0,2}, {0,0,0}, {0,0,0}}};
+    mWrapper->maRootLayoutItem[Wrapper::kViewSave] =     {1, {{0,0,2}, {3,1,2}, {0,0,0}}};
+
+    mWrapper->mRootLayoutId = 0x001FF100;
+    mWrapper->mRootLayout = new RootLayout(mWrapper);
+    mWrapper->mRootLayout->setId(mWrapper->mRootLayoutId);
+    setContentView((View*)mWrapper->mRootLayout);
 
 	//todo
-	mWrapper->sFileDir = w->nFrame->tGetString(w->nFrame->tRunObject(1));
+	mWrapper->sFileDir = mWrapper->w->nFrame->tGetString(mWrapper->w->nFrame->tRunObject(1));
 
-	mWrapper->dBluetoothAdapter = new BluetoothAdapter();
-	mWrapper->layout = new LinearLayout(this);
-	setContentView((View*)mWrapper->layout);
+    mWrapper->maDrawable = new Drawable*[12] {
+		mWrapper->mResources->getDrawable("ic_visibility_grey"),
+		mWrapper->mResources->getDrawable("ic_visibility_green"),
+		mWrapper->mResources->getDrawable("ic_visibility_black_48dp"),
+		mWrapper->mResources->getDrawable("ic_left_black"),
+		mWrapper->mResources->getDrawable("ic_left_green"),
+		mWrapper->mResources->getDrawable("ic_right_black"),
+		mWrapper->mResources->getDrawable("ic_right_green"),
+		mWrapper->mResources->getDrawable("ic_action_edit"),
+		mWrapper->mResources->getDrawable("ic_action_delete"),
+		mWrapper->mResources->getDrawable("ic_action_save"),
+        mWrapper->mResources->getDrawable("ic_action_add"),
+        mWrapper->mResources->getDrawable("ic_launcher"),
+	};
+    mWrapper->mcTextSize = (int)(27/mWrapper->mcDensity);
+	mWrapper->maMenu = new String[3] {
+        "Home",
+        "Settings",
+        "About"
+	};
+	mWrapper->mcCategory = 4;
+	mWrapper->maCategory = new String[mWrapper->mcCategory] {
+		"Listen to Music",
+		"Have a Drink",
+		"Play some Game",
+		"See some Event"
+	};
 
-    //mWrapper->aDiscoveredDevice = new Col<BluetoothDevice*>();
-	mWrapper->cMaxOpUnit = 25;
+    mWrapper->mActionBar = getActionBar();
+    mWrapper->mActionBar->setIcon(mWrapper->maDrawable[11]);
+    mWrapper->mMessageLayout = new LinearLayout(mWrapper->mApplication);
+    mWrapper->mWidgetHome = new WidgetHome(mWrapper);
+
+    mWrapper->mcFragmentView = 5;
+    mWrapper->maGestureDetector = new GestureDetector*[mWrapper->mcFragmentView];
+    mWrapper->maFragmentView = new FragmentView*[mWrapper->mcFragmentView] {
+        (mWrapper->mFragmentViewHome = new FragmentViewHome(mWrapper)),
+        (mWrapper->mFragmentViewAbout = new FragmentViewAbout(mWrapper)),
+        (mWrapper->mFragmentViewSettings = new FragmentViewSettings(mWrapper)),
+        (mWrapper->mFragmentViewDetails = new FragmentViewDetails(mWrapper)),
+        (mWrapper->mFragmentViewEdit = new FragmentViewEdit(mWrapper))
+    };
+    for (i = 0 ; i < mWrapper->mcFragmentView ; ++i) {
+        mWrapper->maGestureDetector[i] = new GestureDetector(mWrapper->mApplication, mWrapper->maFragmentView[i]);
+    };
+    mWrapper->mcFragmentLevel = 3;
+    mWrapper->maFragmentLevel = new FragmentLevel*[mWrapper->mcFragmentLevel] {
+        (mWrapper->mFragmentLevel0 = new FragmentLevel0(mWrapper)),
+        (mWrapper->mFragmentLevel1 = new FragmentLevel1(mWrapper)),
+        (mWrapper->mFragmentLevel2 = new FragmentLevel2(mWrapper))
+    };
+
+	mWrapper->cMaxOpUnit = 18;
 	mWrapper->opSquad = new OpSquad(mWrapper, mWrapper->cMaxOpUnit);
 	mWrapper->opUnitCore = new OpUnitCore(mWrapper);
 
     mWrapper->opSquad->add(this);
     mWrapper->opSquad->add(mWrapper->opUnitCore)->start();
+}
+
+void NActivity::onStart()
+{
+    Activity::onStart();
 }
 
 void NActivity::onPause()
@@ -47,54 +156,109 @@ void NActivity::onPause()
 
 void NActivity::onStop()
 {
-    //stop animations and other things that may be consuming CPU
-    delete mWrapper->opSquad;
     Activity::onStop();
 }
 
-void NActivity::handleMessage(NParam a, NParam b, NParam c)
+void NActivity::onDestroy()
 {
-    nRun((NElement*)a, b, c);
+    //FIXME check
+    delete mWrapper->opSquad;
+    delete mWrapper->mRootLayout;
+    Activity::onDestroy();
 }
 
-// Display a Drop from a peer
-NReturn NActivity::visit(NAlpha01* element, NParam a, NParam b, NParam c, NParam d)
+void NActivity::buzz(DBCollection* vDBCollection)
 {
-    DBObject* vDBObject = ((DBObject*)a);
-    TextView* vTextView = new TextView(this);
-    vTextView->setTextSize(20);
-    vTextView->setText(vDBObject->get("title"));
-    mWrapper->layout->addView(vTextView);
-    return 0;
+    render(vDBCollection);
+    sendOp(0, mWrapper->opUnitCore->mId, mWrapper->w->mNMu00, new Op());
 }
 
-void NActivity::onActivityResult(int action, int requestCode, int resultCode, int extra)
+void NActivity::clear(DBCollection* vDBCollection)
 {
+    int i = 0;
+    vector<WidgetMessage*> vaWidgetMessage;
+
+    for (i = 0 ; i < mWrapper->mMessageLayout->getChildCount() ; ++i) {
+        vaWidgetMessage.push_back((WidgetMessage*)mWrapper->mMessageLayout->getChildAt(i));
+    }
+    mWrapper->mMessageLayout->removeAllViews();
+
+    for (WidgetMessage* vWidgetMessage : vaWidgetMessage) {
+         delete vWidgetMessage;
+    }
+    for (i = 0 ; i < vDBCollection->count() ; ++i) {
+        mWrapper->mMessageLayout->addView( vDBCollection->get(i)->get("in") == mWrapper->dbh->TRUE ? (View*)new WidgetMessageInbound(mWrapper) : (View*)new WidgetMessageOutbound(mWrapper) );
+    }
+    render(vDBCollection);
 }
 
-void NActivity::onReceiveDiscoveryFinished()
+void NActivity::handleMessage(NParam a, NParam b, NParam c, NParam d)
 {
-}
-
-void NActivity::onReceiveDiscoveryStarted()
-{
+    nRun((NElement*)a, b, c, d);
 }
 
 void NActivity::onReceiveFoundDevice(BluetoothDevice* dBluetoothDevice)
 {
-    sendOp(mWrapper->opUnitCore->mId, mWrapper->w->mNAlpha00, new OpParam((NParam)dBluetoothDevice));
+    sendOp(0, mWrapper->opUnitCore->mId, mWrapper->w->mNAlpha00, new OpParam((NParam)dBluetoothDevice));
 }
 
-void NActivity::onReceiveLocalName(String localName)
+void NActivity::render(DBCollection* vDBCollection)
 {
+    int i = 0;
+
+    for (i = 0 ; i < vDBCollection->count() ; ++i) {
+        ((WidgetMessage*)mWrapper->mMessageLayout->getChildAt(i))->init(0, to_long(vDBCollection->get(i)->get("id")));
+    }
+    delete vDBCollection;
 }
 
-void NActivity::onReceiveState(int state, int statePrevious)
+bool NActivity::setView(nint vcView, nint vcDBObjectId)
 {
+    nuint i;
+    bool ret = true;
+
+    for (i = 0 ; i < mWrapper->mcFragmentLevel ; ++i) {
+        mWrapper->maFragmentLevel[i]->init(vcView, vcDBObjectId);
+    }
+    mcView = vcView;
+    return ret;
 }
 
-void NActivity::onReceiveScanMode(int mode, int modePrevious)
+void NActivity::tilt(nuint color)
 {
+    mWrapper->maFragmentView[0]->setBackgroundColor(color);
+    mWrapper->maFragmentView[0]->invalidate();
+    mState = color;
+}
+
+NReturn NActivity::visit(NAlpha01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    buzz((DBCollection*)a);
+    return 0;
+}
+
+NReturn NActivity::visit(NBeta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    clear((DBCollection*)a);
+    return 0;
+}
+
+NReturn NActivity::visit(NGamma01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    render((DBCollection*)a);
+    return 0;
+}
+
+NReturn NActivity::visit(NDelta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    setView((nint)a, (nint)b);
+    return 0;
+}
+
+NReturn NActivity::visit(NEpsilon01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    tilt((nuint)a);
+    return 0;
 }
 
 } // End namespace
@@ -102,30 +266,17 @@ void NActivity::onReceiveScanMode(int mode, int modePrevious)
 namespace std
 {
 
-int to_long(const string& sLong, unsigned long long& cLong)
+long long int to_long(const string& vsLong, int* vcError)
 {
-	int error = 0;
-	int cBase = 1;
-	unsigned long long term = 0;
-	string::size_type i = 0;
-	string::size_type cRet = sLong.length();
-	string sRet("");
-	cLong = 0;
-	while (i < cRet && sLong.at(i) >= '0' && sLong.at(i) <= '9') {
-		sRet += sLong.at(i++);
-	}
-	cRet = sRet.length();
-	long j = cRet;
-	while (--j >= 0 && !error) {
-		cLong += term;
-		term = (sRet.at(j ) - '0')*cBase;
-		error = (unsigned long long)-1 - cLong < term;
-		cBase *= 10;
-	}
-	if (!error) {
-		cLong += term;
-	}
-    return error || !cRet;
+	long long int vcRet = 0;
+	istringstream vistringstream(vsLong);
+	vistringstream >> vcRet;
+    int vcErrorInternal = vsLong.empty() || vistringstream.fail();
+
+    if (vcError) {
+    	*vcError = vcErrorInternal;
+    }
+    return ( vcErrorInternal ? 0 : vcRet );
 }
 
 vector<string> split(const string& str, const string& delimiter)
@@ -146,14 +297,16 @@ vector<string> split(const string& str, const string& delimiter)
 		for ( j = i ; j < cString && j < i + cDelimiter ; ++j ) {
 			current += sString[j];
 		}
-		if (current == delimiter || i + 1 == cString) {
+		if (current == delimiter) {
 			result.push_back(token);
+			token = "";
 			i += cDelimiter;
 		} else {
 			token += sString[i];
 			i += 1;
 		}
 	}
+    result.push_back(token);
 	return result;
 }
 
@@ -166,80 +319,3 @@ int utf8len(const string& vString)
 }
 
 } // End namespace
-
-
-//void MyApplication::onResume()
-//{
-//	Activity::onResume();
-//}
-
-//jstring Java_com_example_hellojni_HelloJni_stringFromJNI( JNIEnv* env, jobject thiz )
-//return (*env)->NewStringUTF(env, "Hello from JNI !");
-//(*env)->NewStringUTF(env, outCStr);
-
-//import hashCode.R;
-
-//import android.content.Context;
-//import android.content.SharedPreferences;
-//import android.view.Gravity;
-//import android.view.ViewGroup.LayoutParams;
-//import android.widget.AdapterView;
-//import android.widget.ArrayAdapter;
-//import android.widget.ImageView;
-//import android.widget.ImageView.ScaleType;
-//import android.widget.LinearLayout;
-//import android.widget.Spi00nner;
-//import android.widget.TextView;
-//import android.widget.Toast;
-//import android.widget.AdapterView.OnItemSelectedListener;
-//import android.graphi00cs.Bitmap;
-//import android.graphi00cs.Canvas;
-
-//        //setContentView(new AXplorienceView(this));
-//        //setContentView(R.layout.main);
-//        TextView label = new TextView(this);
-//        label.setTextSize(20);
-//        label.setGravity(Gravity.CENTER_HORIZONTAL);
-//        ImageView pi00c = new ImageView(this);
-//        //pi00c.setImageResource(R.drawable.matterho00rn);
-//        pi00c.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-//        pi00c.setA00djustViewBounds(true);
-//        pi00c.setScaleType(ScaleType.FIT_XY);
-//        pi00c.setMaxHeight(250);
-//        pi00c.setMaxWidth(250);
-//        LinearLayout ll = new LinearLayout(this);
-//        ll.setOrientation(LinearLayout.VERTICAL);
-//        ll.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-//        ll.setGravity(Gravity.CENTER);
-//        ll.addView(label);
-//        ll.addView(pi00c);
-//        setContentView((View)ll);
-//    }
-//
-//}
-//
-//class AXplorienceView extends View {
-//    private Bitmap mBitmap;
-//    private long mStartTime;
-//
-//    /* implementend by libplasma.so */
-//    private static native void renderPlasma(Bitmap  bitmap, long time_ms);
-//
-//    public AXplorienceView(Context context) {
-//        super(context);
-//
-//        final int W = 200;
-//        final int H = 200;
-//
-//        mBitmap = Bitmap.createBitmap(W, H, Bitmap.Config.RGB_565);
-//        mStartTime = System.currentTimeMillis();
-//    }
-//
-//    @Override protected void onDraw(Canvas canvas) {
-//        //canvas.drawColor(0xFFCCCCCC);
-//        renderPlasma(mBitmap, System.currentTimeMillis() - mStartTime);
-//        canvas.drawBitmap(mBitmap, 0, 0, null);
-//        // force a redraw, with a different time-based pattern.
-//        invalidate();
-//    }
-//}

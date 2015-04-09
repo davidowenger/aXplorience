@@ -12,17 +12,9 @@ public:
     class OnGestureListener
     {
     protected:
-        OnGestureListener()
-        {
-            NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNAlpha02, (NParam)this);
-        }
-
+        OnGestureListener();
     public:
-        virtual ~OnGestureListener()
-        {
-            NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
-        }
-
+        virtual ~OnGestureListener();
         virtual bool onDown(MotionEvent* e) = 0;
         virtual bool onFling(MotionEvent* e1, MotionEvent* e2, float velocityX, float velocityY) = 0;
         virtual void onLongPress(MotionEvent* e) = 0;
@@ -31,24 +23,11 @@ public:
         virtual bool onSingleTapUp(MotionEvent* e) = 0;
     };
 
-    GestureDetector(Context* context, GestureDetector::OnGestureListener* listener)
-    {
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNAlpha00, (NParam)this);
-    }
-
-    virtual ~GestureDetector()
-    {
-    }
-
-    virtual bool onTouchEvent(MotionEvent* ev)
-    {
-        return NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNBeta00, (NParam)this, (NParam)ev);
-    }
-
+    GestureDetector(Context* context, GestureDetector::OnGestureListener* listener);
+    virtual ~GestureDetector();
+    virtual bool onTouchEvent(MotionEvent* ev);
 private:
-    GestureDetector(NNoObject* vNNoObject)
-    {
-    }
+    GestureDetector(NNoObject* vNNoObject);
 };
 
 } // End namespace

@@ -4,9 +4,9 @@
 namespace NSDEVICE
 {
 
-class BluetoothAdapter
+class BluetoothAdapter : public Object
 {
-friend class NSNATIVE::NVisitorBluetooth;
+friend NSNATIVE::NNoObject;
 
 public:
 	const int ERROR = -1 >> 1;
@@ -18,17 +18,10 @@ public:
     const int SCAN_MODE_CONNECTABLE = 21;
     const int SCAN_MODE_CONNECTABLE_DISCOVERABLE = 23;
 
-	//const int BluetoothAdapter::ERROR = -1 >> 1;
-	//const int BluetoothAdapter::STATE_OFF = 10;
-	//const int BluetoothAdapter::STATE_TURNING_ON = 11;
-	//const int BluetoothAdapter::STATE_ON = 12;
-	//const int BluetoothAdapter::STATE_TURNING_OFF = 13;
-	//const int BluetoothAdapter::SCAN_MODE_NONE = 20;
-	//const int BluetoothAdapter::SCAN_MODE_CONNECTABLE = 21;
-	//const int BluetoothAdapter::SCAN_MODE_CONNECTABLE_DISCOVERABLE = 23;
+    static BluetoothAdapter* getDefaultAdapter();
+    static bool checkBluetoothAddress(const String& address);
 
-    BluetoothAdapter();
-   ~BluetoothAdapter();
+    virtual ~BluetoothAdapter() override;
 
     BluetoothDevice* getRemoteDevice(const String& address);
     bool isEnabled();
@@ -45,9 +38,15 @@ public:
     void* getBondedDevices(); //List...<BluetoothDevice>
     BluetoothServerSocket* listenUsingRfcommWithServiceRecord(const String& name, const String& uuid);
     BluetoothServerSocket* listenUsingInsecureRfcommWithServiceRecord(const String& name, const String& uuid);
-    bool checkBluetoothAddress(const String& address);
+
+    //TODO: restore Android API
     void discoverable();
     void discoverable(int cTimeout);
+
+private:
+    BluetoothAdapter(NNoObject* vNNoObject)
+    {
+    }
 };
 
 } // End namespace

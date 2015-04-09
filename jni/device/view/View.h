@@ -13,120 +13,60 @@ public:
     static const int INVISIBLE = 4;
     static const int GONE = 8;
 
+    class LayoutParams : public Object
+    {
+    public:
+        virtual ~LayoutParams();
+    protected:
+        LayoutParams();
+    };
+
     class OnClickListener
     {
     public:
-        virtual ~OnClickListener()
-        {
-            NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
-        }
-
+        virtual ~OnClickListener();
         virtual void onClick(View* v) = 0;
-
     protected:
-        OnClickListener()
-        {
-            NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNAlpha03, (NParam)this);
-        }
+        OnClickListener();
     };
 
     class OnCreateContextMenuListener
     {
     public:
-        virtual ~OnCreateContextMenuListener()
-        {
-            NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
-        }
-
+        virtual ~OnCreateContextMenuListener();
         virtual void onCreateContextMenu(ContextMenu* menu, View* v, ContextMenu::ContextMenuInfo* menuInfo) = 0;
-
     protected:
-        OnCreateContextMenuListener()
-        {
-            NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNBeta03, (NParam)this);
-        }
+        OnCreateContextMenuListener();
     };
 
     class OnTouchListener
     {
     public:
-        virtual ~OnTouchListener()
-        {
-            NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
-        }
-
+        virtual ~OnTouchListener();
         virtual bool onTouch(View* v, MotionEvent* event) = 0;
-
     protected:
-        OnTouchListener()
-        {
-            NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNGamma03, (NParam)this);
-        }
+        OnTouchListener();
     };
 
-	View(Context* context)
-	{
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNAlpha00, (NParam)this);
-	}
-
-	virtual ~View()
-	{
-	}
-
-    virtual int getId()
-    {
-        return (int)NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNBeta00, (NParam)this);
-    }
-
-	virtual void invalidate()
-    {
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNGamma00, (NParam)this);
-    }
-
-	virtual void requestLayout()
-    {
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNDelta00, (NParam)this);
-    }
-
-	virtual void setBackgroundColor(int color)
-    {
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNEpsilon00, (NParam)this, (NParam)color);
-    }
-
-	virtual void setBackgroundDrawable(Drawable* background)
-    {
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNDzeta00, (NParam)this, (NParam)background);
-    }
-
-    virtual void setId(int id)
-    {
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNEta00, (NParam)this, (NParam)id);
-    }
-
-	virtual void setLayoutParams(LayoutParams* params)
-    {
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNTheta00, (NParam)this, (NParam)params);
-    }
-
-	virtual void setOnClickListener(OnClickListener* l)
-    {
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNIota00, (NParam)this, (NParam)l);
-    }
-
-	virtual void setPadding(int left, int top, int right, int bottom)
-    {
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNKappa00, (NParam)this, (NParam)left, (NParam)top, (NParam)right, (NParam)bottom);
-    }
-
-	virtual void setVisibility(int visibility)
-    {
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNLambda00, (NParam)this, (NParam)visibility);
-    }
-
+	View(Context* context);
+	virtual ~View();
+	virtual Drawable* getBackground();
+    virtual int getId();
+	virtual void invalidate();
+	virtual bool performClick();
+	virtual void requestLayout();
+	virtual void setBackgroundColor(int color);
+	virtual void setBackgroundDrawable(Drawable* background);
+    virtual void setId(int id);
+	virtual void setLayoutParams(View::LayoutParams* params);
+	virtual void setMinimumHeight(int minHeight);
+	virtual void setMinimumWidth(int minWidth);
+	virtual void setOnClickListener(View::OnClickListener* l);
+	virtual void setOnTouchListener(View::OnTouchListener* l);
+	virtual void setPadding(int left, int top, int right, int bottom);
+	virtual void setVisibility(int visibility);
 private:
-    View(NNoObject* vNNoObject)
-    {
-    }
+    View(NNoObject* vNNoObject);
 };
 
 } // End namespace

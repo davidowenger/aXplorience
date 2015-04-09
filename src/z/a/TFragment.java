@@ -12,12 +12,18 @@ import android.view.ViewGroup;
 
 public class TFragment extends Fragment
 {
-    public TWrapper w;
-    public long n;
+    private TWrapper w;
+    private long n;
 
     //*******************************************************************************************
     //******************************************* Fragment **************************************
     //*******************************************************************************************
+
+    public TFragment()
+    {
+        this.w = null;
+        this.n = 0;
+    }
 
     public TFragment(TWrapper w, long n)
     {
@@ -29,126 +35,160 @@ public class TFragment extends Fragment
     //************************************* Fragment events ************************************
     //* This passes the call back to the default implementation if the method is not overriden *
     //******************************************************************************************
+
     @Override
     public void onAttach(Activity vActivity)
     {
-        w.mTVisitorAppFragment.nRun(w.mTAlpha01, n,
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTAlpha01, n, -1, 1), vActivity)
-        );
+        long vcKey;
+        if (n != 0) {
+            w.mTVisitorAppFragment.nRun(w.mTAlpha01, n,
+                (vcKey = w.tFrame.getKey(vActivity)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTAlpha01, n, -1, 1), vActivity)
+            );
+        } else {
+            super.onAttach(vActivity);
+        }
     }
 
     @Override
     public void onCreate(Bundle vBundle)
     {
-        w.mTVisitorAppFragment.nRun(w.mTBeta01, n,
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTBeta01, n, -1, 1), vBundle)
-        );
+        long vcKey;
+//        if (n == 0 && vBundle.containsKey("z.a.TFragment.n")) {
+//            n = vBundle.getLong("z.a.TFragment.n");
+//            w = TWrapper.w;
+//        }
+        if (n != 0) {
+            w.mTVisitorAppFragment.nRun(w.mTBeta01, n,
+                (vcKey = w.tFrame.getKey(vBundle)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTBeta01, n, -1, 1), vBundle)
+            );
+        } else {
+            super.onCreate(vBundle);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater vLayoutInflater, ViewGroup vViewGroup, Bundle vBundle)
     {
-        return (View)w.sObject.get("" + w.mTVisitorAppFragment.nRun(w.mTBeta01,n,
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 3), vLayoutInflater),
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 2), vViewGroup),
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 1), vBundle)
-        ));
+        long vcKey;
+        if (n != 0) { return (View)w.sObject.get(w.mTVisitorAppFragment.nRun(w.mTGamma01,n,
+            (vcKey = w.tFrame.getKey(vLayoutInflater)) != -1 ? vcKey :  w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 3), vLayoutInflater),
+            (vcKey = w.tFrame.getKey(vViewGroup)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 2), vViewGroup),
+            (vcKey = w.tFrame.getKey(vBundle)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 1), vBundle)
+        )); } else { return super.onCreateView(vLayoutInflater, vViewGroup, vBundle); }
     }
 
     @Override
     public void onActivityCreated(Bundle vBundle)
     {
-        w.mTVisitorAppFragment.nRun(w.mTDelta01, n,
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTDelta01, n, -1, 1), vBundle)
-        );
+        long vcKey;
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTDelta01, n,
+                (vcKey = w.tFrame.getKey(vBundle)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTDelta01, n, -1, 1), vBundle)
+        ); } else { super.onActivityCreated(vBundle); }
     }
 
     @Override
     public void onViewStateRestored(Bundle vBundle)
     {
-        w.mTVisitorAppFragment.nRun(w.mTEpsilon01, n,
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTEpsilon01, n, -1, 1), vBundle)
-        );
+        long vcKey;
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTEpsilon01, n,
+                (vcKey = w.tFrame.getKey(vBundle)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTEpsilon01, n, -1, 1), vBundle)
+        ); } else { super.onViewStateRestored(vBundle); }
     }
 
     @Override
     public void onStart()
     {
-        w.mTVisitorAppFragment.nRun(w.mTDzeta01, n);
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTDzeta01, n
+        ); } else { super.onStart(); }
     }
 
     @Override
     public void onResume()
     {
-        w.mTVisitorAppFragment.nRun(w.mTEta01, n);
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTEta01, n
+        ); } else { super.onResume(); }
     }
 
     @Override
     public void onPause()
     {
-        w.mTVisitorAppFragment.nRun(w.mTTheta01, n);
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTTheta01, n
+        ); } else { super.onPause(); }
     }
 
     @Override
     public void onSaveInstanceState(Bundle vBundle)
     {
-        w.mTVisitorAppFragment.nRun(w.mTIota01, n,
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTIota01, n, -1, 1), vBundle)
-        );
+        long vcKey;
+        if (n != 0) {
+            w.mTVisitorAppFragment.nRun(w.mTIota01, n,
+                (vcKey = w.tFrame.getKey(vBundle)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTIota01, n, -1, 1), vBundle)
+            );
+//            vBundle.putLong("z.a.TFragment.n", n);
+        } else {
+            super.onSaveInstanceState(vBundle);
+        }
     }
 
     @Override
     public void onStop()
     {
-        w.mTVisitorAppFragment.nRun(w.mTKappa01, n);
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTKappa01, n
+        ); } else { super.onStop(); }
     }
 
     @Override
     public void onDestroyView()
     {
-        w.mTVisitorAppFragment.nRun(w.mTLambda01, n);
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTLambda01, n
+        ); } else { super.onDestroyView(); }
     }
 
     @Override
     public void onDestroy()
     {
-        w.mTVisitorAppFragment.nRun(w.mTMu01, n);
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTMu01, n
+        ); } else { super.onDestroy(); }
     }
 
     @Override
     public void onDetach()
     {
-        w.mTVisitorAppFragment.nRun(w.mTNu01, n);
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTNu01, n
+        ); } else { super.onDetach(); }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu vMenu, MenuInflater vMenuInflater)
     {
-        w.mTVisitorAppFragment.nRun(w.mTXi01, n,
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTXi01, n, -1, 2), vMenu),
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTXi01, n, -1, 1), vMenuInflater)
-        );
+        long vcKey;
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTXi01, n,
+                (vcKey = w.tFrame.getKey(vMenu)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTXi01, n, -1, 2), vMenu),
+                (vcKey = w.tFrame.getKey(vMenuInflater)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTXi01, n, -1, 1), vMenuInflater)
+        ); } else { super.onCreateOptionsMenu(vMenu, vMenuInflater); }
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu vMenu)
     {
-        w.mTVisitorAppFragment.nRun(w.mTOmicron01, n,
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTOmicron01, n, -1, 1), vMenu)
-        );
+        long vcKey;
+        if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTOmicron01, n,
+            (vcKey = w.tFrame.getKey(vMenu)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTOmicron01, n, -1, 1), vMenu)
+        ); } else { super.onPrepareOptionsMenu(vMenu); }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem vMenuItem)
     {
-        return w.mTVisitorAppFragment.nRun(w.mTPi01, n,
-            w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTPi01, n, -1, 1), vMenuItem)
-        ) != 0;
+        long vcKey;
+        if (n != 0) { return w.mTVisitorAppFragment.nRun(w.mTPi01, n,
+            (vcKey = w.tFrame.getKey(vMenuItem)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTPi01, n, -1, 1), vMenuItem)
+        ) != 0; } else { return super.onOptionsItemSelected(vMenuItem); }
     }
 
-    //*******************************************************************************************//
-    //**************************************** Fragment : super  ********************************//
-    //*******************************************************************************************//
+    //*****************************************************************************************
+    //**************************************** Fragment super  ********************************
+    //*****************************************************************************************
     public void onAttachParent(Activity vActivity)
     {
         super.onAttach(vActivity);

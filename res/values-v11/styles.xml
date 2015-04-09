@@ -1,0 +1,7 @@
+<resources>
+
+    <style name="AppBaseTheme" parent="android:Theme.Holo.Light">
+        <!-- overriden by res/values-vNN/styles.xml for API NN -->
+    </style>
+
+</resources>

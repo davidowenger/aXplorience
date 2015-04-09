@@ -58,11 +58,6 @@ void OpUnit::onOpUnitStart()
     mAliveThread = false;
 }
 
-int getUnitType()
-{
-    return 0;
-}
-
 void OpUnit::run()
 {
 }
@@ -76,20 +71,32 @@ Op* OpUnit::nextOp()
 {
     Op* vOp = nullptr;
 	int id = mOpSquad->mcMaxOpUnit;
-	while (--id >= 0 && !(vOp = mOpSquad->maCol[mId][id]->next())) { }
+	while (mAlive && --id >= 0 && !(vOp = mOpSquad->maCol[mId][id]->next())) { }
 	return vOp;
 }
 
-OpCallback* OpUnit::sendOp(int vcOpUnitId, NElement* vNElement, Op* vOp)
+OpCallback* OpUnit::sendOp(int vcOpUnitType, int vcOpUnitId, NElement* vNElement, Op* vOp)
 {
     OpCallback* vOpCallback = nullptr;
 
-    if (mOpSquad->maOpUnitType[vcOpUnitId]) {
+    if (mOpSquad->maOpUnitType[vcOpUnitId] && (!vcOpUnitType || mOpSquad->maOpUnitType[vcOpUnitId] == vcOpUnitType)) {
         vOp->mNElement = vNElement;
         mOpSquad->maCol[vcOpUnitId][mId]->add(vOp);
         vOpCallback = vOp->mOpCallback;
     }
     return vOpCallback;
+}
+
+NReturn OpUnit::sendOpForResult(int vcOpUnitType, int vcOpUnitId, NElement* vNElement, Op* vOp)
+{
+    OpCallback* vOpCallback = sendOp(vcOpUnitType, vcOpUnitId, vNElement, vOp);
+
+    while (mAlive && !*vOpCallback->mDone) {
+        this_thread::sleep_for(chrono::milliseconds(300));
+    }
+    NReturn vNReturn = *vOpCallback->mNReturn;
+    delete vOpCallback;
+    return vNReturn;
 }
 
 void OpUnit::handleOp()
@@ -109,25 +116,26 @@ void OpUnit::handleOp()
 
 bool OpUnit::waitOp(TimeStamp vcMilisecondes, NElement* vNElement)
 {
-    Op* vOp = nullptr;
-    bool vAlive = true;
-    TimeStamp vcTimeStampStart = steady_clock::now().time_since_epoch().count();
-    TimeStamp vcTimeStampNow;
-
-    while (vAlive && ((vcTimeStampNow = steady_clock::now().time_since_epoch().count()) - vcTimeStampStart < vcMilisecondes)) {
-        if ((vOp = nextOp()) && vOp->mNElement == vNElement) {
-            execOp(vOp);
-            vAlive = false;
-        } else {
-            this_thread::sleep_for(chrono::milliseconds(300));
-        }
-    }
-    return vAlive*1;
+//    Op* vOp = nullptr;
+//    bool vAlive = true;
+//    TimeStamp vcTimeStampStart = steady_clock::now().time_since_epoch().count();
+//    TimeStamp vcTimeStampNow;
+//
+//    while (vAlive && ((vcTimeStampNow = steady_clock::now().time_since_epoch().count()) - vcTimeStampStart < vcMilisecondes)) {
+//        if ((vOp = nextOp()) && vOp->mNElement == vNElement) {
+//            execOp(vOp);
+//            vAlive = false;
+//        } else {
+//            this_thread::sleep_for(chrono::milliseconds(300));
+//        }
+//    }
+//    return vAlive*1;
+    return false;
 }
 
 void OpUnit::execOp(Op* vOp)
 {
-    NReturn vNReturn = nRun(vOp->mNElement, vOp->a, vOp->b, vOp->c, vOp->d);
+    NReturn vNReturn = nRun(vOp->mNElement, vOp->a, vOp->b, vOp->c, vOp->d, vOp->e);
 
     if (vOp->mOpCallback) {
         *vOp->mOpCallback->mNReturn = vNReturn;

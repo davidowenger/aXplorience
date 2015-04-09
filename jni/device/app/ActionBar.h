@@ -15,9 +15,9 @@ public:
     {
     }
 
-    virtual void setIcon(int resId)
+    virtual void setIcon(Drawable* icon)
     {
-        NWrapper::w->mNVisitorApp->tRun(NWrapper::w->mNAlpha00, (NParam)this, (NParam)resId);
+        NWrapper::w->mNVisitorApp->tRun(NWrapper::w->mNAlpha00, (NParam)this, (NParam)icon);
     }
 
     virtual void setDisplayHomeAsUpEnabled(bool showHomeAsUp)

@@ -19,9 +19,10 @@ public class TOnItemClickListener implements AdapterView.OnItemClickListener
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
     {
+        long vcKey;
         w.mTVisitorWidgetView.nRun(w.mTGamma03, n,
-            w.tFrame.putKey(w.mTVisitorView.nRun(w.mTGamma03, n, -1, 2), parent),
-            w.tFrame.putKey(w.mTVisitorView.nRun(w.mTGamma03, n, -1, 1), view),
+            (vcKey = w.tFrame.getKey(parent)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorView.nRun(w.mTGamma03, n, -1, 2), parent),
+            (vcKey = w.tFrame.getKey(view)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorView.nRun(w.mTGamma03, n, -1, 1), view),
             position,
             id
         );

@@ -15,20 +15,17 @@ OpCallback::~OpCallback()
     delete mDone;
 }
 
-Op::Op(NElement* vNElement, NLong a, NLong b, NLong c, NLong d, OpCallback* vOpCallback)
-	: mNElement(vNElement), mOpCallback(vOpCallback), a(a), b(b), c(c), d(d)
+Op::Op(NElement* vNElement, nlong a, nlong b, nlong c, nlong d, nlong e, OpCallback* vOpCallback)
+	: mNElement(vNElement), mOpCallback(vOpCallback), a(a), b(b), c(c), d(d), e(e)
 {
 }
 
 Op::~Op()
 {
-    if (mOpCallback) {
-        *mOpCallback->mDone = true;
-    }
 }
 
-OpParam::OpParam(NLong a, NLong b, NLong c, NLong d)
-    : Op(nullptr, a, b, c, d, nullptr)
+OpParam::OpParam(nlong a, nlong b, nlong c, nlong d, nlong e)
+    : Op(nullptr, a, b, c, d, e, nullptr)
 {
 }
 
@@ -36,20 +33,20 @@ OpParam::~OpParam()
 {
 }
 
-OpMessage::OpMessage(const String& vString)
-    : Op(nullptr, 0, 0, 0, 0, nullptr), mString(vString)
+OpMessage::OpMessage(const String& vStringA, const String& vStringB, const String& vStringC, const String& vStringD, const String& vStringE, nlong b, nlong c, nlong d, nlong e)
+    : Op(nullptr, 0, b, c, d, e, nullptr), mStringA(vStringA), mStringB(vStringB), mStringC(vStringC), mStringD(vStringD), mStringE(vStringE)
 {
-    a = (NLong)this;
+    a = (nlong)this;
 }
 
 OpMessage::~OpMessage()
 {
 }
 
-OpMessageForResult::OpMessageForResult(const String& vString)
-    : Op(nullptr, 0, 0, 0, 0, nullptr), mString(vString)
+OpMessageForResult::OpMessageForResult(const String& vStringA, const String& vStringB, const String& vStringC, const String& vStringD, const String& vStringE, nlong b, nlong c, nlong d, nlong e)
+    : Op(nullptr, 0, b, c, d, e, nullptr), mStringA(vStringA), mStringB(vStringB), mStringC(vStringC), mStringD(vStringD), mStringE(vStringE)
 {
-    a = (NLong)this;
+    a = (nlong)this;
     mOpCallback = new OpCallback(new NReturn(), new bool());
 }
 

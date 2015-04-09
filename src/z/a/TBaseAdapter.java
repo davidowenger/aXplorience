@@ -27,17 +27,18 @@ public class TBaseAdapter extends BaseAdapter
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent)
     {
-        return (View)w.sObject.get("" + w.mTVisitorWidget.nRun(w.mTBeta01,n,
+        long vcKey;
+        return (View)w.sObject.get(w.mTVisitorWidget.nRun(w.mTBeta01,n,
             position,
-            w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTBeta01, n, -1, 2), convertView),
-            w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTBeta01, n, -1, 1), parent)
+            (vcKey = w.tFrame.getKey(convertView)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTBeta01, n, -1, 2), convertView),
+            (vcKey = w.tFrame.getKey(parent)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTBeta01, n, -1, 1), parent)
         ));
     }
 
     @Override
     public Object getItem(int position)
     {
-        return w.sObject.get("" + w.mTVisitorWidget.nRun(w.mTGamma01,n,
+        return w.sObject.get(w.mTVisitorWidget.nRun(w.mTGamma01,n,
             position
         ));
     }
@@ -53,10 +54,11 @@ public class TBaseAdapter extends BaseAdapter
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        return (View)w.sObject.get("" + w.mTVisitorWidget.nRun(w.mTEpsilon01,n,
+        long vcKey;
+        return (View)w.sObject.get(w.mTVisitorWidget.nRun(w.mTEpsilon01,n,
             position,
-            w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTEpsilon01, n, -1, 2), convertView),
-            w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTEpsilon01, n, -1, 1), parent)
+            (vcKey = w.tFrame.getKey(convertView)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTEpsilon01, n, -1, 2), convertView),
+            (vcKey = w.tFrame.getKey(parent)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTEpsilon01, n, -1, 1), parent)
         ));
     }
 
@@ -67,5 +69,4 @@ public class TBaseAdapter extends BaseAdapter
     {
         return super.getDropDownView(position, convertView, parent);
     }
-
 }

@@ -1,6 +1,8 @@
 package z.a;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
@@ -22,119 +24,115 @@ public class TVisitorBluetooth extends TVisitor
     //static BluetoothAdapter* getDefaultAdapter()
 	public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
 	{
-		w.sObject.put("" + a, BluetoothAdapter.getDefaultAdapter());
-		return 0;
+		return w.tFrame.emplaceKey(a, BluetoothAdapter.getDefaultAdapter());
 	}
 
 	//BluetoothDevice* getRemoteDevice(String address)
 	public long visit(TBeta00 element, long a, long b, long c, long d, long e)
 	{
-		w.sObject.put("" + b, ((BluetoothAdapter)w.sObject.get("" + a)).getRemoteDevice((String)w.tFrame.nRunObject(c)));
-		return 0;
+		return w.tFrame.emplaceKey(b, ((BluetoothAdapter)w.sObject.get(a)).getRemoteDevice((String)w.tFrame.nRunObject(c)));
 	}
 
 	//bool isEnabled()
 	public long visit(TGamma00 element, long a, long b, long c, long d, long e)
     {
-		return ( ((BluetoothAdapter)w.sObject.get("" + a)).isEnabled() ? 1 : 0 );
+		return ( ((BluetoothAdapter)w.sObject.get(a)).isEnabled() ? 1 : 0 );
     }
 
 	//int getState()
 	public long visit(TDelta00 element, long a, long b, long c, long d, long e)
     {
-		return ((BluetoothAdapter)w.sObject.get("" + a)).getState();
+		return ((BluetoothAdapter)w.sObject.get(a)).getState();
     }
 
 	//bool enable()
 	public long visit(TEpsilon00 element, long a, long b, long c, long d, long e)
     {
-		return ( ((BluetoothAdapter)w.sObject.get("" + a)).enable() ? 1 : 0 );
+		return ( ((BluetoothAdapter)w.sObject.get(a)).enable() ? 1 : 0 );
     }
 
 	//bool disable()
 	public long visit(TDzeta00 element, long a, long b, long c, long d, long e)
     {
-		return ( ((BluetoothAdapter)w.sObject.get("" + a)).disable() ? 1 : 0 );
+		return ( ((BluetoothAdapter)w.sObject.get(a)).disable() ? 1 : 0 );
     }
 
     //String getAddress()
 	public long visit(TEta00 element, long a, long b, long c, long d, long e)
     {
-		return w.tFrame.putNext(((BluetoothAdapter)w.sObject.get("" + a)).getAddress());
+		return w.tFrame.putNext(((BluetoothAdapter)w.sObject.get(a)).getAddress());
     }
 
     //String getName()
 	public long visit(TTheta00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothAdapter)w.sObject.get("" + a)).getName());
+        return w.tFrame.putNext(((BluetoothAdapter)w.sObject.get(a)).getName());
     }
 
     //bool setName(String name)
 	public long visit(TIota00 element, long a, long b, long c, long d, long e)
     {
-		return ( ((BluetoothAdapter)w.sObject.get("" + a)).setName((String)w.tFrame.nRunObject(b)) ? 1 : 0 );
+		return ( ((BluetoothAdapter)w.sObject.get(a)).setName((String)w.tFrame.nRunObject(b)) ? 1 : 0 );
     }
 
     //int getScanMode()
 	public long visit(TKappa00 element, long a, long b, long c, long d, long e)
     {
-		return ((BluetoothAdapter)w.sObject.get("" + a)).getScanMode();
+		return ((BluetoothAdapter)w.sObject.get(a)).getScanMode();
     }
 
     //bool startDiscovery()
 	public long visit(TLambda00 element, long a, long b, long c, long d, long e)
     {
-		return ( ((BluetoothAdapter)w.sObject.get("" + a)).startDiscovery() ? 1 : 0 );
+		return ( ((BluetoothAdapter)w.sObject.get(a)).startDiscovery() ? 1 : 0 );
     }
 
     //bool cancelDiscovery()
 	public long visit(TMu00 element, long a, long b, long c, long d, long e)
     {
-		return ( ((BluetoothAdapter)w.sObject.get("" + a)).cancelDiscovery() ? 1 : 0 );
+		return ( ((BluetoothAdapter)w.sObject.get(a)).cancelDiscovery() ? 1 : 0 );
     }
 
     //bool isDiscovering()
 	public long visit(TNu00 element, long a, long b, long c, long d, long e)
     {
-		return ( ((BluetoothAdapter)w.sObject.get("" + a)).isDiscovering() ? 1 : 0 );
+		return ( ((BluetoothAdapter)w.sObject.get(a)).isDiscovering() ? 1 : 0 );
     }
 
     //Set<BluetoothDevice> getBondedDevices()
 	public long visit(TXi00 element, long a, long b, long c, long d, long e)
 	{
 		//TODO: implements
-		//w.sObject.put("" + b, ((BluetoothAdapter)w.sObject.get("" + a)).getBondedDevices());
+		//w.sObject.put(b, ((BluetoothAdapter)w.sObject.get(a)).getBondedDevices());
 		return 0;
 	}
 
 	//BluetoothServerSocket* listenUsingRfcommWithServiceRecord(String name, String uuid)
 	public long visit(TOmicron00 element, long a, long b, long c, long d, long e)
     {
-		BluetoothServerSocket ret;
+		BluetoothServerSocket vBluetoothServerSocket = null;
 		try {
-			ret = ((BluetoothAdapter)w.sObject.get("" + a)).listenUsingRfcommWithServiceRecord((String)w.tFrame.nRunObject(c), UUID.fromString((String)w.tFrame.nRunObject(d)));
-			w.sObject.put("" + b, ret);
+			vBluetoothServerSocket = ((BluetoothAdapter)w.sObject.get(a)).listenUsingRfcommWithServiceRecord((String)w.tFrame.nRunObject(c), UUID.fromString((String)w.tFrame.nRunObject(d)));
 		}
 		catch (IOException vException) {
 			if (w.doDebug) vException.printStackTrace();
-			ret = null;
-		}
-		return ( ret == null ? 1 : 0 );
+            vBluetoothServerSocket = null;
+        }
+        return w.tFrame.emplaceKey(b, vBluetoothServerSocket);
     }
 
-	//BluetoothServerSocket* listenUsingRfcommWithServiceRecord(String name, String uuid)
+	//BluetoothServerSocket* listenUsingInsecureRfcommWithServiceRecord(String name, String uuid)
 	public long visit(TPi00 element, long a, long b, long c, long d, long e)
     {
-		BluetoothServerSocket ret;
+		BluetoothServerSocket vBluetoothServerSocket = null;
 		try {
-			ret = ((BluetoothAdapter)w.sObject.get("" + a)).listenUsingInsecureRfcommWithServiceRecord((String)w.tFrame.nRunObject(c), UUID.fromString((String)w.tFrame.nRunObject(d)));
-			w.sObject.put("" + b, ret);
+			vBluetoothServerSocket = ((BluetoothAdapter)w.sObject.get(a)).listenUsingInsecureRfcommWithServiceRecord((String)w.tFrame.nRunObject(c), UUID.fromString((String)w.tFrame.nRunObject(d)));
 		}
 		catch (IOException vException) {
 			if (w.doDebug) vException.printStackTrace();
-			ret = null;
+			vBluetoothServerSocket = null;
 		}
-		return ( ret == null ? 1 : 0 );
+        return w.tFrame.emplaceKey(b, vBluetoothServerSocket);
     }
 
     //static bool checkBluetoothAddress(String address)
@@ -159,25 +157,25 @@ public class TVisitorBluetooth extends TVisitor
 	//bool equals(BluetoothDevice* dBluetoothDevice);
 	public long visit(TAlpha01 element, long a, long b, long c, long d, long e)
     {
-		return ( ((BluetoothDevice)w.sObject.get("" + a)).equals((BluetoothDevice)w.sObject.get("" + b)) ? 1 : 0 );
+		return ( ((BluetoothDevice)w.sObject.get(a)).equals(w.tFrame.getValue(b, BluetoothDevice.class)) ? 1 : 0 );
     }
 
 	//int hashCode();
 	public long visit(TBeta01 element, long a, long b, long c, long d, long e)
     {
-		return ((BluetoothDevice)w.sObject.get("" + a)).hashCode();
+		return ((BluetoothDevice)w.sObject.get(a)).hashCode();
     }
 
 	//String toString();
 	public long visit(TGamma01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothDevice)w.sObject.get("" + a)).toString());
+        return w.tFrame.putNext(((BluetoothDevice)w.sObject.get(a)).toString());
     }
 
 	//int describeContents();
 	public long visit(TDelta01 element, long a, long b, long c, long d, long e)
     {
-		return ((BluetoothDevice)w.sObject.get("" + a)).describeContents();
+		return ((BluetoothDevice)w.sObject.get(a)).describeContents();
     }
 
 	//void writeToParcel(void* out, int flags);
@@ -190,57 +188,60 @@ public class TVisitorBluetooth extends TVisitor
 	//String getAddress();
 	public long visit(TDzeta01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothDevice)w.sObject.get("" + a)).getAddress());
+        return w.tFrame.putNext(((BluetoothDevice)w.sObject.get(a)).getAddress());
     }
 
 	//String getName();
 	public long visit(TEta01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothDevice)w.sObject.get("" + a)).getName());
+        return w.tFrame.putNext(((BluetoothDevice)w.sObject.get(a)).getName());
     }
 
 	//int getBondState();
 	public long visit(TTheta01 element, long a, long b, long c, long d, long e)
     {
-		return ((BluetoothDevice)w.sObject.get("" + a)).getBondState();
+		return ((BluetoothDevice)w.sObject.get(a)).getBondState();
     }
 
 	//BluetoothClass* getBluetoothClass();
 	public long visit(TIota01 element, long a, long b, long c, long d, long e)
     {
-		w.sObject.put("" + b, ((BluetoothDevice)w.sObject.get("" + a)).getBluetoothClass());
-		return 0;
+        return w.tFrame.emplaceKey(b, ((BluetoothDevice)w.sObject.get(a)).getBluetoothClass());
     }
 
 	//BluetoothSocket* createRfcommSocketToServiceRecord(const String& uuid);
 	public long visit(TKappa01 element, long a, long b, long c, long d, long e)
 	{
-		BluetoothSocket ret;
+        BluetoothSocket vBluetoothSocket = null;
 		try {
-			ret = ((BluetoothDevice)w.sObject.get("" + a)).createRfcommSocketToServiceRecord(UUID.fromString((String)w.tFrame.nRunObject(c)));
-			w.sObject.put("" + b, ret);
+			vBluetoothSocket = ((BluetoothDevice)w.sObject.get(a)).createRfcommSocketToServiceRecord(UUID.fromString((String)w.tFrame.nRunObject(c)));
 		}
 		catch (IOException vException) {
 			if (w.doDebug) vException.printStackTrace();
-			ret = null;
-		}
-		return ( ret == null ? 1 : 0 );
+            vBluetoothSocket = null;
+        }
+        return w.tFrame.emplaceKey(b, vBluetoothSocket);
 	}
 
-	//BluetoothSocket* createInsecureRfcommSocketToServiceRecord(const String& uuid);
-	public long visit(TLambda01 element, long a, long b, long c, long d, long e)
-	{
-		BluetoothSocket ret;
-		try {
-			ret = ((BluetoothDevice)w.sObject.get("" + a)).createInsecureRfcommSocketToServiceRecord(UUID.fromString((String)w.tFrame.nRunObject(c)));
-			w.sObject.put("" + b, ret);
-		}
-		catch (IOException vException) {
-			if (w.doDebug) vException.printStackTrace();
-			ret = null;
-		}
-		return ( ret == null ? 1 : 0 );
-	}
+    //BluetoothSocket* createInsecureRfcommSocketToServiceRecord(const String& uuid);
+    public long visit(TLambda01 element, long a, long b, long c, long d, long e)
+    {
+        BluetoothSocket vBluetoothSocket = null;
+        try {
+            vBluetoothSocket = ((BluetoothDevice)w.sObject.get(a)).createInsecureRfcommSocketToServiceRecord(UUID.fromString((String)w.tFrame.nRunObject(c)));
+        }
+        catch (IOException vException) {
+            if (w.doDebug) vException.printStackTrace();
+            vBluetoothSocket = null;
+        }
+        return w.tFrame.emplaceKey(b, vBluetoothSocket);
+    }
+
+    // vector<ParcelUuid*> getUuids();
+    public long visit(TMu01 element, long a, long b, long c, long d, long e)
+    {
+        return w.tFrame.putNext(((BluetoothDevice)w.sObject.get(a)).getUuids());
+    }
 
 	//*******************************************************************************
 	//************************* BluetoothServerSocket *******************************
@@ -249,31 +250,29 @@ public class TVisitorBluetooth extends TVisitor
 	//BluetoothSocket* accept();
 	public long visit(TAlpha02 element, long a, long b, long c, long d, long e)
 	{
-		BluetoothSocket ret;
+		BluetoothSocket vBluetoothSocket = null;
 		try {
-			ret = ((BluetoothServerSocket)w.sObject.get("" + a)).accept();
-			w.sObject.put("" + b, ret);
+			vBluetoothSocket = ((BluetoothServerSocket)w.sObject.get(a)).accept();
 		}
 		catch (IOException vException) {
 			if (w.doDebug) vException.printStackTrace();
-			ret = null;
+			vBluetoothSocket = null;
 		}
-		return ( ret == null ? 1 : 0 );
+        return w.tFrame.emplaceKey(b, vBluetoothSocket);
 	}
 
 	//BluetoothSocket* accept(int timeout);
 	public long visit(TBeta02 element, long a, long b, long c, long d, long e)
 	{
-		BluetoothSocket ret;
-		try {
-			ret = ((BluetoothServerSocket)w.sObject.get("" + a)).accept((int)c);
-			w.sObject.put("" + b, ret);
+        BluetoothSocket vBluetoothSocket = null;
+        try {
+			vBluetoothSocket = ((BluetoothServerSocket)w.sObject.get(a)).accept((int)c);
 		}
-		catch (IOException vException) {
-			if (w.doDebug) vException.printStackTrace();
-			ret = null;
-		}
-		return ( ret == null ? 1 : 0 );
+        catch (IOException vException) {
+            if (w.doDebug) vException.printStackTrace();
+            vBluetoothSocket = null;
+        }
+        return w.tFrame.emplaceKey(b, vBluetoothSocket);
 	}
 
 	//void close();
@@ -281,7 +280,7 @@ public class TVisitorBluetooth extends TVisitor
 	{
 		long err = 0;
 		try {
-			((BluetoothServerSocket)w.sObject.get("" + a)).close();
+			((BluetoothServerSocket)w.sObject.get(a)).close();
 		}
 		catch (IOException vException) {
 			if (w.doDebug) vException.printStackTrace();
@@ -299,7 +298,7 @@ public class TVisitorBluetooth extends TVisitor
 	{
 		long err = 0;
 		try {
-			((BluetoothSocket)w.sObject.get("" + a)).connect();
+			((BluetoothSocket)w.sObject.get(a)).connect();
 		}
 		catch (IOException vException) {
 			if (w.doDebug) vException.printStackTrace();
@@ -313,7 +312,7 @@ public class TVisitorBluetooth extends TVisitor
 	{
 		long err = 0;
 		try {
-			((BluetoothSocket)w.sObject.get("" + a)).close();
+			((BluetoothSocket)w.sObject.get(a)).close();
 		}
 		catch (IOException vException) {
 			if (w.doDebug) vException.printStackTrace();
@@ -325,35 +324,34 @@ public class TVisitorBluetooth extends TVisitor
     //BluetoothDevice* getRemoteDevice()
 	public long visit(TGamma03 element, long a, long b, long c, long d, long e)
     {
-		w.sObject.put("" + b, ((BluetoothSocket)w.sObject.get("" + a)).getRemoteDevice());
-		return 0;
+        return w.tFrame.emplaceKey(b, ((BluetoothSocket)w.sObject.get(a)).getRemoteDevice());
     }
 
 	//InputStream* getInputStream()
 	public long visit(TDelta03 element, long a, long b, long c, long d, long e)
     {
-		long err = 0;
+		InputStream vInputStream = null;
 		try {
-			w.sObject.put("" + b, ((BluetoothSocket)w.sObject.get("" + a)).getInputStream());
+			vInputStream = ((BluetoothSocket)w.sObject.get(a)).getInputStream();
 		}
 		catch (IOException vException) {
 			if (w.doDebug) vException.printStackTrace();
-			err = 1;
+			vInputStream = null;
 		}
-		return err;
+        return w.tFrame.emplaceKey(b, vInputStream);
     }
 
 	//OutputStream* getOutputStream()
 	public long visit(TEpsilon03 element, long a, long b, long c, long d, long e)
     {
-		long err = 0;
+        OutputStream vOutputStream = null;
 		try {
-			w.sObject.put("" + b, ((BluetoothSocket)w.sObject.get("" + a)).getOutputStream());
+			vOutputStream = ((BluetoothSocket)w.sObject.get(a)).getOutputStream();
 		}
 		catch (IOException vException) {
 			if (w.doDebug) vException.printStackTrace();
-			err = 1;
+            vOutputStream = null;
 		}
-		return err;
+        return w.tFrame.emplaceKey(b, vOutputStream);
     }
 }

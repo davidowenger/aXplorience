@@ -14,16 +14,11 @@ public:
 	TextView(Context* context)
         : View(NWrapper::w->mNNoObject->instance<View>())
 	{
-		NWrapper::getInstance()->mNVisitorWidgetView->tRun(NWrapper::getInstance()->mNIota00, (NParam)this, (NParam)context);
+		NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNIota00, (NParam)this, (NParam)context);
 	}
 
     virtual ~TextView()
     {
-    }
-
-    virtual void onSaveInstanceState()
-    {
-        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNKappa00, (NParam)this);
     }
 
     virtual void setEnabled(bool enabled)
@@ -36,6 +31,16 @@ public:
         NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNMu00, (NParam)this, (NParam)gravity);
     }
 
+    virtual void setHint(const String& hint)
+    {
+        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNUpsilon00, (NParam)this, NParamBox(NWrapper::w, hint).n);
+    }
+
+    virtual void setImeOptions(int imeOptions)
+    {
+        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNPhi00, (NParam)this, (NParam)imeOptions);
+    }
+
     virtual void setLines(int lines)
     {
         NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNNu00, (NParam)this, (NParam)lines);
@@ -46,6 +51,11 @@ public:
         NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNXi00, (NParam)this, (NParam)left, (NParam)top, (NParam)right, (NParam)bottom);
     }
 
+    virtual void setRawInputType(int type)
+    {
+        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNKhi00, (NParam)this, (NParam)type);
+    }
+
     virtual void setSelected(bool selected)
     {
         NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNOmicron00, (NParam)this, (NParam)selected);
@@ -53,13 +63,18 @@ public:
 
     virtual void setText(const String& text)
 	{
-		NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::getInstance()->mNPi00, (NParam)this, NParamBox(NWrapper::getInstance(), text).n);
+		NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNPi00, (NParam)this, NParamBox(NWrapper::w, text).n);
 	}
+
+    virtual void setTextColor(int color)
+    {
+        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNPsi00, (NParam)this, (NParam)color);
+    }
 
     virtual void setTextSize(float size)
     {
-        double vcSize = size;
-        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::getInstance()->mNRho00, (NParam)this, (NParam)*reinterpret_cast<long*>(&vcSize));
+        ndouble vcSize = size;
+        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNRho00, (NParam)this, *reinterpret_cast<NParam*>(&vcSize));
     }
 
     virtual void setTypeface(Typeface* tf)

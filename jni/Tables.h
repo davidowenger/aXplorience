@@ -4,18 +4,44 @@
 namespace NSDEVICE
 {
 
-class Table_Drop : public DBTable
+class Table_Message : public DBTable
 {
 	void init() {
 		aField = {
 			"id",
 			"mac",
 			"id_drop",
+            "in",
 			"id_cat",
 			"date",
 			"title",
 			"text",
-			"archived",
+			"link",
+			"sEnabled",
+            "sDeleted",
+            "sArchivedAuto",
+            "sArchivedUser",
+            "sBuzzed",
+            "sBuzzedIndex",
+		};
+	}
+};
+
+class Table_Application : public DBTable
+{
+	void init() {
+		aField = {
+			"id",
+            "sDBObjectId",
+            "sView",
+			"sSort",
+			"sAscending",
+			"sBluetooth",
+			"sDiscoverable",
+			"sCategory0",
+			"sCategory1",
+			"sCategory2",
+			"sCategory3",
 		};
 	}
 };

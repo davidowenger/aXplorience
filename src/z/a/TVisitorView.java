@@ -6,7 +6,7 @@ import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
+import android.view.ContextThemeWrapper;
 
 public class TVisitorView extends TVisitor
 {
@@ -15,19 +15,28 @@ public class TVisitorView extends TVisitor
 	}
 
     //******************************************************************************************
+    //********************************** ContextThemeWrapper ***********************************
+    //******************************************************************************************
+    // Resources* getResources()
+    public long visit(TKappa00 element, long a, long b, long c, long d, long e)
+    {
+        return w.tFrame.emplaceKey(b, ((ContextThemeWrapper)w.sObject.get(a)).getResources());
+    }
+
+    //******************************************************************************************
     //********************************** GestureDetector ***************************************
     //******************************************************************************************
     // GestureDetector(Context* context, GestureDetector::OnGestureListener* listener)
     public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put("" + a, new GestureDetector((Context)w.sObject.get("" + b), (GestureDetector.OnGestureListener)w.sObject.get("" + c)));
+        w.sObject.put(a, new GestureDetector(w.tFrame.getValue(b, Context.class), w.tFrame.getValue(c, GestureDetector.OnGestureListener.class)));
         return 0;
     }
 
     // bool onTouchEvent(MotionEvent* ev)
     public long visit(TBeta00 element, long a, long b, long c, long d, long e)
     {
-        return ( ((View)w.sObject.get("" + a)).onTouchEvent((MotionEvent)w.sObject.get("" + b)) ? 1 : 0 );
+        return ( ((GestureDetector)w.sObject.get(a)).onTouchEvent(w.tFrame.getValue(b, MotionEvent.class)) ? 1 : 0 );
     }
 
     //*******************************************************************************************
@@ -36,14 +45,13 @@ public class TVisitorView extends TVisitor
     // MenuItem* add(int groupId, int itemId, int order, const String& title)
     public long visit(TGamma00 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put("" + b, ((Menu)w.sObject.get("" + a)).add(w.tFrame.getInt(c, 0), w.tFrame.getInt(c, 1), (int)d, (String)w.tFrame.nRunObject(e)));
-        return 0;
+        return w.tFrame.emplaceKey(b, ((Menu)w.sObject.get(a)).add(w.tFrame.getSubInt(c, 0), w.tFrame.getSubInt(c, 1), (int)d, (String)w.tFrame.nRunObject(e)));
     }
 
     // void removeItem(int id)
     public long visit(TDelta00 element, long a, long b, long c, long d, long e)
     {
-        ((Menu)w.sObject.get("" + a)).removeItem((int)b);
+        ((Menu)w.sObject.get(a)).removeItem((int)b);
         return 0;
     }
 
@@ -53,20 +61,20 @@ public class TVisitorView extends TVisitor
     // int getItemId()
     public long visit(TEpsilon00 element, long a, long b, long c, long d, long e)
     {
-        return ((MenuItem)w.sObject.get("" + a)).getItemId();
+        return ((MenuItem)w.sObject.get(a)).getItemId();
     }
 
     // MenuItem* setIcon(Drawable* icon)
     public long visit(TDzeta00 element, long a, long b, long c, long d, long e)
     {
-        ((MenuItem)w.sObject.get("" + a)).setIcon((Drawable)w.sObject.get("" + b));
+        ((MenuItem)w.sObject.get(a)).setIcon(w.tFrame.getValue(b, Drawable.class));
         return 0;
     }
 
-    // MenuItem* setShowAsAction(int actionEnum)
+    // void setShowAsAction(int actionEnum)
     public long visit(TEta00 element, long a, long b, long c, long d, long e)
     {
-        ((MenuItem)w.sObject.get("" + a)).setShowAsAction((int)b);
+        ((MenuItem)w.sObject.get(a)).setShowAsAction((int)b);
         return 0;
     }
 
@@ -76,13 +84,13 @@ public class TVisitorView extends TVisitor
     // float getX()
     public long visit(TTheta00 element, long a, long b, long c, long d, long e)
     {
-        return Double.doubleToRawLongBits((double)((MotionEvent)w.sObject.get("" + a)).getX());
+        return Double.doubleToRawLongBits(((MotionEvent)w.sObject.get(a)).getX());
     }
 
     // float getY()
     public long visit(TIota00 element, long a, long b, long c, long d, long e)
     {
-        return Double.doubleToRawLongBits((double)((MotionEvent)w.sObject.get("" + a)).getY());
+        return Double.doubleToRawLongBits(((MotionEvent)w.sObject.get(a)).getY());
     }
 
     //*******************************************************************************************
@@ -91,7 +99,7 @@ public class TVisitorView extends TVisitor
     // OnGestureListener()
     public long visit(TAlpha02 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put("" + a, new TOnGestureListener(w, a));
+        w.sObject.put(a, new TOnGestureListener(w, a));
         return 0;
     }
 }

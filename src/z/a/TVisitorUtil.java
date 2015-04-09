@@ -14,6 +14,6 @@ public class TVisitorUtil extends TVisitor
     // float getDensity()
     public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
     {
-        return Double.doubleToRawLongBits((double)((DisplayMetrics)w.sObject.get("" + a)).density);
+        return Double.doubleToRawLongBits((double)((DisplayMetrics)w.sObject.get(a)).density);
     }
 }

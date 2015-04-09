@@ -13,9 +13,14 @@ public:
 	{
 	}
 
-    void setButtonDrawable(Drawable* d)
+    virtual void setButtonDrawable(Drawable* d)
     {
-        NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNLambda00, (NParam)this);
+        NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNLambda00, (NParam)this, (NParam)d);
+    }
+
+    virtual bool isChecked()
+    {
+        return (bool)NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNOmega00, (NParam)this);
     }
 
 private:

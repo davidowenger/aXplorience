@@ -11,22 +11,23 @@ friend NSNATIVE::NNoObject;
 public:
 	int close()
 	{
-		return NWrapper::getInstance()->mNVisitorIO->tRun(NWrapper::getInstance()->mNAlpha00, (NParam)this);
+		return (nint)NWrapper::w->mNVisitorIO->tRun(NWrapper::w->mNAlpha00, (NParam)this);
 	}
 
-    int read(string& buffer, int cMaxByte)
+    int read(String& buffer, int byteCount)
     {
     	// Blocks and returns the number of bytes read
     	// -1 if end of the stream is reached
     	// -2 if stream closed or another IO exception
     	// -3 if UTF-8 is not supported
-		int err = (int)NWrapper::getInstance()->mNVisitorIO->tRun(NWrapper::getInstance()->mNBeta00, (NParam)this, (NParam)cMaxByte);
+        size_t size = buffer.size();
+		NReturn err = NWrapper::w->mNVisitorIO->tRun(NWrapper::w->mNBeta00, (NParam)this, (NParam)byteCount);
 
 		if (err >= 0) {
-			buffer += NWrapper::getInstance()->nFrame->tGetString(NWrapper::getInstance()->nFrame->tRunObject((NParam)err));
-			err = 0;
+			buffer += NWrapper::w->nFrame->tGetString(NWrapper::w->nFrame->tRunObject((NParam)err));
+			err = buffer.size() - size;
 		}
-		return -err;
+		return err;
 	}
 
 private:

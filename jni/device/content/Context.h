@@ -13,6 +13,12 @@ public:
 	{
 	}
 
+//    virtual Context* getApplicationContext()
+//    {
+//        Context* b = NWrapper::w->mNNoObject->pointer<Context>();
+//        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorContent->tRun(NWrapper::w->mNAlpha00, (NParam)this, (NParam)b));
+//    }
+
 private:
     Context(NNoObject* vNNoObject)
     {

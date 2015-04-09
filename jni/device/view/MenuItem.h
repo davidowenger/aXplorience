@@ -22,7 +22,7 @@ public:
 
     virtual int getItemId()
     {
-        return NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNEpsilon00, (NParam)this);
+        return (nint)NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNEpsilon00, (NParam)this);
     }
 
     virtual MenuItem* setIcon(Drawable* icon)

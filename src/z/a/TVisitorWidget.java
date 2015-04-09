@@ -29,7 +29,7 @@ public class TVisitorWidget extends TVisitor
     // void setSelection(int position)
     public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
     {
-        ((AbsSpinner)w.sObject.get("" + a)).setSelection((int)b);
+        ((AbsSpinner)w.sObject.get(a)).setSelection((int)b);
         return 0;
     }
 
@@ -39,14 +39,14 @@ public class TVisitorWidget extends TVisitor
     // TBaseAdapter(TWrapper w, long n)
     public long visit(TBeta00 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put("" + a, new TBaseAdapter(w, a));
+        w.sObject.put(a, new TBaseAdapter(w, a));
         return 0;
     }
 
     // View* getDropDownView(int position, View* convertView, ViewGroup* parent)
     public long visit(TGamma00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putKey(b, ((TBaseAdapter)w.sObject.get("" + a)).getDropDownViewParent((int)c, (View)w.sObject.get("" + d), (ViewGroup)w.sObject.get("" + e)));
+        return w.tFrame.putKey(b, ((TBaseAdapter)w.sObject.get(a)).getDropDownViewParent((int)c, (View)w.sObject.get(d), (ViewGroup)w.sObject.get(e)));
     }
 
     //******************************************************************************************
@@ -55,7 +55,7 @@ public class TVisitorWidget extends TVisitor
     // Button(Context* context)
     public long visit(TIota00 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put("" + a, new Button((Context)w.sObject.get("" + b)));
+        w.sObject.put(a, new Button((Context)w.sObject.get(b)));
         return 0;
     }
 
@@ -68,8 +68,14 @@ public class TVisitorWidget extends TVisitor
     // void setButtonDrawable(Drawable* d)
     public long visit(TLambda00 element, long a, long b, long c, long d, long e)
     {
-        ((CompoundButton)w.sObject.get("" + a)).setButtonDrawable((Drawable)w.sObject.get("" + b));
+        ((CompoundButton)w.sObject.get(a)).setButtonDrawable((Drawable)w.sObject.get(b));
         return 0;
+    }
+
+    // bool isChecked()
+    public long visit(TOmega00 element, long a, long b, long c, long d, long e)
+    {
+        return (((CompoundButton)w.sObject.get(a)).isChecked() ? 1 : 0 );
     }
 
     //******************************************************************************************
@@ -78,20 +84,20 @@ public class TVisitorWidget extends TVisitor
     // EditText(Context* context)
     public long visit(TMu00 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put("" + a, new EditText((Context)w.sObject.get("" + b)));
+        w.sObject.put(a, new EditText((Context)w.sObject.get(b)));
         return 0;
     }
 
     // String getText()
     public long visit(TNu00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((EditText)w.sObject.get("" + a)).getText());
+        return w.tFrame.putNext(((EditText)w.sObject.get(a)).getText().toString());
     }
 
     // void setText(const String& text, TextView::BufferType type)
     public long visit(TXi00 element, long a, long b, long c, long d, long e)
     {
-        ((EditText)w.sObject.get("" + a)).setText((String)w.tFrame.nRunObject(b), maBufferType[(int)c]);
+        ((EditText)w.sObject.get(a)).setText((String)w.tFrame.nRunObject(b), maBufferType[(int)c]);
         return 0;
     }
 
@@ -101,7 +107,7 @@ public class TVisitorWidget extends TVisitor
     // ImageButton(Context* context)
     public long visit(TOmicron00 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put("" + a, new ImageButton((Context)w.sObject.get("" + b)));
+        w.sObject.put(a, new ImageButton((Context)w.sObject.get(b)));
         return 0;
     }
 
@@ -111,28 +117,28 @@ public class TVisitorWidget extends TVisitor
     // Spinner(Context* context)
     public long visit(TPi00 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put("" + a, new Spinner((Context)w.sObject.get("" + b)));
+        w.sObject.put(a, new Spinner((Context)w.sObject.get(b)));
         return 0;
     }
 
     // void setGravity(int gravity)
     public long visit(TRho00 element, long a, long b, long c, long d, long e)
     {
-        ((Spinner)w.sObject.get("" + a)).setGravity((int)b);
+        ((Spinner)w.sObject.get(a)).setGravity((int)b);
         return 0;
     }
 
     // void setOnItemClickListener(AdapterView::OnItemClickListener* l)
     public long visit(TSigma00 element, long a, long b, long c, long d, long e)
     {
-        ((Spinner)w.sObject.get("" + a)).setOnItemClickListener((OnItemClickListener)w.sObject.get("" + b));
+        ((Spinner)w.sObject.get(a)).setOnItemClickListener((OnItemClickListener)w.sObject.get(b));
         return 0;
     }
 
     // void setAdapter(SpinnerAdapter* adapter)
     public long visit(TTau00 element, long a, long b, long c, long d, long e)
     {
-        ((Spinner)w.sObject.get("" + a)).setAdapter((SpinnerAdapter)w.sObject.get("" + b));
+        ((Spinner)w.sObject.get(a)).setAdapter((SpinnerAdapter)w.sObject.get(b));
         return 0;
     }
 
@@ -142,28 +148,28 @@ public class TVisitorWidget extends TVisitor
     // ToggleButton(Context* context)
     public long visit(TUpsilon00 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put("" + a, new ToggleButton((Context)w.sObject.get("" + b)));
+        w.sObject.put(a, new ToggleButton((Context)w.sObject.get(b)));
         return 0;
     }
 
     // void setChecked(bool checked)
     public long visit(TPhi00 element, long a, long b, long c, long d, long e)
     {
-        ((ToggleButton)w.sObject.get("" + a)).setChecked( b != 0 ? true : false );
+        ((ToggleButton)w.sObject.get(a)).setChecked( b != 0 ? true : false );
         return 0;
     }
 
     // void setTextOn(const String& textOn)
     public long visit(TKhi00 element, long a, long b, long c, long d, long e)
     {
-        ((ToggleButton)w.sObject.get("" + a)).setTextOn((String)w.tFrame.nRunObject(b));
+        ((ToggleButton)w.sObject.get(a)).setTextOn((String)w.tFrame.nRunObject(b));
         return 0;
     }
 
     // void setTextOff(const String& textOff)
     public long visit(TPsi00 element, long a, long b, long c, long d, long e)
     {
-        ((ToggleButton)w.sObject.get("" + a)).setTextOff((String)w.tFrame.nRunObject(b));
+        ((ToggleButton)w.sObject.get(a)).setTextOff((String)w.tFrame.nRunObject(b));
         return 0;
     }
 }

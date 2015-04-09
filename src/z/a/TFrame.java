@@ -9,4 +9,5 @@ public abstract class TFrame extends TVisitor
     public abstract void tInit();
 
     public native long nInit(long cState);
+    public native long nCancel();
 }

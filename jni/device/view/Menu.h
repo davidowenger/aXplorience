@@ -23,9 +23,8 @@ public:
 
     virtual MenuItem* add(int groupId, int itemId, int order, const String& title)
     {
-        MenuItem* vMenuItem = NWrapper::w->mNNoObject->pointer<MenuItem>();
-        NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)groupId<<32|itemId, (NParam)order, NParamBox(NWrapper::w, title).n);
-        return vMenuItem;
+        MenuItem* b = NWrapper::w->mNNoObject->pointer<MenuItem>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)b, (NParam)groupId<<32|itemId, (NParam)order, NParamBox(NWrapper::w, title).n));
     }
 
     virtual void removeItem(int id)

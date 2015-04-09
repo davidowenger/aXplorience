@@ -21,7 +21,7 @@ public:
 
     virtual int getCount() = 0;
     virtual Object* getItem(int position) = 0;
-    virtual long getItemId(int position) = 0;
+    virtual long long int getItemId(int position) = 0;
     virtual View* getView(int position, View* convertView, ViewGroup* parent) = 0;
 };
 

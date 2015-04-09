@@ -23,16 +23,10 @@ public:
     NReturn visit(NAlpha03* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<View>();
-        }
-        if (b != -1) {
-            ((View::OnClickListener*)a)->onClick((View*)b);
-        }
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<View>();
+        if (b != -1) ((View::OnClickListener*)a)->onClick((View*)b);
         return vcRet;
     }
-
 
     //******************************************************************************************
     //***************************** OnCreateContextMenuListener ********************************
@@ -41,16 +35,10 @@ public:
     NReturn visit(NBeta03* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 2) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<ContextMenu>();
-        }
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<ContextMenu::ContextMenuInfo>();
-        }
-        if (b != -1) {
-            ((View::OnCreateContextMenuListener*)a)->onCreateContextMenu((ContextMenu*)b, (View*)c, (ContextMenu::ContextMenuInfo*)d);
-        }
+        if (b == -1 && c == 3) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<ContextMenu>();
+        if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<View>();
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<ContextMenu::ContextMenuInfo>();
+        if (b != -1) ((View::OnCreateContextMenuListener*)a)->onCreateContextMenu((ContextMenu*)b, (View*)c, (ContextMenu::ContextMenuInfo*)d);
         return vcRet;
     }
 
@@ -61,16 +49,9 @@ public:
     NReturn visit(NGamma03* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 2) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<View>();
-        }
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
-        }
-        if (b != -1) {
-            vcRet = ((View::OnTouchListener*)a)->onTouch((View*)b, (MotionEvent*)c);
-        }
+        if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<View>();
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
+        if (b != -1) vcRet = ((View::OnTouchListener*)a)->onTouch((View*)b, (MotionEvent*)c);
         return vcRet;
     }
 };

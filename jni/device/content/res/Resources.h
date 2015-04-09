@@ -11,47 +11,29 @@ friend NSNATIVE::NNoObject;
 public:
     virtual ~Resources()
     {
-        delete mDisplayMetrics;
-        delete mConfiguration;
     }
 
     virtual DisplayMetrics* getDisplayMetrics()
     {
-        NWrapper::w->mNVisitorContentRes->tRun(NWrapper::w->mNAlpha01, (NParam)this, (NParam)mDisplayMetrics);
-        return mDisplayMetrics;
+        DisplayMetrics* b = NWrapper::w->mNNoObject->pointer<DisplayMetrics>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorContentRes->tRun(NWrapper::w->mNAlpha01, (NParam)this, (NParam)b));
     }
 
     virtual Configuration* getConfiguration()
     {
-        NWrapper::w->mNVisitorContentRes->tRun(NWrapper::w->mNBeta01, (NParam)this, (NParam)mConfiguration);
-        return mConfiguration;
+        Configuration* b = NWrapper::w->mNNoObject->pointer<Configuration>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorContentRes->tRun(NWrapper::w->mNBeta01, (NParam)this, (NParam)b));
     }
 
-    virtual Drawable* getDrawable(int id)
+    virtual Drawable* getDrawable(const String& vString)
     {
-        Drawable* vDrawable = NWrapper::w->mNNoObject->pointer<Drawable>();
-        bool error = NWrapper::w->mNVisitorContentRes->tRun(NWrapper::w->mNGamma01, (NParam)this, (NParam)vDrawable, (NParam)id);
-
-        if (error) {
-            delete vDrawable;
-            vDrawable = nullptr;
-        }
-        return vDrawable;
+        Drawable* b = NWrapper::w->mNNoObject->pointer<Drawable>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorContentRes->tRun(NWrapper::w->mNGamma01, (NParam)this, (NParam)b, NParamBox(NWrapper::w, vString).n));
     }
 
 private:
-    DisplayMetrics* mDisplayMetrics;
-    Configuration* mConfiguration;
-
     Resources(NNoObject* vNNoObject)
     {
-        init();
-    }
-
-    void init()
-    {
-        mDisplayMetrics = NWrapper::w->mNNoObject->pointer<DisplayMetrics>();
-        mConfiguration = NWrapper::w->mNNoObject->pointer<Configuration>();
     }
 };
 

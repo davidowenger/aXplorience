@@ -14,31 +14,26 @@ public:
     static const int ITALIC = BOLD + 1;
     static const int BOLD_ITALIC = ITALIC + 1;
 
-    static const Typeface* DEFAULT;
-    static const Typeface* DEFAULT_BOLD;
-    static const Typeface* SANS_SERIF;
-    static const Typeface* SERIF;
-    static const Typeface* MONOSPACE;
+    static Typeface* DEFAULT;
+    static Typeface* DEFAULT_BOLD;
+    static Typeface* SANS_SERIF;
+    static Typeface* SERIF;
+    static Typeface* MONOSPACE;
 
     static Typeface* create(const String& familyName, int style)
     {
-//        Typeface* vTypeface = NWrapper::w->mNNoObject->pointer<Typeface>();
-//        NWrapper::w->mNVisitorGraphics->tRun(NWrapper::w->mNAlpha03, (NParam)vTypeface, NParamBox(NWrapper::w, familyName).n, (NParam)style);
-//        return vTypeface;
-    	return nullptr;
+        Typeface* b = NWrapper::w->mNNoObject->pointer<Typeface>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorGraphics->tRun(NWrapper::w->mNGamma00, (NParam)b, NParamBox(NWrapper::w, familyName).n, (NParam)style));
     }
 
     static Typeface* defaultFromStyle(int style)
     {
-//        Typeface* vTypeface = NWrapper::w->mNNoObject->pointer<Typeface>();
-//        NWrapper::w->mNVisitorGraphics->tRun(NWrapper::w->mNBeta03, (NParam)vTypeface, (NParam)style);
-//        return vTypeface;
-    	return nullptr;
+        Typeface* b = NWrapper::w->mNNoObject->pointer<Typeface>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorGraphics->tRun(NWrapper::w->mNDelta00, (NParam)b, (NParam)style));
     }
 
     virtual ~Typeface()
     {
-        //FIXME
     }
 
 protected:

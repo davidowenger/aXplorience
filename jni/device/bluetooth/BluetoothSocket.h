@@ -6,7 +6,7 @@ namespace NSDEVICE
 
 class BluetoothSocket
 {
-friend NSNATIVE::NVisitorBluetooth;
+friend NSNATIVE::NNoObject;
 
 public:
     int connect();
@@ -14,6 +14,11 @@ public:
     BluetoothDevice* getRemoteDevice();
     InputStream* getInputStream();
     OutputStream* getOutputStream();
+
+private:
+    BluetoothSocket(NNoObject* vNNoObject)
+    {
+    }
 };
 
 } // END namespace

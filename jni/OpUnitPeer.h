@@ -13,6 +13,7 @@ public:
 
     virtual void run() override;
     virtual void cancel() override;
+    virtual void handleOp() override;
 
     virtual NReturn visit(NAlpha01* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
     virtual NReturn visit(NBeta01* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
@@ -24,15 +25,18 @@ public:
     Wrapper* mWrapper;
 	int mcOrigin;
     String mUuid;
+    String mBuffer;
+    TimeStamp mcTimeStampBroadcast;
+    nuint mcForce;
 
 	BluetoothServerSocket* mServerSocket;
-    BluetoothSocket* mPeerSocket;
-    BluetoothDevice* mPeerDevice;
     InputStream* mInputStream;
     OutputStream* mOutputStream;
     DBTableHandler* mDropHandler;
     OpUnitListener* mOpUnitListener;
     String msMac;
+    BluetoothSocket* mPeerSocket;
+    BluetoothDevice* mPeerDevice;
 };
 
 } // End namespace

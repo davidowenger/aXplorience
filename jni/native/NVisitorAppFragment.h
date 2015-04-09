@@ -24,13 +24,8 @@ public:
     NReturn visit(NAlpha01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Activity>();
-        }
-        if (b != -1) {
-            ((Fragment*)a)->onAttach((Activity*)b);
-        }
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Activity>();
+        if (b != -1) ((Fragment*)a)->onAttach((Activity*)b);
         return vcRet;
     }
 
@@ -38,13 +33,8 @@ public:
     NReturn visit(NBeta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
-        }
-        if (b != -1) {
-            ((Fragment*)a)->onCreate((Bundle*)b);
-        }
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
+        if (b != -1) ((Fragment*)a)->onCreate((Bundle*)b);
         return vcRet;
     }
 
@@ -52,19 +42,10 @@ public:
     NReturn visit(NGamma01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 3) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<LayoutInflater>();
-        }
-        if (b == -1 && c == 2) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<ViewGroup>();
-        }
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
-        }
-        if (b != -1) {
-            vcRet = (NReturn)((Fragment*)a)->onCreateView((LayoutInflater*)b, (ViewGroup*)c, (Bundle*)d);
-        }
+        if (b == -1 && c == 3) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<LayoutInflater>();
+        if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<ViewGroup>();
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
+        if (b != -1) vcRet = (NReturn)((Fragment*)a)->onCreateView((LayoutInflater*)b, (ViewGroup*)c, (Bundle*)d);
         return vcRet;
     }
 
@@ -72,13 +53,8 @@ public:
     NReturn visit(NDelta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
-        }
-        if (b != -1) {
-            ((Fragment*)a)->onActivityCreated((Bundle*)b);
-        }
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
+        if (b != -1) ((Fragment*)a)->onActivityCreated((Bundle*)b);
         return vcRet;
     }
 
@@ -86,13 +62,8 @@ public:
     NReturn visit(NEpsilon01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
-        }
-        if (b != -1) {
-            ((Fragment*)a)->onViewStateRestored((Bundle*)b);
-        }
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
+        if (b != -1) ((Fragment*)a)->onViewStateRestored((Bundle*)b);
         return vcRet;
     }
 
@@ -117,18 +88,12 @@ public:
         return 0;
     }
 
-
     //void onSaveInstanceState(Bundle vBundle)
     NReturn visit(NIota01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
-        }
-        if (b != -1) {
-            ((Fragment*)a)->onSaveInstanceState((Bundle*)b);
-        }
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
+        if (b != -1) ((Fragment*)a)->onSaveInstanceState((Bundle*)b);
         return vcRet;
     }
 
@@ -164,16 +129,9 @@ public:
     NReturn visit(NXi01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 2) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Menu>();
-        }
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MenuInflater>();
-        }
-        if (b != -1) {
-            ((Fragment*)a)->onCreateOptionsMenu((Menu*)b, (MenuInflater*)c);
-        }
+        if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Menu>();
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MenuInflater>();
+        if (b != -1) ((Fragment*)a)->onCreateOptionsMenu((Menu*)b, (MenuInflater*)c);
         return vcRet;
     }
 
@@ -181,13 +139,8 @@ public:
     NReturn visit(NOmicron01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Menu>();
-        }
-        if (b != -1) {
-            ((Fragment*)a)->onPrepareOptionsMenu((Menu*)b);
-        }
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Menu>();
+        if (b != -1) ((Fragment*)a)->onPrepareOptionsMenu((Menu*)b);
         return vcRet;
     }
 
@@ -195,13 +148,8 @@ public:
     NReturn visit(NPi01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         NReturn vcRet = 0;
-
-        if (b == -1 && c == 1) {
-            vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MenuItem>();
-        }
-        if (b != -1) {
-            vcRet = (NReturn)((Fragment*)a)->onOptionsItemSelected((MenuItem*)b);
-        }
+        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MenuItem>();
+        if (b != -1) vcRet = (NReturn)((Fragment*)a)->onOptionsItemSelected((MenuItem*)b);
         return vcRet;
     }
 };

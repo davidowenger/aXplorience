@@ -19,8 +19,8 @@ public:
 
     virtual float getDensity()
     {
-        long vcX = NWrapper::w->mNVisitorUtil->tRun(NWrapper::w->mNAlpha00, (NParam)this);
-        return (float)(*reinterpret_cast<double*>(&vcX));
+        nlong vcX = NWrapper::w->mNVisitorUtil->tRun(NWrapper::w->mNAlpha00, (NParam)this);
+        return (nfloat)*reinterpret_cast<ndouble*>(&vcX);
     }
 
 private:

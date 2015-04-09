@@ -18,20 +18,24 @@ OpUnitServer::~OpUnitServer()
 
 void OpUnitServer::run()
 {
-    while (mAlive) {
-        //FIXME
-        //if ( mode == w->dBluetoothAdapter->SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-    	BluetoothSocket* vBluetoothSocket = nullptr;
-		mServerSocket = mWrapper->dBluetoothAdapter->listenUsingInsecureRfcommWithServiceRecord(mWrapper->sServiceName, mWrapper->sUuidService + mWrapper->sUuidSuffix);
+    BluetoothSocket* vBluetoothSocket;
 
-		while (mAlive && mServerSocket && !vBluetoothSocket) {
-			vBluetoothSocket = mServerSocket->accept();
-		}
-		if (mServerSocket) {
-			mServerSocket->close();
-		}
-        if (mAlive && vBluetoothSocket) {
-            sendOp(mWrapper->opUnitCore->mId, mWrapper->w->mNBeta00, new OpParam((NParam)vBluetoothSocket));
+    while (mAlive) {
+        if (mWrapper->dBluetoothAdapter->getScanMode() == mWrapper->dBluetoothAdapter->SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+            vBluetoothSocket = nullptr;
+
+            if ((mServerSocket = mWrapper->dBluetoothAdapter->listenUsingInsecureRfcommWithServiceRecord(mWrapper->sServiceName, mWrapper->sUuidService + mWrapper->sUuidSuffix)) != nullptr) {
+                while (mAlive && !vBluetoothSocket) {
+                    vBluetoothSocket = mServerSocket->accept();
+                }
+                if (vBluetoothSocket) {
+                    sendOp(0, mWrapper->opUnitCore->mId, mWrapper->w->mNBeta00, new OpParam((NParam)vBluetoothSocket));
+                }
+                mServerSocket->close();
+            }
+        } else {
+            LOGW("SERVER NOT DISCOVERABLE : now waiting 15 seconds");
+            this_thread::sleep_for(chrono::milliseconds(15000));
         }
     }
 }

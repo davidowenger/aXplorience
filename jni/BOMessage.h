@@ -10,11 +10,16 @@ public:
     BOHandlerMessage(Wrapper* w);
     virtual ~BOHandlerMessage();
 
+    nuint addDrop(String packed);
+    nuint addSeed(const String& id_cat, const String& title, const String& text, const String& link);
+    DBObject* get(nuint id);
     DBCollection* getDrops();
+    DBCollection* getMessages();
+    DBCollection* getMessagesSorted();
+    DBCollection* getMessagesToBroadcast();
     DBCollection* getSeeds();
-    DBObject* addSeed(const String& id_cat, const String& title, const String& text);
-    DBObject* addDrop(String packed);
     String pack(DBObject* vDBObject);
+    void setMessage(nuint id, const String& id_cat, const String& title, const String& text, const String& link);
 
     Wrapper* w;
     DBTableHandler* h;

@@ -13,6 +13,16 @@ public:
 	{
 	}
 
+    virtual int getIntrinsicHeight()
+    {
+        return (int)NWrapper::w->mNVisitorGraphics->tRun(NWrapper::w->mNDzeta00, (NParam)this);
+    }
+
+    virtual int getIntrinsicWidth()
+    {
+        return (int)NWrapper::w->mNVisitorGraphics->tRun(NWrapper::w->mNEta00, (NParam)this);
+    }
+
 private:
     Drawable(NNoObject* vNNoObject)
     {

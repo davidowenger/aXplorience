@@ -18,7 +18,7 @@ public:
     {
     }
 
-    virtual View* getDropDownView(int position, View convertView, ViewGroup parent) = 0;
+    virtual View* getDropDownView(int position, View* convertView, ViewGroup* parent) = 0;
 };
 
 } // End namespace

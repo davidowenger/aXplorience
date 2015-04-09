@@ -24,24 +24,20 @@ public:
 
     virtual ActionBar* getActionBar()
     {
-
-        ActionBar* vActionBar = NWrapper::w->mNNoObject->pointer<ActionBar>();
-        bool error = NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNBeta00, (NParam)this, (NParam)vActionBar);
-        return ( error ? nullptr : vActionBar);
+        ActionBar* b = NWrapper::w->mNNoObject->pointer<ActionBar>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNBeta00, (NParam)this, (NParam)b));
     }
 
-    virtual Resources* getResources()
+    virtual Application* getApplication()
     {
-        Resources* vResources = NWrapper::w->mNNoObject->pointer<Resources>();
-        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)vResources);
-        return vResources;
+        Application* b = NWrapper::w->mNNoObject->pointer<Application>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)b));
     }
 
     virtual FragmentManager* getFragmentManager()
     {
-        FragmentManager* vFragmentManager = NWrapper::w->mNNoObject->pointer<FragmentManager>();
-        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDelta00, (NParam)this, (NParam)vFragmentManager);
-        return vFragmentManager;
+        FragmentManager* b = NWrapper::w->mNNoObject->pointer<FragmentManager>();
+        return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDelta00, (NParam)this, (NParam)b));
     }
 
 	virtual void setContentView(View* view)
@@ -49,9 +45,9 @@ public:
 		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEpsilon00, (NParam)this, (NParam)view);
 	}
 
-	virtual void sendMessage(NParam a = 0, NParam b = 0, NParam c = 0)
+	virtual void sendMessage(NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0)
 	{
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDzeta00, (NParam)this, (NParam)a, (NParam)b, (NParam)c);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDzeta00, (NParam)this, (NParam)a, (NParam)b, (NParam)c, (NParam)d);
 	}
 
 protected:
@@ -59,43 +55,43 @@ protected:
     //************************************* Activity events ************************************
     //* This passes the call back to the default implementation if the method is not overriden *
     //******************************************************************************************
-	virtual void onCreate()
+	virtual void onCreate(Bundle* savedInstanceState)
 	{
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNAlpha03, (NParam)this);
+		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNAlpha03, (NParam)this, (NParam)savedInstanceState);
 	}
+
+    virtual void onRestart()
+    {
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNBeta03, (NParam)this);
+    }
+
+    virtual void onStart()
+    {
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNGamma03, (NParam)this);
+    }
+
+    virtual void onResume()
+    {
+        // Resume here animations and other things that may be consuming CPU
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDelta03, (NParam)this);
+    }
+
+    virtual void onPause()
+    {
+        // This is the last method garanteed to be called before the process may be killed
+        // Stop things that may be consuming CPU (like animations) here
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEpsilon03, (NParam)this);
+    }
+
+    virtual void onStop()
+    {
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDzeta03, (NParam)this);
+    }
 
 	virtual void onDestroy()
 	{
 		// Called only if the system must not recover memory in an emergency
 		// Clean memory here
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNBeta03, (NParam)this);
-	}
-
-	virtual void onPause()
-	{
-		// This is the last method garanteed to be called before the process may be killed
-		// Stop things that may be consuming CPU (like animations) here
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNGamma03, (NParam)this);
-	}
-
-	virtual void onRestart()
-	{
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDelta03, (NParam)this);
-	}
-
-	virtual void onResume()
-	{
-		// Resume here animations and other things that may be consuming CPU
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEpsilon03, (NParam)this);
-	}
-
-	virtual void onStart()
-	{
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDzeta03, (NParam)this);
-	}
-
-	virtual void onStop()
-	{
 		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEta03, (NParam)this);
 	}
 
@@ -127,7 +123,7 @@ protected:
 	{
 	}
 
-	virtual void handleMessage(NParam a, NParam b, NParam c)
+	virtual void handleMessage(NParam a, NParam b, NParam c, NParam d)
 	{
 	}
 
