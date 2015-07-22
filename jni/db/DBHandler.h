@@ -74,7 +74,7 @@ public:
 	Wrapper* w;
 	DBTable* mDBTable;
 	DBFile* mDBFile;
-	unordered_map<string,nint> maFieldIndex;
+	unordered_map<string,nuint> maFieldIndex;
 };
 
 class DBObject
@@ -86,6 +86,7 @@ public:
 	DBObject* load();
 	String* get();
 	String get(const String& field);
+	nuint getFieldIndex(const String& field);
     nlong count(const String& field);
     bool is(const String& field);
 	DBObject* set(String* aValue, nuint count);
@@ -102,15 +103,30 @@ public:
 	bool mIsCache;
 };
 
+class Sort
+{
+public:
+    Sort(const String& vField, bool vIsAscending = true)
+        : mField(vField), mIsAscending(vIsAscending)
+    {
+    };
+
+    String mField;
+    bool mIsAscending;
+};
+
 class DBCollection
 {
 public:
-	DBCollection(Wrapper* w, DBTableHandler* dbTableHandler);
+    typedef function<bool(const String&,const String&)> Compare;
+
+    DBCollection(Wrapper* w, DBTableHandler* dbTableHandler);
    ~DBCollection();
 
 	DBCollection* load();
 	DBObject* get(nint index);
-	DBCollection* sort(const String& field, bool ascending = true);
+    DBCollection* sort(list<Sort> vaSort);
+    DBCollection* sort(const String& field, bool ascending = true);
     DBCollection* filter(const String& field, const String& value, const String& op);
     DBCollection* filter(const String& field, nlong value, const String& op);
 	DBCollection* filter(DBFilter* left, DBFilter* right, const String& op);
@@ -118,9 +134,12 @@ public:
 
 	Wrapper* w;
 	DBTableHandler* mDBTableHandler;
-	vector<DBObject*> maDBObject;
 	DBFilter* mDBFiltre;
-	bool isLoaded;
+    multimap<String,DBObject*,Compare>* maDBObjectSorted;
+
+    vector<DBObject*> maDBObject;
+
+    bool isLoaded;
 };
 
 class DBFilter

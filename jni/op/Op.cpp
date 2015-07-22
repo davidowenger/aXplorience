@@ -7,6 +7,7 @@ OpCallback::OpCallback(NReturn* vNReturn, bool* vDone)
     : mNReturn(vNReturn), mDone(vDone)
 {
     *mDone = false;
+    *mNReturn = 0;
 }
 
 OpCallback::~OpCallback()
@@ -41,6 +42,17 @@ OpMessage::OpMessage(const String& vStringA, const String& vStringB, const Strin
 
 OpMessage::~OpMessage()
 {
+}
+
+OpParamForResult::OpParamForResult(nlong a, nlong b, nlong c, nlong d, nlong e)
+    : Op(nullptr, a, b, c, d, e, nullptr)
+{
+    mOpCallback = new OpCallback(new NReturn(), new bool());
+}
+
+OpParamForResult::~OpParamForResult()
+{
+    *mOpCallback->mDone = true;
 }
 
 OpMessageForResult::OpMessageForResult(const String& vStringA, const String& vStringB, const String& vStringC, const String& vStringD, const String& vStringE, nlong b, nlong c, nlong d, nlong e)

@@ -174,7 +174,7 @@ NReturn NClozer::nInit(nint cState)
 
 NReturnObject NClozer::tRunString(const String& boxed)
 {
-	LOGPRINTD("Call to NAPI for a new string from char sequence : %s", boxed.c_str());
+	LOGPRINTV("Call to NAPI for a new string from char sequence : %s", boxed.c_str());
 	return NAPI_tRunString(w, boxed);
 }
 

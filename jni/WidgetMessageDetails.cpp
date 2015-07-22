@@ -16,7 +16,6 @@ WidgetMessageDetails::WidgetMessageDetails(Wrapper* const w)
     setOrientation(LinearLayout::VERTICAL);
     setLayoutParams(new LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT, 1));
     setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
-    setBackgroundColor(w->maColor[Theme::kColorApplicationBackground]);
     setOnTouchListener(this);
 
     mCategory->setGravity(Gravity::START);
@@ -24,24 +23,28 @@ WidgetMessageDetails::WidgetMessageDetails(Wrapper* const w)
     mCategory->setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT));
     mCategory->setTextColor(w->maColor[Theme::kColorMessageText]);
     mCategory->setTextSize(w->mcTextSize);
+    mCategory->setOnTouchListener(this);
 
     mTitle->setGravity(Gravity::START);
     mTitle->setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
     mTitle->setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT));
     mTitle->setTextColor(w->maColor[Theme::kColorMessageText]);
     mTitle->setTextSize(w->mcTextSize);
+    mTitle->setOnTouchListener(this);
 
     mText->setGravity(Gravity::START);
     mText->setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
     mText->setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT));
     mText->setTextColor(w->maColor[Theme::kColorMessageText]);
     mText->setTextSize(w->mcTextSize);
+    mText->setOnTouchListener(this);
 
     mLink->setGravity(Gravity::START);
     mLink->setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
     mLink->setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT));
     mLink->setTextColor(w->maColor[Theme::kColorMessageText]);
     mLink->setTextSize(w->mcTextSize);
+    mLink->setOnTouchListener(this);
 
     addView(mCategory);
     addView(mTitle);
@@ -73,11 +76,11 @@ void WidgetMessageDetails::init(nuint vcView, nuint vcDBObjectId)
     mcView = vcView;
     mcDBObjectId = vcDBObjectId;
     mDBObject = w->mBOHandlerMessage->get(mcDBObjectId);
-    mcCategoryId = (nint)to_long(mDBObject->get("id_cat"));
+    mcCategoryId = (nint)to_long(mDBObject->get("sCategoryId"));
 
     mCategory->setBackgroundColor(w->maColor[Theme::kColorCategoryBackground + mcCategoryId*3]);
     mCategory->setText(w->maCategory[mcCategoryId]);
-    mTitle->setText(mDBObject->get("title"));
+    mTitle->setText(mDBObject->get("sTitle"));
     mText->setText(mDBObject->get("text"));
     mLink->setText(mDBObject->get("link"));
 
@@ -89,11 +92,10 @@ void WidgetMessageDetails::init(nuint vcView, nuint vcDBObjectId)
 //*******************************************************************************************
 bool WidgetMessageDetails::onTouch(View* vView, MotionEvent* event)
 {
-    if (w->maFragmentView[w->mcView]->mTouchState == 0) {
-        w->maFragmentView[w->mcView]->mTouchState = 1;
-        w->maFragmentView[w->mcView]->mViewSource = vView;
+    if (w->mTouchState == 3) {
+        w->mTouchState = 0;
     }
-    return w->maGestureDetector[w->mcView]->onTouchEvent(event);
+    return true;
 }
 
 } // End namespace

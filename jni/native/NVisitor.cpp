@@ -17,7 +17,7 @@ NVisitor::~NVisitor()
 NReturn NVisitor::defaultVisit(NElement* nElement)
 {
     LOGPRINTW("Empty NATIVE visit method called for element #%d at visitor #%d", nElement->i, this->i);
-	return nElement->accept(this);
+	return 1;
 }
 
 NReturn NVisitor::tRun(NElement* nElement, NParam a, NParam b, NParam c, NParam d, NParam e)

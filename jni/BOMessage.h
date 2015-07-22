@@ -14,9 +14,10 @@ public:
     nuint addSeed(const String& id_cat, const String& title, const String& text, const String& link);
     DBObject* get(nuint id);
     DBCollection* getDrops();
-    DBCollection* getMessages();
-    DBCollection* getMessagesSorted();
+  //DBCollection* getMessages();
+  //DBCollection* getMessagesSorted();
     DBCollection* getMessagesToBroadcast();
+    DBCollection* getMessagesToDisplay();
     DBCollection* getSeeds();
     String pack(DBObject* vDBObject);
     void setMessage(nuint id, const String& id_cat, const String& title, const String& text, const String& link);

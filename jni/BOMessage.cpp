@@ -17,6 +17,7 @@ nuint BOHandlerMessage::addDrop(String packed)
 {
     //FIXME: UTF8 compatibility
     int i;
+    TimeStamp vcTimeStampNow = system_clock::now().time_since_epoch().count();
     vector<string> aValue = split(packed, String("1#"));
     nuint vcDBObjectId = 0;
 
@@ -30,14 +31,16 @@ nuint BOHandlerMessage::addDrop(String packed)
         DBObject* vExisting = c->get(0);
         vcDBObjectId = (nuint)to_long(vExisting->get("id"));
 
-        if (!vExisting->is("in")) {
+        if (!vExisting->is("sIn")) {
             if (!vExisting->is("sBuzzed") && vReceived->is("sBuzzed") && vExisting->get("sBuzzedIndex") == vReceived->get("sBuzzedIndex")) {
                 if (!vExisting->is("sArchivedUser")) vExisting->set("sBuzzed", true);
                 vExisting->set("sBuzzedIndex", (nuint)vExisting->count("sBuzzedIndex") + 1);
+                vExisting->set("sBuzzing", true);
             }
         } else {
-            setMessage(vcDBObjectId, vReceived->get("id_cat"), vReceived->get("title"), vReceived->get("text"), vReceived->get("link"));
-            vExisting->set("sArchivedAuto", false);
+            setMessage(vcDBObjectId, vReceived->get("sCategoryId"), vReceived->get("sTitle"), vReceived->get("text"), vReceived->get("link"));
+            vExisting->set("date", vReceived->get("date"));
+            vExisting->set("sArchivedAuto", vcTimeStampNow - vReceived->count("date") > 6*w->mc10Secondes);
             vExisting->set("sArchivedUser", vReceived->get("sArchivedUser"));
 
             if (vExisting->is("sBuzzed") && !vReceived->is("sBuzzed") && vExisting->count("sBuzzedIndex") < vReceived->count("sBuzzedIndex")) {
@@ -47,14 +50,12 @@ nuint BOHandlerMessage::addDrop(String packed)
                 vExisting->set("sBuzzedIndex", vReceived->get("sBuzzedIndex"));
             }
         }
-        vExisting->set("date", to_string(steady_clock::now().time_since_epoch().count()));
         vExisting->commit();
     } else {
-        vReceived->set("in", true);
-        vReceived->set("date", to_string(steady_clock::now().time_since_epoch().count()));
+        vReceived->set("sIn", true);
         vReceived->set("sEnabled", true);
         vReceived->set("sDeleted", false);
-        vReceived->set("sArchivedAuto", false);
+        vReceived->set("sArchivedAuto", vcTimeStampNow - vReceived->count("date") > 6*w->mc10Secondes);
         vReceived->set("sArchivedUser", false);
         vReceived->set("sBuzzed", false);
         vReceived->commit();
@@ -69,8 +70,8 @@ nuint BOHandlerMessage::addSeed(const String& id_cat, const String& title, const
 {
     DBObject* vDBObject = h->getInstance();
     vDBObject->set("mac", w->mac);
-    vDBObject->set("in", false);
-    vDBObject->set("date", steady_clock::now().time_since_epoch().count());
+    vDBObject->set("sIn", false);
+    vDBObject->set("date", system_clock::now().time_since_epoch().count());
     vDBObject->set("sEnabled", true);
     vDBObject->set("sDeleted", false);
     vDBObject->set("sArchivedAuto", false);
@@ -97,30 +98,37 @@ DBObject* BOHandlerMessage::get(nuint id)
 
 DBCollection* BOHandlerMessage::getDrops()
 {
-    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("in", true, "=");
+    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("sIn", true, "=");
 }
 
-DBCollection* BOHandlerMessage::getMessages()
-{
-    return h->getCollection()->filter("id", "1", "!=")->filter("sArchivedAuto", false, "=");
-}
+//DBCollection* BOHandlerMessage::getMessages()
+//{
+//    return h->getCollection()->filter("id", "1", "!=")->filter("sArchivedAuto", false, "=");
+//}
 
-DBCollection* BOHandlerMessage::getMessagesSorted()
-{
-    DBHelper n;
-    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("sArchivedAuto", false, "=")
-            ->filter(n.f("in", false, "="), n.f("sArchivedUser", false, "="), "OR")
-    		->sort(w->mDBObjectApplication->get("sSort"), w->mDBObjectApplication->is("sAscending"));
-}
+//DBCollection* BOHandlerMessage::getMessagesSorted()
+//{
+//    DBHelper n;
+//    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("sArchivedAuto", false, "=")
+//            ->filter(n.f("sIn", false, "="), n.f("sArchivedUser", false, "="), "OR")
+//            ->sort(w->mDBObjectApplication->get("sSort"), w->mDBObjectApplication->is("sAscending"));
+//}
 
 DBCollection* BOHandlerMessage::getMessagesToBroadcast()
 {
-    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=");
+    return h->getCollection()->filter("id", "1", "!=")->filter("sArchivedAuto", false, "=")
+            ->filter(f("sIn", false, "="), f("sArchivedUser", false, "="), "OR");
+}
+
+DBCollection* BOHandlerMessage::getMessagesToDisplay()
+{
+    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("sArchivedAuto", false, "=")
+            ->filter(f("sIn", false, "="), f("sArchivedUser", false, "="), "OR");
 }
 
 DBCollection* BOHandlerMessage::getSeeds()
 {
-    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("in", false, "=");
+    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("sIn", false, "=");
 }
 
 String BOHandlerMessage::pack(DBObject* vDBObject)
@@ -141,8 +149,8 @@ String BOHandlerMessage::pack(DBObject* vDBObject)
 void BOHandlerMessage::setMessage(nuint id, const String& id_cat, const String& title, const String& text, const String& link)
 {
     DBObject* vDBObject = h->getInstance(to_string(id));
-    vDBObject->set("id_cat", id_cat);
-    vDBObject->set("title", title);
+    vDBObject->set("sCategoryId", id_cat);
+    vDBObject->set("sTitle", title);
     vDBObject->set("text", text);
     vDBObject->set("link", link);
     vDBObject->commit();

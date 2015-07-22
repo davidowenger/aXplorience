@@ -11,6 +11,7 @@ public:
     virtual ~FragmentViewHome() override;
 
     virtual void init(nuint vcView, Menu* vMenu, nuint vcDBObjectId) override;
+    virtual bool onInterceptTouchEvent(MotionEvent* ev) override;
     virtual bool onMenuItemSelected(nint id) override;
 
     // GestureDetector::OnGestureListener

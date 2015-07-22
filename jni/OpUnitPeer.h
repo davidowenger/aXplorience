@@ -22,7 +22,6 @@ public:
     int write(String packet);
     int waitMessage(String& vBuffer, TimeStamp vcSecondesTimeout);
 
-    Wrapper* mWrapper;
 	int mcOrigin;
     String mUuid;
     String mBuffer;

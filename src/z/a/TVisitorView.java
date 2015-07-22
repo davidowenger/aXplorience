@@ -93,6 +93,12 @@ public class TVisitorView extends TVisitor
         return Double.doubleToRawLongBits(((MotionEvent)w.sObject.get(a)).getY());
     }
 
+    // nlong getEventTime()
+    public long visit(TLambda00 element, long a, long b, long c, long d, long e)
+    {
+        return ((MotionEvent)w.sObject.get(a)).getEventTime();
+    }
+
     //*******************************************************************************************
     //*********************************** OnGestureListener *************************************
     //*******************************************************************************************

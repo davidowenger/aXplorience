@@ -51,7 +51,10 @@ public:
         NReturn vcRet = 0;
         if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<View>();
         if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
-        if (b != -1) vcRet = ((View::OnTouchListener*)a)->onTouch((View*)b, (MotionEvent*)c);
+        if (b != -1) {
+            vcRet = ((View::OnTouchListener*)a)->onTouch((View*)b, (MotionEvent*)c);
+            delete (MotionEvent*)c;
+        }
         return vcRet;
     }
 };

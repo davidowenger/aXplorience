@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -107,15 +109,22 @@ public class TVisitorBluetooth extends TVisitor
 		return 0;
 	}
 
-	//BluetoothServerSocket* listenUsingRfcommWithServiceRecord(String name, String uuid)
-	public long visit(TOmicron00 element, long a, long b, long c, long d, long e)
+    //BluetoothServerSocket* listenUsingInsecureRfcommOn(int channel)
+    public long visit(TTau00 element, long a, long b, long c, long d, long e)
     {
-		BluetoothServerSocket vBluetoothServerSocket = null;
-		try {
-			vBluetoothServerSocket = ((BluetoothAdapter)w.sObject.get(a)).listenUsingRfcommWithServiceRecord((String)w.tFrame.nRunObject(c), UUID.fromString((String)w.tFrame.nRunObject(d)));
-		}
-		catch (IOException vException) {
-			if (w.doDebug) vException.printStackTrace();
+        BluetoothServerSocket vBluetoothServerSocket = null;
+        BluetoothAdapter vBluetoothAdapter = (BluetoothAdapter)w.sObject.get(a);
+        Class<?> vClass;
+        Method vMethod;
+
+        try {
+            vClass = vBluetoothAdapter.getClass();
+            vMethod = vClass.getDeclaredMethod("listenUsingInsecureRfcommOn", new Class[] { Integer.TYPE });
+            vMethod.setAccessible(true);
+            vBluetoothServerSocket = (BluetoothServerSocket)vMethod.invoke(vBluetoothAdapter, new Object[] { (Integer)((int)c) });
+        }
+        catch (Exception vException) {
+            if (w.doDebug) vException.printStackTrace();
             vBluetoothServerSocket = null;
         }
         return w.tFrame.emplaceKey(b, vBluetoothServerSocket);
@@ -132,6 +141,20 @@ public class TVisitorBluetooth extends TVisitor
 			if (w.doDebug) vException.printStackTrace();
 			vBluetoothServerSocket = null;
 		}
+        return w.tFrame.emplaceKey(b, vBluetoothServerSocket);
+    }
+
+    //BluetoothServerSocket* listenUsingRfcommWithServiceRecord(String name, String uuid)
+    public long visit(TOmicron00 element, long a, long b, long c, long d, long e)
+    {
+        BluetoothServerSocket vBluetoothServerSocket = null;
+        try {
+            vBluetoothServerSocket = ((BluetoothAdapter)w.sObject.get(a)).listenUsingRfcommWithServiceRecord((String)w.tFrame.nRunObject(c), UUID.fromString((String)w.tFrame.nRunObject(d)));
+        }
+        catch (IOException vException) {
+            if (w.doDebug) vException.printStackTrace();
+            vBluetoothServerSocket = null;
+        }
         return w.tFrame.emplaceKey(b, vBluetoothServerSocket);
     }
 
@@ -209,19 +232,26 @@ public class TVisitorBluetooth extends TVisitor
         return w.tFrame.emplaceKey(b, ((BluetoothDevice)w.sObject.get(a)).getBluetoothClass());
     }
 
-	//BluetoothSocket* createRfcommSocketToServiceRecord(const String& uuid);
-	public long visit(TKappa01 element, long a, long b, long c, long d, long e)
-	{
+    //BluetoothSocket* createInsecureRfcommSocket(int port);
+    public long visit(TNu01 element, long a, long b, long c, long d, long e)
+    {
         BluetoothSocket vBluetoothSocket = null;
-		try {
-			vBluetoothSocket = ((BluetoothDevice)w.sObject.get(a)).createRfcommSocketToServiceRecord(UUID.fromString((String)w.tFrame.nRunObject(c)));
-		}
-		catch (IOException vException) {
-			if (w.doDebug) vException.printStackTrace();
+        BluetoothDevice vBluetoothDevice = (BluetoothDevice)w.sObject.get(a);
+        Class<?> vClass;
+        Method vMethod;
+
+        try {
+            vClass = vBluetoothDevice.getClass();
+            vMethod = vClass.getDeclaredMethod("createInsecureRfcommSocket", new Class[] { Integer.TYPE });
+            vMethod.setAccessible(true);
+            vBluetoothSocket = (BluetoothSocket)vMethod.invoke(vBluetoothDevice, new Object[] { (Integer)((int)c) });
+        }
+        catch (Exception vException) {
+            if (w.doDebug) vException.printStackTrace();
             vBluetoothSocket = null;
         }
         return w.tFrame.emplaceKey(b, vBluetoothSocket);
-	}
+    }
 
     //BluetoothSocket* createInsecureRfcommSocketToServiceRecord(const String& uuid);
     public long visit(TLambda01 element, long a, long b, long c, long d, long e)
@@ -229,6 +259,20 @@ public class TVisitorBluetooth extends TVisitor
         BluetoothSocket vBluetoothSocket = null;
         try {
             vBluetoothSocket = ((BluetoothDevice)w.sObject.get(a)).createInsecureRfcommSocketToServiceRecord(UUID.fromString((String)w.tFrame.nRunObject(c)));
+        }
+        catch (IOException vException) {
+            if (w.doDebug) vException.printStackTrace();
+            vBluetoothSocket = null;
+        }
+        return w.tFrame.emplaceKey(b, vBluetoothSocket);
+    }
+
+    //BluetoothSocket* createRfcommSocketToServiceRecord(const String& uuid);
+    public long visit(TKappa01 element, long a, long b, long c, long d, long e)
+    {
+        BluetoothSocket vBluetoothSocket = null;
+        try {
+            vBluetoothSocket = ((BluetoothDevice)w.sObject.get(a)).createRfcommSocketToServiceRecord(UUID.fromString((String)w.tFrame.nRunObject(c)));
         }
         catch (IOException vException) {
             if (w.doDebug) vException.printStackTrace();
@@ -289,6 +333,27 @@ public class TVisitorBluetooth extends TVisitor
 		return err;
 	}
 
+    //int getChannel()
+    public long visit(TDelta02 element, long a, long b, long c, long d, long e)
+    {
+        int vcChannel = -1;
+        BluetoothServerSocket vBluetoothServerSocket = (BluetoothServerSocket)w.sObject.get(a);
+        Class<?> vClass;
+        Field vField;
+
+        try {
+            vClass = vBluetoothServerSocket.getClass();
+            vField = vClass.getDeclaredField("mChannel");
+            vField.setAccessible(true);
+            vcChannel = vField.getInt(vBluetoothServerSocket);
+        }
+        catch (Exception vException) {
+            if (w.doDebug) vException.printStackTrace();
+            vcChannel = -1;
+        }
+        return vcChannel;
+    }
+
 	//*******************************************************************************
 	//***************************** BluetoothSocket *********************************
 	//*******************************************************************************
@@ -341,17 +406,38 @@ public class TVisitorBluetooth extends TVisitor
         return w.tFrame.emplaceKey(b, vInputStream);
     }
 
-	//OutputStream* getOutputStream()
-	public long visit(TEpsilon03 element, long a, long b, long c, long d, long e)
+    //OutputStream* getOutputStream()
+    public long visit(TEpsilon03 element, long a, long b, long c, long d, long e)
     {
         OutputStream vOutputStream = null;
-		try {
-			vOutputStream = ((BluetoothSocket)w.sObject.get(a)).getOutputStream();
-		}
-		catch (IOException vException) {
-			if (w.doDebug) vException.printStackTrace();
+        try {
+            vOutputStream = ((BluetoothSocket)w.sObject.get(a)).getOutputStream();
+        }
+        catch (IOException vException) {
+            if (w.doDebug) vException.printStackTrace();
             vOutputStream = null;
-		}
+        }
         return w.tFrame.emplaceKey(b, vOutputStream);
+    }
+
+    //int getPort()
+    public long visit(TDzeta03 element, long a, long b, long c, long d, long e)
+    {
+        int vcPort = -1;
+        BluetoothSocket vBluetoothSocket = (BluetoothSocket)w.sObject.get(a);
+        Class<?> vClass;
+        Field vField;
+
+        try {
+            vClass = vBluetoothSocket.getClass();
+            vField = vClass.getDeclaredField("mPort");
+            vField.setAccessible(true);
+            vcPort = vField.getInt(vBluetoothSocket);
+        }
+        catch (Exception vException) {
+            if (w.doDebug) vException.printStackTrace();
+            vcPort = -1;
+        }
+        return vcPort;
     }
 }

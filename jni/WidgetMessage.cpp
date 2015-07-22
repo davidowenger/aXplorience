@@ -14,6 +14,25 @@ WidgetMessage::WidgetMessage(Wrapper* const w)
     mText = new Button(w->mApplication);
     mCheck = new ToggleButton(w->mApplication);
     mBuzz = new ToggleButton(w->mApplication);
+    mStateListCheck = new StateListDrawable*[2]();
+    mStateListBuzz = new StateListDrawable*[2]();
+
+    mStateListCheck[0] = new StateListDrawable();
+    mStateListCheck[0]->addState(vector<int>() = { R::attr::state_enabled, R::attr::state_checked }, w->maDrawable[6]);
+    mStateListCheck[0]->addState(vector<int>() = { R::attr::state_enabled }, w->maDrawable[5]);
+
+    mStateListBuzz[0] = new StateListDrawable();
+    mStateListBuzz[0]->addState(vector<int>() = { R::attr::state_checked  }, w->maDrawable[1]);
+    mStateListBuzz[0]->addState(vector<int>(), w->maDrawable[0]);
+
+    mStateListCheck[1] = new StateListDrawable();
+    mStateListCheck[1]->addState(vector<int>() = { R::attr::state_enabled, R::attr::state_checked }, w->maDrawable[4]);
+    mStateListCheck[1]->addState(vector<int>() = { R::attr::state_enabled }, w->maDrawable[3]);
+
+    mStateListBuzz[1] = new StateListDrawable();
+    mStateListBuzz[1]->addState(vector<int>() = { R::attr::state_enabled, R::attr::state_checked  }, w->maDrawable[1]);
+    mStateListBuzz[1]->addState(vector<int>() = { R::attr::state_enabled }, w->maDrawable[2]);
+    mStateListBuzz[1]->addState(vector<int>(), w->maDrawable[0]);
 
     LinearLayout::LayoutParams vLayoutParams = LinearLayout::LayoutParams(ViewGroup::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT);
     vLayoutParams.setMargins(5, 5, 5, 5);
@@ -33,10 +52,22 @@ WidgetMessage::~WidgetMessage()
        delete mDBObject;
     }
     if (mStateListBuzz) {
-       delete mStateListBuzz;
+        if (mStateListBuzz[0]) {
+           delete mStateListBuzz[0];
+        }
+        if (mStateListBuzz[1]) {
+           delete mStateListBuzz[1];
+        }
+        delete[] mStateListBuzz;
     }
     if (mStateListCheck) {
-       delete mStateListCheck;
+        if (mStateListCheck[0]) {
+           delete mStateListCheck[0];
+        }
+        if (mStateListCheck[1]) {
+           delete mStateListCheck[1];
+        }
+       delete[] mStateListCheck;
     }
     if (mBuzz) {
        mBuzz->setButtonDrawable(nullptr);
@@ -52,37 +83,19 @@ WidgetMessage::~WidgetMessage()
     if (mCategory) {
        delete mCategory;
     }
-}
-
-void WidgetMessage::init(nuint vcView, nuint vcDBObjectId)
-{
-    mcView = vcView;
-    mcDBObjectId = vcDBObjectId;
-
-    mDBObject = w->mBOHandlerMessage->get(mcDBObjectId);
-    mcCategoryId = to_long(mDBObject->get("id_cat"));
-
-    mCategory->setImageDrawable(new ColorDrawable(w->maColor[Theme::kColorCategoryBackground + mcCategoryId*3]));
-    mText->setText(mDBObject->get("title"));
-    mCheck->setChecked(mDBObject->get("sEnabled") == w->dbh->TRUE);
-    mBuzz->setEnabled(mIsInbound && mCheck->isChecked());
-    mBuzz->setChecked(mDBObject->get("sBuzzed") == w->dbh->TRUE);
-
-    requestLayout();
-}
-
-bool WidgetMessage::onInterceptTouchEvent(MotionEvent* ev)
-{
-//    return onTouch(this, ev);
-    return false;
+    if (mRight) {
+       delete mRight;
+    }
+    if (mLeft) {
+       delete mLeft;
+    }
 }
 
 void WidgetMessage::render()
 {
-    LinearLayout::LayoutParams vLayoutParamsCategory = LinearLayout::LayoutParams((int)(27*w->mcDensity), LinearLayout::LayoutParams::MATCH_PARENT);
-    vLayoutParamsCategory.setMargins(0, 0, 0, 0);
-
-    mCategory->setLayoutParams(&vLayoutParamsCategory);
+    LinearLayout::LayoutParams vLayoutParams1 = LinearLayout::LayoutParams((int)(27*w->mcDensity), LinearLayout::LayoutParams::MATCH_PARENT);
+    vLayoutParams1.setMargins(0, 0, 0, 0);
+    mCategory->setLayoutParams(&vLayoutParams1);
     mCategory->setPadding((int)(5*w->mcDensity), 5, (int)(15*w->mcDensity), 5);
     mCategory->setMinimumHeight(w->maDrawable[3]->getIntrinsicHeight());
     mCategory->setBackgroundDrawable(nullptr);
@@ -90,8 +103,9 @@ void WidgetMessage::render()
     mCategory->setOnClickListener(this);
     mCategory->setOnTouchListener(this);
 
+    LinearLayout::LayoutParams vLayoutParams2 = LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::WRAP_CONTENT, 1);
+    mText->setLayoutParams(&vLayoutParams2);
     mText->setGravity(Gravity::LEFT|Gravity::CLIP_HORIZONTAL|Gravity::CENTER_VERTICAL);
-    mText->setLayoutParams(new LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::WRAP_CONTENT, 1));
     mText->setPadding(5,5,5,5);
     mText->setMinimumHeight(w->maDrawable[3]->getIntrinsicHeight());
     mText->setLines(1);
@@ -101,10 +115,11 @@ void WidgetMessage::render()
     mText->setOnClickListener(this);
     mText->setOnTouchListener(this);
 
-    mCheck->setLayoutParams(new ViewGroup::LayoutParams(w->maDrawable[3]->getIntrinsicWidth(), w->maDrawable[3]->getIntrinsicHeight()));
+    ViewGroup::LayoutParams vLayoutParams3 = ViewGroup::LayoutParams(w->maDrawable[3]->getIntrinsicWidth(), w->maDrawable[3]->getIntrinsicHeight());
+    mCheck->setLayoutParams(&vLayoutParams3);
     mCheck->setPadding(0,0,0,0);
     mCheck->setBackgroundDrawable(nullptr);
-    mCheck->setButtonDrawable(mStateListCheck);
+    //mCheck->setButtonDrawable(mStateListCheck);
     mCheck->setText("");
     mCheck->setTextOn("");
     mCheck->setTextOff("");
@@ -112,26 +127,28 @@ void WidgetMessage::render()
     mCheck->setOnClickListener(this);
     mCheck->setOnTouchListener(this);
 
-    mBuzz->setOnClickListener(this);
-    mBuzz->setLayoutParams(new ViewGroup::LayoutParams(w->maDrawable[3]->getIntrinsicWidth(), w->maDrawable[3]->getIntrinsicHeight()));
+    ViewGroup::LayoutParams vLayoutParams4 = ViewGroup::LayoutParams(w->maDrawable[3]->getIntrinsicWidth(), w->maDrawable[3]->getIntrinsicHeight());
+    mBuzz->setLayoutParams(&vLayoutParams4);
     mBuzz->setPadding(0,0,0,0);
     mBuzz->setBackgroundDrawable(nullptr);
-    mBuzz->setButtonDrawable(mStateListBuzz);
+    //mBuzz->setButtonDrawable(mStateListBuzz);
     mBuzz->setText("");
     mBuzz->setTextOn("");
     mBuzz->setTextOff("");
     mBuzz->setOnClickListener(this);
     mBuzz->setOnTouchListener(this);
 
+    WidgetMessage::LayoutParams vLayoutParams5 = WidgetMessage::LayoutParams(0, LinearLayout::LayoutParams::WRAP_CONTENT, 1);
+    mLeft->setLayoutParams(&vLayoutParams5);
     mLeft->setGravity(Gravity::LEFT);
     mLeft->setOrientation(LinearLayout::HORIZONTAL);
-    mLeft->setLayoutParams(new WidgetMessage::LayoutParams(0, LinearLayout::LayoutParams::WRAP_CONTENT, 1));
     mLeft->setPadding(0,0,0,0);
     mLeft->setOnTouchListener(this);
 
+    WidgetMessage::LayoutParams vLayoutParams6 = WidgetMessage::LayoutParams(LinearLayout::LayoutParams::WRAP_CONTENT, LinearLayout::LayoutParams::WRAP_CONTENT);
+    mRight->setLayoutParams(&vLayoutParams6);
     mRight->setGravity(Gravity::LEFT);
     mRight->setOrientation(LinearLayout::HORIZONTAL);
-    mRight->setLayoutParams(new WidgetMessage::LayoutParams(LinearLayout::LayoutParams::WRAP_CONTENT, LinearLayout::LayoutParams::WRAP_CONTENT));
     mRight->setPadding(0,0,0,0);
     mRight->setOnTouchListener(this);
 
@@ -144,20 +161,29 @@ void WidgetMessage::render()
     addView(mRight);
 }
 
+void WidgetMessage::init(nuint vcView, nuint vcDBObjectId)
+{
+    mcDBObjectId = vcDBObjectId;
+    mcView = vcView;
+
+    mDBObject = w->mBOHandlerMessage->get(mcDBObjectId);
+    mIsInbound = mDBObject->is("sIn");
+    mcCategoryId = mDBObject->count("sCategoryId");
+
+    mCategory->setImageDrawable(new ColorDrawable(w->maColor[Theme::kColorCategoryBackground + mcCategoryId*3]));
+    mText->setText(mDBObject->get("sTitle"));
+    mCheck->setChecked(mDBObject->is("sEnabled"));
+    mCheck->setButtonDrawable(mStateListCheck[mIsInbound*1]);
+    mBuzz->setEnabled((mIsInbound || mDBObject->is("sBuzzed")) && mDBObject->is("sEnabled"));
+    mBuzz->setChecked(mDBObject->is("sBuzzed"));
+    mBuzz->setButtonDrawable(mStateListBuzz[mIsInbound*1]);
+
+    requestLayout();
+}
+
 WidgetMessageInbound::WidgetMessageInbound(Wrapper* const w)
     : WidgetMessage(w)
 {
-    mIsInbound = true;
-
-    mStateListCheck = new StateListDrawable();
-    mStateListCheck->addState(vector<int>() = { R::attr::state_enabled, R::attr::state_checked }, w->maDrawable[4]);
-    mStateListCheck->addState(vector<int>() = { R::attr::state_enabled }, w->maDrawable[3]);
-
-    mStateListBuzz = new StateListDrawable();
-    mStateListBuzz->addState(vector<int>() = { R::attr::state_enabled, R::attr::state_checked  }, w->maDrawable[1]);
-    mStateListBuzz->addState(vector<int>() = { R::attr::state_enabled }, w->maDrawable[2]);
-    mStateListBuzz->addState(vector<int>(), w->maDrawable[0]);
-
     render();
 }
 
@@ -168,16 +194,6 @@ WidgetMessageInbound::~WidgetMessageInbound()
 WidgetMessageOutbound::WidgetMessageOutbound(Wrapper* const w)
 	: WidgetMessage(w)
 {
-    mIsInbound = false;
-
-    mStateListCheck = new StateListDrawable();
-    mStateListCheck->addState(vector<int>() = { R::attr::state_enabled, R::attr::state_checked }, w->maDrawable[6]);
-    mStateListCheck->addState(vector<int>() = { R::attr::state_enabled }, w->maDrawable[5]);
-
-    mStateListBuzz = new StateListDrawable();
-    mStateListBuzz->addState(vector<int>() = { R::attr::state_checked  }, w->maDrawable[1]);
-    mStateListBuzz->addState(vector<int>(), w->maDrawable[0]);
-
     render();
 }
 
@@ -191,16 +207,14 @@ WidgetMessageOutbound::~WidgetMessageOutbound()
 void WidgetMessage::onClick(View* vView)
 {
     if (vView == mText) {
-        w->mNActivity->sendOp(0, w->mOpUnitCoreId, w->w->mNIota00, new OpParam(Wrapper::kViewDetails, mcDBObjectId));
+        w->mNActivity->setView(Wrapper::kViewDetails, mcDBObjectId);
+        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewDetails, mcDBObjectId));
     }
     if (vView == mCheck) {
-        bool checked = mCheck->isChecked();
-        mBuzz->setEnabled(mIsInbound && checked);
-        w->mNActivity->sendOp(0, w->mOpUnitCoreId, w->w->mNXi00, new OpParam(mcDBObjectId, checked));
+        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNXi00, new OpParam(mcDBObjectId, true));
     }
     if (vView == mBuzz) {
-        bool checked = mBuzz->isChecked();
-        w->mNActivity->sendOp(0, w->mOpUnitCoreId, w->w->mNDzeta00, new OpParam(mcDBObjectId, checked));
+        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNDzeta00, new OpParam(mcDBObjectId, mIsInbound));
     }
 }
 
@@ -209,11 +223,33 @@ void WidgetMessage::onClick(View* vView)
 //*******************************************************************************************
 bool WidgetMessage::onTouch(View* vView, MotionEvent* event)
 {
-    if (w->maFragmentView[w->mcView]->mTouchState == 0) {
-        w->maFragmentView[w->mcView]->mTouchState = 1;
-        w->maFragmentView[w->mcView]->mViewSource = vView;
+    Wrapper* vWrapper = w;
+    nuint vcDBObjectId = mcDBObjectId;
+    bool vIsInbound = mIsInbound;
+
+    if (w->mTouchState == 1 && vView == mText) {
+        w->mTouchState = 2;
+        w->mEventAction = function<void()>([vWrapper,vcDBObjectId,vIsInbound]()->void{
+            vWrapper->mNActivity->setView(Wrapper::kViewDetails, vcDBObjectId);
+            vWrapper->mNActivity->sendOp(0, vWrapper->mOpUnitUIId, vWrapper->w->mNIota00, new OpParam(Wrapper::kViewDetails, vcDBObjectId));
+        });
     }
-    return w->maGestureDetector[w->mcView]->onTouchEvent(event);
+    if (w->mTouchState == 1 && vView == mCheck) {
+        w->mTouchState = 2;
+        w->mEventAction = function<void()>([vWrapper,vcDBObjectId,vIsInbound]()->void{
+            vWrapper->mNActivity->sendOp(0, vWrapper->mOpUnitUIId, vWrapper->w->mNXi00, new OpParam(vcDBObjectId, true));
+        });
+    }
+    if (w->mTouchState == 1 && vView == mBuzz) {
+        w->mTouchState = 2;
+        w->mEventAction = function<void()>([vWrapper,vcDBObjectId,vIsInbound]()->void{
+            vWrapper->mNActivity->sendOp(0, vWrapper->mOpUnitUIId, vWrapper->w->mNDzeta00, new OpParam(vcDBObjectId, vIsInbound));
+        });
+    }
+    if (w->mTouchState == 3) {
+        w->mTouchState = 0;
+    }
+    return true;
 }
 
 } // End namespace

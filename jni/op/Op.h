@@ -36,7 +36,6 @@ public:
     virtual ~OpParam() override;
 };
 
-
 class OpMessage : public Op
 {
 public:
@@ -48,6 +47,13 @@ public:
     String mStringC;
     String mStringD;
     String mStringE;
+};
+
+class OpParamForResult : public Op
+{
+public:
+    OpParamForResult(nlong a = 0, nlong b = 0, nlong c = 0, nlong d = 0, nlong e = 0);
+    virtual ~OpParamForResult() override;
 };
 
 class OpMessageForResult : public Op

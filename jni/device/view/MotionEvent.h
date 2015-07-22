@@ -25,6 +25,11 @@ public:
         return (nfloat)(*reinterpret_cast<ndouble*>(&vcY));
     }
 
+    long long int getEventTime()
+    {
+        return NWrapper::w->mNVisitorView->tRun(NWrapper::w->mNLambda00, (NParam)this);
+    }
+
 private:
     MotionEvent(NNoObject* vNNoObject)
         : InputEvent(NWrapper::w->mNNoObject->instance<InputEvent>())

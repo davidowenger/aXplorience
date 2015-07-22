@@ -1,9 +1,5 @@
 package z.a;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Binder;
 import android.os.Build.VERSION;
 
 public class TAndroid
@@ -28,30 +24,5 @@ public class TAndroid
 //			ret = 3;
 //		}
         return ret;
-	}
-
-	public boolean isSystem()
-	{
-		int ok = PackageManager.PERMISSION_GRANTED;
-		Context c = w.context;
-		PackageManager pm = w.context.getPackageManager();
-
-		String permission = Manifest.permission.WRITE_SECURE_SETTINGS;
-
-		String pname = c.getPackageName();
-		int uid = Binder.getCallingUid();
-		String uidname  = pm.getNameForUid(uid);
-
-		int r1 = c.checkCallingOrSelfPermission(permission);
-		int r2 = pm.checkPermission(permission, pname);
-		int r3 = pm.checkPermission(permission, uidname);
-
-		boolean ret = false;
-
-		ret |= (r1 == ok);
-		ret |= (r2 == ok);
-		ret |= (r3 == ok);
-
-		return ret;
 	}
 }

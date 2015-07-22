@@ -47,8 +47,9 @@ public:
     String getName();
     int getBondState();
     BluetoothClass* getBluetoothClass();
-    BluetoothSocket* createRfcommSocketToServiceRecord(const String& uuid);
+    BluetoothSocket* createInsecureRfcommSocket(int port);
     BluetoothSocket* createInsecureRfcommSocketToServiceRecord(const String& uuid);
+    BluetoothSocket* createRfcommSocketToServiceRecord(const String& uuid);
     vector<ParcelUuid*> getUuids();
 
 private:

@@ -12,7 +12,7 @@ Activity* Activity::getInstance(NWrapper* const vNWrapper)
 }
 
 NActivity::NActivity(Wrapper* vWrapper)
-    : Activity(), OpUnit(vWrapper), mcView(0), mState(7)
+    : Activity(), OpUnit(vWrapper), mcView(0), mState(7), mCount(0)
 {
 }
 
@@ -110,7 +110,6 @@ void NActivity::onCreate(Bundle* savedInstanceState)
 		"Play some Game",
 		"See some Event"
 	};
-
     mWrapper->mActionBar = getActionBar();
     mWrapper->mActionBar->setIcon(mWrapper->maDrawable[11]);
     mWrapper->mMessageLayout = new LinearLayout(mWrapper->mApplication);
@@ -134,12 +133,9 @@ void NActivity::onCreate(Bundle* savedInstanceState)
         (mWrapper->mFragmentLevel1 = new FragmentLevel1(mWrapper)),
         (mWrapper->mFragmentLevel2 = new FragmentLevel2(mWrapper))
     };
-
 	mWrapper->cMaxOpUnit = 18;
 	mWrapper->opSquad = new OpSquad(mWrapper, mWrapper->cMaxOpUnit);
 	mWrapper->opUnitCore = new OpUnitCore(mWrapper);
-
-    mWrapper->opSquad->add(this);
     mWrapper->opSquad->add(mWrapper->opUnitCore)->start();
 }
 
@@ -169,8 +165,8 @@ void NActivity::onDestroy()
 
 void NActivity::buzz(DBCollection* vDBCollection)
 {
+    sendOp(0, mWrapper->mOpUnitCoreId, mWrapper->w->mNMu00, new Op());
     render(vDBCollection);
-    sendOp(0, mWrapper->opUnitCore->mId, mWrapper->w->mNMu00, new Op());
 }
 
 void NActivity::clear(DBCollection* vDBCollection)
@@ -187,29 +183,46 @@ void NActivity::clear(DBCollection* vDBCollection)
          delete vWidgetMessage;
     }
     for (i = 0 ; i < vDBCollection->count() ; ++i) {
-        mWrapper->mMessageLayout->addView( vDBCollection->get(i)->get("in") == mWrapper->dbh->TRUE ? (View*)new WidgetMessageInbound(mWrapper) : (View*)new WidgetMessageOutbound(mWrapper) );
+        mWrapper->mMessageLayout->addView( vDBCollection->get(i)->get("sIn") == mWrapper->dbh->TRUE ? (View*)new WidgetMessageInbound(mWrapper) : (View*)new WidgetMessageOutbound(mWrapper) );
     }
     render(vDBCollection);
 }
 
 void NActivity::handleMessage(NParam a, NParam b, NParam c, NParam d)
 {
+    //LOGE("NActivity::handleMessage");
     nRun((NElement*)a, b, c, d);
+}
+
+void NActivity::onReceiveDiscoveryFinished()
+{
+    sendOp(0, mWrapper->mOpUnitCoreId, mWrapper->w->mNSigma00, new OpParam());
 }
 
 void NActivity::onReceiveFoundDevice(BluetoothDevice* dBluetoothDevice)
 {
-    sendOp(0, mWrapper->opUnitCore->mId, mWrapper->w->mNAlpha00, new OpParam((NParam)dBluetoothDevice));
+    sendOp(0, mWrapper->mOpUnitCoreId, mWrapper->w->mNAlpha00, new OpParam((NParam)dBluetoothDevice));
+}
+
+void NActivity::renderHeader(DBCollection* vDBCollection)
+{
+    mWrapper->mWidgetHome->initHeader();
+    render(vDBCollection);
 }
 
 void NActivity::render(DBCollection* vDBCollection)
 {
-    int i = 0;
+    nint i = vDBCollection->count();
 
-    for (i = 0 ; i < vDBCollection->count() ; ++i) {
-        ((WidgetMessage*)mWrapper->mMessageLayout->getChildAt(i))->init(0, to_long(vDBCollection->get(i)->get("id")));
+    if (i != mCount) {
+        mCount = i;
+        clear(vDBCollection);
+    } else {
+        for ( i = 0 ; i < mCount  ; ++i) {
+            ((WidgetMessage*)mWrapper->mMessageLayout->getChildAt(i))->init(0, vDBCollection->get(i)->count("id"));
+        }
+        delete vDBCollection;
     }
-    delete vDBCollection;
 }
 
 bool NActivity::setView(nint vcView, nint vcDBObjectId)
@@ -226,8 +239,8 @@ bool NActivity::setView(nint vcView, nint vcDBObjectId)
 
 void NActivity::tilt(nuint color)
 {
-    mWrapper->maFragmentView[0]->setBackgroundColor(color);
-    mWrapper->maFragmentView[0]->invalidate();
+    mWrapper->mRootLayout->setBackgroundColor(color);
+    mWrapper->mRootLayout->invalidate();
     mState = color;
 }
 
@@ -258,6 +271,12 @@ NReturn NActivity::visit(NDelta01* element, NParam a, NParam b, NParam c, NParam
 NReturn NActivity::visit(NEpsilon01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
     tilt((nuint)a);
+    return 0;
+}
+
+NReturn NActivity::visit(NDzeta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    renderHeader((DBCollection*)a);
     return 0;
 }
 

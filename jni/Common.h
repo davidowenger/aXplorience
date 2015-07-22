@@ -5,6 +5,9 @@
 #include <regex>
 #include <mutex>
 #include <unordered_set>
+#include <list>
+#include <forward_list>
+//#include <iomanip>
 
 using namespace std::chrono;
 using NSNATIVE::NWrapper;
@@ -13,7 +16,7 @@ using NSNATIVE::NWrapper;
 namespace NSDEVICE
 {
 typedef mutex Mutex;
-typedef steady_clock::duration::rep TimeStamp;
+typedef system_clock::duration::rep TimeStamp;
 
 class OpSquad;
 class Widget;
@@ -40,9 +43,10 @@ class Wrapper;
 #include "Tables.h"
 #include "BOMessage.h"
 #include "RootLayout.h"
-#include "Network.h"
+//#include "Network.h"
 #include "OpUnitListener.h"
 #include "OpUnitCore.h"
+#include "OpUnitUI.h"
 #include "OpUnitServer.h"
 #include "OpUnitPeer.h"
 #include "FragmentLevel.h"

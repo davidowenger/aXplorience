@@ -68,7 +68,7 @@ public class TVisitorWidget extends TVisitor
     // void setButtonDrawable(Drawable* d)
     public long visit(TLambda00 element, long a, long b, long c, long d, long e)
     {
-        ((CompoundButton)w.sObject.get(a)).setButtonDrawable((Drawable)w.sObject.get(b));
+        ((CompoundButton)w.sObject.get(a)).setButtonDrawable(w.tFrame.getValue(b, Drawable.class));
         return 0;
     }
 

@@ -40,9 +40,21 @@ void FragmentViewSettings::init(nuint vcView, Menu* menu, nuint vcDBObjectId)
     }
 }
 
+bool FragmentViewSettings::onInterceptTouchEvent(MotionEvent* ev)
+{
+    return w->maGestureDetector[w->mcView]->onTouchEvent(ev);
+}
+
 bool FragmentViewSettings::onMenuItemSelected(nint id)
 {
-    return false;
+    bool ret = false;
+
+    if (id == R::id::home) {
+        w->mNActivity->setView(Wrapper::kViewHome, 0);
+        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewHome));
+        ret = true;
+    }
+    return ret;
 }
 
 //*******************************************************************************************
@@ -50,63 +62,56 @@ bool FragmentViewSettings::onMenuItemSelected(nint id)
 //*******************************************************************************************
 bool FragmentViewSettings::onDown(MotionEvent* e)
 {
-    return true;
+    if (w->mTouchState == 0) {
+        w->mTouchState = 1;
+        w->mEventAction = function<void()>([]()->void{});
+        LOGV("NEW EVENT");
+        mX = e->getX();
+        mY = e->getY();
+        mT = e->getEventTime();
+    }
+    return false;
 }
 
 bool FragmentViewSettings::onFling(MotionEvent* e1, MotionEvent* e2, float vVelocityX, float vVelocityY)
 {
-    bool ret  = false;
-    float vDiffX = e2->getX() - e1->getX();
-
-    if (
-        abs(vDiffX) > Wrapper::SWIPE_MIN_DISTANCE &&
-        abs(vVelocityX) > Wrapper::SWIPE_THRESHOLD_VELOCITY &&
-        abs(e2->getY() - e1->getY()) < Wrapper::SWIPE_MAX_OFF_PATH
-    ) {
-//        int vIndex = 0;
-//        int vSize = w->mLayoutMesssage->getChildCount();
-//        String vNext = msDBObjectId;
-//        ret = true;
-//
-//        for (vIndex = 0 ; vIndex < vSize && vNext == msDBObjectId ; ++vIndex) {
-//            if (((FragmentViewSettings*)w->mLayoutMesssage->getChildAt(vIndex))->msDBObjectId == msDBObjectId) {
-//                vNext = ((FragmentViewSettings*)w->mLayoutMesssage->getChildAt((vIndex + vSize + ( vDiffX > 0 ? 1 : -1))%vSize))->msDBObjectId;
-//            }
-//        }
-        w->mNActivity->setView(Wrapper::kViewAbout, 1);
-    } else if (mTouchState == 1) {
-        mViewSource->performClick();
-    }
-    mTouchState = 0;
-    return ret;
+    w->mTouchState = 3;
+    return true;
 }
 
 void FragmentViewSettings::onLongPress(MotionEvent* e)
 {
-    if (mTouchState == 1) {
-        mViewSource->performClick();
-    }
-    mTouchState = 0;
+    w->mTouchState = 3;
+    w->mEventAction();
 }
 
 bool FragmentViewSettings::onScroll(MotionEvent* e1, MotionEvent* e2, float distanceX, float distanceY)
 {
-    mTouchState = 0;
-    return false;
+    nfloat vX = e2->getX() - mX;
+    nfloat vY = e2->getY() - mY;
+    nfloat vD = (e2->getEventTime() - mT)/1000.0;
+    bool ret = abs(vX) > Wrapper::SWIPE_MIN_DISTANCE && abs(vY) < Wrapper::SWIPE_MAX_OFF_PATH && abs(vX/vD) > Wrapper::SWIPE_THRESHOLD_VELOCITY;
+    w->mTouchState = 3;
+
+    LOGV(("Duration : #" + to_string(vD)).c_str());
+    LOGV(("Distance X: #" + to_string(vX) + " Y: #" + to_string(vY)).c_str());
+    LOGV(("Velocity X: #" + to_string(vX/vD) + " Y: #" + to_string(vY/vD)).c_str());
+
+    if (ret) {
+        w->mNActivity->setView(Wrapper::kViewAbout, 1);
+    }
+    return ret;
 }
 
 void FragmentViewSettings::onShowPress(MotionEvent* e)
 {
-    mTouchState = 0;
 }
 
 bool FragmentViewSettings::onSingleTapUp(MotionEvent* e)
 {
-    if (mTouchState == 1) {
-        mViewSource->performClick();
-    }
-    mTouchState = 0;
-    return false;
+    w->mTouchState = 3;
+    w->mEventAction();
+    return true;
 }
 
 } // End namespace

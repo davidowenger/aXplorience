@@ -8,7 +8,7 @@ class FragmentView : public LinearLayout, public GestureDetector::OnGestureListe
 {
 public:
     FragmentView(Wrapper* const w)
-        : LinearLayout(w->mApplication), w(w), maContent(nullptr), mViewSource(nullptr), mcView(0), mcDBObjectId(1), mTouchState(0)
+        : LinearLayout(w->mApplication), w(w), maContent(nullptr), mViewSource(nullptr), mcView(0), mcDBObjectId(1), mTouchState(0), mX(0.0), mY(0.0), mT(0)
     {
     }
 
@@ -61,10 +61,14 @@ public:
     Wrapper* w;
     Widget** maContent;
     View* mViewSource;
+    function<void()> mEventAction;
 
     nuint mcView;
     nuint mcDBObjectId;
     nuint mTouchState;
+    nfloat mX;
+    nfloat mY;
+    nlong mT;
 };
 
 } // End namespace

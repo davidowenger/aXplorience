@@ -25,7 +25,10 @@ public:
     {
         NReturn vcRet = 0;
         if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
-        if (b != -1) vcRet = ((ViewGroup*)a)->onInterceptTouchEvent((MotionEvent*)b);
+        if (b != -1) {
+            vcRet = ((ViewGroup*)a)->onInterceptTouchEvent((MotionEvent*)b);
+            delete (MotionEvent*)b;
+        }
         return vcRet;
     }
 };

@@ -5,8 +5,12 @@ namespace NSDEVICE
 {
 
 OpUnitCore::OpUnitCore(Wrapper* const w)
-	: OpUnit(w), mWrapper(w), mcProcessedDevice(0), mcTimeStampBroadcast(0), mcForce(0), mcRunningInitializations(0), maMac()
+	: OpUnit(w), mcProcessedDevice(0), mcTimeStampBroadcast(0), mcForce(0), mcRunningInitializations(0), mcDiscovery(0), mcDiscoveryDone(0), maMac(), maBluetoothDevice(), mcState(0)
 {
+    mWrapper->dbh = new DBHandler(mWrapper);
+    mWrapper->dbh->add<Table_Message>("Message");
+    mWrapper->dbh->add<Table_Application>("Application");
+    mWrapper->mBOHandlerMessage = new BOHandlerMessage(mWrapper);
 }
 
 OpUnitCore::~OpUnitCore()
@@ -17,22 +21,11 @@ OpUnitCore::~OpUnitCore()
 
 void OpUnitCore::run()
 {
-	//00000000-0000-07da-0000-0000000007d0
-    //00001101-0000-1000-8000-00805F9B34FB
-	//UUID(2010L,2000L);
-
     mWrapper->mOpUnitCoreId = mId;
+
     mWrapper->dBluetoothAdapter = BluetoothAdapter::getDefaultAdapter();
-
-    mWrapper->dbh = new DBHandler(mWrapper);
-	mWrapper->dbh->add<Table_Message>("Message");
-	mWrapper->dbh->add<Table_Application>("Application");
-	mWrapper->mBOHandlerMessage = new BOHandlerMessage(mWrapper);
-	mWrapper->opUnitServer = new OpUnitServer(mWrapper);
-
-    // DEBUG
-    mWrapper->dbh->get("Application")->drop();
-    // DEBUG
+    mWrapper->opUnitUI = new OpUnitUI(mWrapper);
+    mWrapper->opUnitServer = new OpUnitServer(mWrapper);
 
     DBCollection* vaApplication = mWrapper->dbh->get("Application")->getCollection();
     DBCollection* vaMessage = mWrapper->dbh->get("Message")->getCollection();
@@ -43,10 +36,12 @@ void OpUnitCore::run()
 		mWrapper->mDBObjectApplication = mWrapper->dbh->get("Application")->getInstance();
         mWrapper->mDBObjectApplication->set("sDBObjectId", "0");
         mWrapper->mDBObjectApplication->set("sView", "0");
-        mWrapper->mDBObjectApplication->set("sSort", "in");
-        mWrapper->mDBObjectApplication->set("sAscending", mWrapper->dbh->TRUE);
-		mWrapper->mDBObjectApplication->set("sBluetooth", mWrapper->dbh->TRUE);
-		mWrapper->mDBObjectApplication->set("sDiscoverable", mWrapper->dbh->TRUE);
+        mWrapper->mDBObjectApplication->set("sSort0", "sTitle");
+        mWrapper->mDBObjectApplication->set("sAscending0", mWrapper->dbh->TRUE);
+        mWrapper->mDBObjectApplication->set("sSort1", "sCategoryId");
+        mWrapper->mDBObjectApplication->set("sAscending1", mWrapper->dbh->TRUE);
+        mWrapper->mDBObjectApplication->set("sSort2", "sIn");
+        mWrapper->mDBObjectApplication->set("sAscending2", mWrapper->dbh->TRUE);
 		mWrapper->mDBObjectApplication->set("sCategory0", mWrapper->dbh->TRUE);
 		mWrapper->mDBObjectApplication->set("sCategory1", mWrapper->dbh->TRUE);
 		mWrapper->mDBObjectApplication->set("sCategory2", mWrapper->dbh->TRUE);
@@ -63,24 +58,21 @@ void OpUnitCore::run()
 	delete vaMessage;
 
     mWrapper->mac = mWrapper->dBluetoothAdapter->getAddress();
-    clear();
-    setView(Wrapper::kViewHome, 1);
-
-    mWrapper->mc10Secondes = chrono::duration_cast<steady_clock::duration>(chrono::seconds(10)).count();
+    mWrapper->mc10Secondes = chrono::duration_cast<system_clock::duration>(chrono::seconds(10)).count();
+    mWrapper->mc375Mili = chrono::duration_cast<system_clock::duration>(chrono::milliseconds(375)).count();
+    mWrapper->mcSleep = chrono::milliseconds(20);
 	mWrapper->sServiceName = "Proximity service";
-	mWrapper->sUuidService = "0001F9B3-";
+	mWrapper->sUuidService = "0000F9B3-";
 	mWrapper->sUuidPeer = "0002F9B3-";
 	mWrapper->sUuidSuffix = "0000-0000-0000-000000000000";
     mWrapper->sUuidMacSuffix = parseMac(mWrapper->mac);
 
-    if (!mWrapper->dBluetoothAdapter->isEnabled()) {
-        mWrapper->dBluetoothAdapter->enable();
-    }
-    if (mWrapper->dBluetoothAdapter->getScanMode() != mWrapper->dBluetoothAdapter->SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-        mWrapper->dBluetoothAdapter->discoverable();
-    }
-    //mWrapper->dBluetoothAdapter->startDiscovery();
+    LOGD((String("System timestamp is : #") + to_string(system_clock::now().time_since_epoch().count())).c_str());
+
+    mWrapper->opSquad->add(mWrapper->mNActivity);
+    mWrapper->opSquad->add(mWrapper->opUnitUI)->start();
     mWrapper->opSquad->add(mWrapper->opUnitServer)->start();
+
 	handleOp();
     cancel();
 }
@@ -88,74 +80,36 @@ void OpUnitCore::run()
 void OpUnitCore::handleOp()
 {
     Op* op;
-    nint i = 0;
     TimeStamp vcTimeStampNow;
 
     while (mAlive) {
-        vcTimeStampNow = steady_clock::now().time_since_epoch().count();
+        //LOGE("OpUnitCore::handleOp");
+        vcTimeStampNow = system_clock::now().time_since_epoch().count();
 
-        if (vcTimeStampNow - mcTimeStampBroadcast > mWrapper->mc10Secondes) {
-            mcTimeStampBroadcast = vcTimeStampNow;
-            DBCollection* vaMessage = mWrapper->mBOHandlerMessage->getMessagesToBroadcast()->filter("in", mWrapper->dbh->FALSE, "=");
-
-            for (i = 0 ; i < vaMessage->count() ; ++i) {
-                vaMessage->get(i)->set("date", vcTimeStampNow)->commit();
+        if (mcState == 0 && mcDiscovery <= mcDiscoveryDone) {
+            for (BluetoothDevice* vBluetoothDevice : maBluetoothDevice) {
+                if (requestAsClient(vBluetoothDevice)) {
+                    mWrapper->opSquad->add(new OpUnitPeer(mWrapper, vBluetoothDevice))->start();
+                }
             }
-            delete vaMessage;
+            maBluetoothDevice = forward_list<BluetoothDevice*>();
+            mcTimeStampBroadcast = vcTimeStampNow;
+            mcState = 1;
+        }
+        if (mcState == 1 && mcRunningInitializations == 0 && vcTimeStampNow - mcTimeStampBroadcast > mWrapper->mc10Secondes) {
+            mcDiscovery = mcDiscoveryDone + 1;
+            LOGD("startDiscovery");
+            mWrapper->dBluetoothAdapter->startDiscovery();
+            mcState = 0;
         }
         op = nextOp();
 
         if (op) {
             execOp(op);
-            //Hnint: use op->result here, before calling nextOp again
-        } else {
-            this_thread::sleep_for(chrono::milliseconds(300));
+            //HINT: use op->result here, before calling nextOp again
         }
+        this_thread::sleep_for(mWrapper->mcSleep*8);
     }
-}
-
-void OpUnitCore::addDrop(const String& packed)
-{
-    DBObject* vDBObject = mWrapper->mBOHandlerMessage->get(mWrapper->mBOHandlerMessage->addDrop(packed));
-    clear();
-
-    if (!vDBObject->is("in") && vDBObject->is("sBuzzed")) {
-        tilt();
-        vDBObject->set("sBuzzed", false);
-        vDBObject->commit();
-        render();
-    }
-    delete vDBObject;
-}
-
-void OpUnitCore::addSeed(const String& id_cat, const String& title, const String& text, const String& link)
-{
-    nint vcDBObjectId = mWrapper->mBOHandlerMessage->addSeed(id_cat, title, text, link);
-    clear();
-    setView(Wrapper::kViewDetails, vcDBObjectId);
-}
-
-void OpUnitCore::archive(nint vcDBObjectId, bool vIsArchived)
-{
-    DBObject* vDBObject = mWrapper->mBOHandlerMessage->get(vcDBObjectId);
-    vDBObject->set("sArchivedAuto", vIsArchived);
-    vDBObject->set("date", steady_clock::now().time_since_epoch().count());
-    vDBObject->commit();
-    clear();
-    setView(Wrapper::kViewHome);
-}
-
-void OpUnitCore::buzz(nint vcDBObjectId, bool vIsBuzzed)
-{
-    DBObject* vDBObject = mWrapper->mBOHandlerMessage->get(vcDBObjectId);
-    vDBObject->set("sBuzzed", vIsBuzzed);
-    vDBObject->set("date", steady_clock::now().time_since_epoch().count());
-    vDBObject->commit();
-
-    mcForce = mcForce + 1;
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNAlpha01, (NParam)mWrapper->mBOHandlerMessage->getMessagesSorted());
-
-    delete vDBObject;
 }
 
 void OpUnitCore::cancel()
@@ -163,41 +117,65 @@ void OpUnitCore::cancel()
     mAlive = false;
 }
 
-void OpUnitCore::clear()
+bool OpUnitCore::requestAsClient(BluetoothDevice* vBluetoothDevice)
 {
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNBeta01, (NParam)mWrapper->mBOHandlerMessage->getMessagesSorted());
+    bool vIsAlive = (vBluetoothDevice != nullptr);
+
+    if (vIsAlive) {
+        String vMac = parseMac(vBluetoothDevice->getAddress());
+        vIsAlive &= !maMac.count(vMac);
+    }
+    if (vIsAlive) {
+        LOGV(("Currently running initialization for MAC : #" + parseMac(vBluetoothDevice->getAddress())).c_str());
+        ++mcRunningInitializations;
+    }
+    return vIsAlive;
 }
 
-void OpUnitCore::discard(nint vcDBObjectId, bool vIsDeleted)
+bool OpUnitCore::requestAsServer(BluetoothDevice* vBluetoothDevice)
 {
-    DBObject* vDBObject = mWrapper->mBOHandlerMessage->get(vcDBObjectId);
-    vDBObject->set("sDeleted", vIsDeleted);
-    vDBObject->set("date", steady_clock::now().time_since_epoch().count());
+    bool vIsAlive = (vBluetoothDevice != nullptr);
 
-    if (!vDBObject->is("in")) {
-        vDBObject->set("sArchivedUser", !vDBObject->is("sEnabled") || vDBObject->is("sDeleted"));
+    if (vIsAlive) {
+        String vMac = parseMac(vBluetoothDevice->getAddress());
+        vIsAlive &= !maMac.count(vMac);
     }
-    vDBObject->commit();
-
-    mcForce = mcForce + 1;
-    clear();
-    setView(Wrapper::kViewHome);
-    delete vDBObject;
+    if (vIsAlive) {
+        LOGV(("Currently running initialization for MAC : #" + parseMac(vBluetoothDevice->getAddress())).c_str());
+        ++mcRunningInitializations;
+        mWrapper->dBluetoothAdapter->cancelDiscovery();
+    }
+    return vIsAlive;
 }
 
-void OpUnitCore::enable(nint vcDBObjectId, bool vIsEnabled)
+bool OpUnitCore::registerAsClient(BluetoothDevice* vBluetoothDevice)
 {
-    DBObject* vDBObject = mWrapper->mBOHandlerMessage->get(vcDBObjectId);
-    vDBObject->set("sEnabled", vIsEnabled);
-    vDBObject->set("date", steady_clock::now().time_since_epoch().count());
+    bool vIsAlive = (vBluetoothDevice != nullptr);
 
-    if (!vDBObject->is("in")) {
-        vDBObject->set("sArchivedUser", !vDBObject->is("sEnabled") || vDBObject->is("sDeleted"));
+    if (vIsAlive) {
+        String vMac = parseMac(vBluetoothDevice->getAddress());
+        std::pair<unordered_set<String>::iterator, bool> vEmplace = maMac.emplace(vMac);
+        vIsAlive &= vEmplace.second;
     }
-    vDBObject->commit();
+    if (vIsAlive) {
+        LOGV(("Connection registered for MAC : #" + parseMac(vBluetoothDevice->getAddress())).c_str());
+    }
+    return vIsAlive;
+}
 
-    mcForce = mcForce + 1;
-    delete vDBObject;
+void OpUnitCore::registerAsServer(BluetoothSocket* vBluetoothSocket)
+{
+    bool vIsAlive = (vBluetoothSocket->getRemoteDevice() != nullptr);
+
+    if (vIsAlive) {
+        String vMac = parseMac(vBluetoothSocket->getRemoteDevice()->getAddress());
+        std::pair<unordered_set<String>::iterator, bool> vEmplace = maMac.emplace(vMac);
+        vIsAlive &= vEmplace.second;
+    }
+    if (vIsAlive) {
+        LOGV(("Connection registered for MAC : #" + parseMac(vBluetoothSocket->getRemoteDevice()->getAddress())).c_str());
+        mWrapper->opSquad->add(new OpUnitPeer(mWrapper, vBluetoothSocket))->start();
+    }
 }
 
 String OpUnitCore::parseMac(const String& vMac)
@@ -212,38 +190,30 @@ String OpUnitCore::parseMac(const String& vMac)
     return vMacParsed;
 }
 
-void OpUnitCore::render()
+void OpUnitCore::setState(bool vIsEnabled, bool vIsDiscoverable)
 {
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNGamma01, (NParam)mWrapper->mBOHandlerMessage->getMessagesSorted());
-}
-
-void OpUnitCore::setSeed(nint vcDBObjectId, const String& id_cat, const String& title, const String& text, const String& link)
-{
-    mWrapper->mBOHandlerMessage->setMessage(vcDBObjectId, id_cat, title, text, link);
-    clear();
-    setView(Wrapper::kViewDetails, vcDBObjectId);
-}
-
-void OpUnitCore::setView(nint vcView, nint vcDBObjectId)
-{
-    if (vcView == Wrapper::kViewDetails && vcDBObjectId == 1) {
-        vcView = Wrapper::kViewHome;
+    if (!vIsEnabled) {
+        mWrapper->dBluetoothAdapter->disable();
     }
-    mWrapper->mDBObjectApplication->set("sView", vcView);
-    mWrapper->mDBObjectApplication->set("sDBObjectId", vcDBObjectId);
-    mWrapper->mDBObjectApplication->commit();
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNDelta01, (NParam)vcView, (NParam)vcDBObjectId);
+    if (vIsEnabled) {
+        mWrapper->dBluetoothAdapter->enable();
+    }
+    if (vIsEnabled && vIsDiscoverable) {
+        mWrapper->dBluetoothAdapter->discoverable();
+    }
+    if (vIsEnabled && !vIsDiscoverable) {
+        mWrapper->dBluetoothAdapter->discoverable(1);
+    }
 }
 
-void OpUnitCore::sort(const String& vColumn, bool vIsAscending)
+void OpUnitCore::setSettings(bool vIsEnabled, bool vIsDiscoverable)
 {
-    mWrapper->mDBObjectApplication->set("sSort", vColumn)->set("sAscending", vIsAscending)->commit();
-    render();
+    setState(vIsEnabled, vIsDiscoverable);
 }
 
-void OpUnitCore::tilt()
+void OpUnitCore::tilt(nint vcDBObjectId)
 {
-    LOGV("******* TILTING *******");
+    LOGD("******* TILTING *******");
     nuint i;
     nuint j;
     nuint k;
@@ -253,7 +223,7 @@ void OpUnitCore::tilt()
     while (mAlive && mWrapper->mNActivity->mState != mWrapper->maColor[1]) {}
     this_thread::sleep_for(chrono::milliseconds(700));
 
-    for (k = 0 ; k < 2 ; ++k) {
+    for (k = 0 ; k < 1 ; ++k) {
         for (j = 0 ; j < sizeof(vaAnim)/sizeof(nuint) ; ++j) {
             nuint index = vaAnim[j]*3 + 6;
             mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNEpsilon01, mWrapper->maColor[1]);
@@ -269,157 +239,100 @@ void OpUnitCore::tilt()
         }
         this_thread::sleep_for(chrono::milliseconds(460));
 
-        if (!k) {
-            mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNEpsilon01, mWrapper->maColor[1]);
-            while (mAlive && mWrapper->mNActivity->mState != mWrapper->maColor[1]) {}
-            this_thread::sleep_for(chrono::milliseconds(720));
-            mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNEpsilon01, mWrapper->maColor[20]);
-            while (mAlive && mWrapper->mNActivity->mState != mWrapper->maColor[20]) {}
-            this_thread::sleep_for(chrono::milliseconds(760));
-        }
+//        if (!k) {
+//            mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNEpsilon01, mWrapper->maColor[1]);
+//            while (mAlive && mWrapper->mNActivity->mState != mWrapper->maColor[1]) {}
+//            this_thread::sleep_for(chrono::milliseconds(720));
+//            mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNEpsilon01, mWrapper->maColor[20]);
+//            while (mAlive && mWrapper->mNActivity->mState != mWrapper->maColor[20]) {}
+//            this_thread::sleep_for(chrono::milliseconds(760));
+//        }
         mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNEpsilon01, mWrapper->maColor[1]);
         while (mAlive && mWrapper->mNActivity->mState != mWrapper->maColor[1]) {}
         this_thread::sleep_for(chrono::milliseconds(700));
     }
     mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNEpsilon01, mWrapper->maColor[Theme::kColorApplicationBackground]);
     while (mAlive && mWrapper->mNActivity->mState != mWrapper->maColor[Theme::kColorApplicationBackground]) {}
+
+    if (vcDBObjectId) {
+        sendOp(0, mWrapper->mOpUnitUIId, w->w->mNDzeta00, new OpParam(vcDBObjectId, false));
+    }
 }
 
-// Add a peer server
+// void connectAsClient(BluetoothDevice* vBluetoothDevice)
 NReturn OpUnitCore::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    BluetoothDevice* vBluetoothDevice = (BluetoothDevice*)a;
-    bool vIsAlive = (vBluetoothDevice != nullptr);
-
-    if (vIsAlive) {
-        vector<ParcelUuid*> vaParcelUuid = vBluetoothDevice->getUuids();
-        bool vHasUuid = false;
-
-        for (ParcelUuid* vParcelUuid : vaParcelUuid) {
-            vHasUuid |= (vParcelUuid->toString() == mWrapper->sUuidService + mWrapper->sUuidSuffix);
-        }
-        vIsAlive &= vaParcelUuid.empty() || vHasUuid;
-    }
-    if (vIsAlive) {
-        String vMac = parseMac(vBluetoothDevice->getAddress());
-        std::pair<unordered_set<String>::iterator, bool> vEmplace = maMac.emplace(vMac);
-        vIsAlive &= vEmplace.second;
-        //vIsAlive &= maMac.emplace(parseMac(vBluetoothDevice->getAddress())).second;
-    }
-    if (vIsAlive) {
-        LOGV(("Currently running initialization for MAC : #" + parseMac(vBluetoothDevice->getAddress())).c_str());
-        ++mcRunningInitializations;
-        mWrapper->dBluetoothAdapter->cancelDiscovery();
-        mWrapper->opSquad->add(new OpUnitPeer(mWrapper, vBluetoothDevice))->start();
-    }
+    //connectAsClient((BluetoothDevice*)a);
+    maBluetoothDevice.push_front((BluetoothDevice*)a);
     return 0;
 }
 
-// Add a peer client
-NReturn OpUnitCore::visit(NBeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+// Add a listener
+NReturn OpUnitCore::visit(NPi00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    BluetoothSocket* vBluetoothSocket = (BluetoothSocket*)a;
-    bool vIsAlive = (vBluetoothSocket != nullptr);
-
-    if (vIsAlive) {
-        String vMac = parseMac(vBluetoothSocket->getRemoteDevice()->getAddress());
-        std::pair<unordered_set<String>::iterator, bool> vEmplace = maMac.emplace(vMac);
-        vIsAlive &= vEmplace.second;
-        //vIsAlive &= maMac.emplace(parseMac(vBluetoothSocket->getRemoteDevice()->getAddress())).second;
-    }
-    if (vIsAlive) {
-        LOGV(("Currently running initialization for MAC : #" + parseMac(vBluetoothSocket->getRemoteDevice()->getAddress())).c_str());
-        ++mcRunningInitializations;
-        mWrapper->dBluetoothAdapter->cancelDiscovery();
-        mWrapper->opSquad->add(new OpUnitPeer(mWrapper, vBluetoothSocket))->start();
-    }
+    mWrapper->opSquad->add(new OpUnitListener(mWrapper, (OpUnit*)a, (InputStream*)b))->start();
     return 0;
 }
 
-// nint addDrop(const String& packed)
-NReturn OpUnitCore::visit(NGamma00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+// void void setSettings(bool vIsEnable, bool vIsDiscoverable);
+NReturn OpUnitCore::visit(NOmicron00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    addDrop(((OpMessage*)a)->mStringA);
+    setSettings((bool)a, (bool)b);
     return 0;
 }
 
-// nint addSeed(const String& id_cat, const String& title, const String& text, const String& link)
-NReturn OpUnitCore::visit(NDelta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+// initialization ended
+NReturn OpUnitCore::visit(NRho00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    addSeed(((OpMessage*)a)->mStringA, ((OpMessage*)a)->mStringB, ((OpMessage*)a)->mStringC, ((OpMessage*)a)->mStringD);
+    mWrapper->opUnitCore->maMac.erase(((OpMessage*)a)->mStringA);
     return 0;
 }
 
-// void archive(nint vcDBObjectId, bool vIsArchived)
-NReturn OpUnitCore::visit(NNu00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+// initialization count
+NReturn OpUnitCore::visit(NKappa00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    archive((nint)a, (nint)b);
-    return 0;
-}
-
-// void buzz(nint vcDBObjectId, bool vIsBuzzed)
-NReturn OpUnitCore::visit(NDzeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    buzz((nint)a, (nint)b);
-    return 0;
-}
-
-// void discard(nint vcDBObjectId, bool vIsArchived)
-NReturn OpUnitCore::visit(NEpsilon00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    discard((nint)a, (nint)b);
-    return 0;
-}
-
-// void void setSeed(nint vcDBObjectId, const String& id_cat, const String& title, const String& text, const String& link)
-NReturn OpUnitCore::visit(NXi00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    enable((nint)a, (nint)b);
-    return 0;
-}
-
-// void void setSeed(nint vcDBObjectId, const String& id_cat, const String& title, const String& text, const String& link)
-NReturn OpUnitCore::visit(NTheta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    setSeed(b, ((OpMessage*)a)->mStringA, ((OpMessage*)a)->mStringB, ((OpMessage*)a)->mStringC, ((OpMessage*)a)->mStringD);
-    return 0;
-}
-
-// void setView(nint vIndex, nint vcDBObjectId = 1)
-NReturn OpUnitCore::visit(NIota00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    setView((nint)a, (nint)b);
-    return 0;
-}
-
-// void sort(const String& vColumn, bool vIsAscending)
-NReturn OpUnitCore::visit(NEta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    sort(((OpMessage*)a)->mStringA, (bool)b);
+    --mcRunningInitializations;
+    LOGD(("Currently running initializations count : #" + to_string(mcRunningInitializations)).c_str());
+  //if (mcRunningInitializations == 0) {
+  //    this_thread::sleep_for(chrono::milliseconds(3500));
+  //    mWrapper->dBluetoothAdapter->startDiscovery();
+  //}
     return 0;
 }
 
 // startdiscovery
-NReturn OpUnitCore::visit(NKappa00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+NReturn OpUnitCore::visit(NSigma00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    LOGV(("Currently running initializations count : #" + to_string(mcRunningInitializations - 1)).c_str());
-    mWrapper->opUnitCore->maMac.erase(((OpMessage*)a)->mStringA);
-    if (--mcRunningInitializations == 0) {
-        //mWrapper->dBluetoothAdapter->startDiscovery();
-    }
+    ++mcDiscoveryDone;
+    //LOGD("startDiscovery");
+    //this_thread::sleep_for(chrono::milliseconds(3500));
+    //mWrapper->dBluetoothAdapter->startDiscovery();
     return 0;
-}
-
-// get messages for braodcast
-NReturn OpUnitCore::visit(NLambda00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    return (NReturn)mWrapper->mBOHandlerMessage->getMessagesToBroadcast();
 }
 
 // tilt
 NReturn OpUnitCore::visit(NMu00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-   tilt();
+   tilt((nint)a);
+   return 0;
+}
+
+// requestAsServer
+NReturn OpUnitCore::visit(NTau00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+   return requestAsServer((BluetoothDevice*)a);
+}
+
+// registerAsClient
+NReturn OpUnitCore::visit(NUpsilon00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+   return registerAsClient((BluetoothDevice*)a);
+}
+
+// registerAsServer
+NReturn OpUnitCore::visit(NPhi00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+   registerAsServer((BluetoothSocket*)a);
    return 0;
 }
 

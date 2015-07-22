@@ -21,8 +21,8 @@ public class TOnItemSelectedListener implements AdapterView.OnItemSelectedListen
     {
         long vcKey;
         w.mTVisitorWidgetView.nRun(w.mTAlpha03, n,
-            (vcKey = w.tFrame.getKey(parent)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorView.nRun(w.mTAlpha03, n, -1, 2), parent),
-            (vcKey = w.tFrame.getKey(view)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorView.nRun(w.mTAlpha03, n, -1, 1), view),
+            (vcKey = w.tFrame.getKey(parent)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidgetView.nRun(w.mTAlpha03, n, -1, 2), parent),
+            (vcKey = w.tFrame.getKey(view)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidgetView.nRun(w.mTAlpha03, n, -1, 1), view),
             position,
             id
         );
@@ -32,7 +32,7 @@ public class TOnItemSelectedListener implements AdapterView.OnItemSelectedListen
     {
         long vcKey;
         w.mTVisitorWidgetView.nRun(w.mTBeta03, n,
-            (vcKey = w.tFrame.getKey(parent)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorView.nRun(w.mTBeta03, n, -1, 1), parent)
+            (vcKey = w.tFrame.getKey(parent)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidgetView.nRun(w.mTBeta03, n, -1, 1), parent)
         );
     }
 }

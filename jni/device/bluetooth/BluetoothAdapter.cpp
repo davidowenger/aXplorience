@@ -89,10 +89,10 @@ void* BluetoothAdapter::getBondedDevices()
 	return NULL;
 }
 
-BluetoothServerSocket* BluetoothAdapter::listenUsingRfcommWithServiceRecord(const String& name, const String& uuid)
+BluetoothServerSocket* BluetoothAdapter::listenUsingInsecureRfcommOn(int channel)
 {
     BluetoothServerSocket* b = NWrapper::w->mNNoObject->pointer<BluetoothServerSocket>();
-    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNOmicron00, (NParam)this, (NParam)b, NParamBox(NWrapper::w, name).n, NParamBox(NWrapper::w, uuid).n));
+    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNTau00, (NParam)this, (NParam)b, (NParam)channel));
 }
 
 BluetoothServerSocket* BluetoothAdapter::listenUsingInsecureRfcommWithServiceRecord(const String& name, const String& uuid)
@@ -100,6 +100,13 @@ BluetoothServerSocket* BluetoothAdapter::listenUsingInsecureRfcommWithServiceRec
     BluetoothServerSocket* b = NWrapper::w->mNNoObject->pointer<BluetoothServerSocket>();
     return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNPi00, (NParam)this, (NParam)b, NParamBox(NWrapper::w, name).n, NParamBox(NWrapper::w, uuid).n));
 }
+
+BluetoothServerSocket* BluetoothAdapter::listenUsingRfcommWithServiceRecord(const String& name, const String& uuid)
+{
+    BluetoothServerSocket* b = NWrapper::w->mNNoObject->pointer<BluetoothServerSocket>();
+    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNOmicron00, (NParam)this, (NParam)b, NParamBox(NWrapper::w, name).n, NParamBox(NWrapper::w, uuid).n));
+}
+
 void BluetoothAdapter::discoverable()
 {
 	discoverable(0);

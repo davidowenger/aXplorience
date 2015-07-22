@@ -89,6 +89,7 @@ public class TActivity extends Activity
         w.tActivity = null;
         w = null;
         TWrapper.w = null;
+        //System.exit(0);
 	}
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)
@@ -197,6 +198,7 @@ class TActivityHandler extends Handler
 
     public void handleMessage(Message m)
     {
+        //System.err.println("TActivityHandler::handleMessage");
         if (m.what == 0) {
             w.mTVisitorAppActivity.nRun(w.mTPhi00, w.tActivity.n, ((long[])m.obj)[0], ((long[])m.obj)[1], ((long[])m.obj)[2], ((long[])m.obj)[3]);
         } else {

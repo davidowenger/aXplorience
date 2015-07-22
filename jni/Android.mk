@@ -44,10 +44,10 @@ LOCAL_SRC_FILES := \
 	FragmentLevel1.cpp \
 	FragmentLevel0.cpp \
 	RootLayout.cpp \
-	Network.cpp \
 	OpUnitListener.cpp \
 	OpUnitPeer.cpp \
 	OpUnitServer.cpp \
+	OpUnitUI.cpp \
 	OpUnitCore.cpp \
 	NActivity.cpp
 
@@ -56,6 +56,8 @@ LOCAL_LDLIBS := \
 	-lm
 
 include $(BUILD_SHARED_LIBRARY)
+
+#Network.cpp \
 
 #LOCAL_CFLAGS := -Werror
 #LOCAL_CFLAGS := -std=gnu++11

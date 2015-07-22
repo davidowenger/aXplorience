@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppBaseTheme" parent="android:Theme">
+    <style name="AppBaseTheme" parent="@android:style/Theme.Light">
         <!-- Base properties here -->
         <!-- overriden by res/values-vNN/styles.xml for API NN -->
     </style>

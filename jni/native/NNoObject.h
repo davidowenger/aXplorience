@@ -32,12 +32,12 @@ public:
     {
         static Col<T*> maCol;
         if ((NReturn)vApplicationCallback != vUserCallback) {
-            // Callback pointers initialized (with operator new) by the user  have to be deleted by the user
+            // Callback pointers initialized (with operator new) by the user have to be deleted by the user
             delete vApplicationCallback;
             vApplicationCallback = (T*)vUserCallback;
         } else {
             // Callback pointers sent to a listener (void onEvent(Event* e)) by the application will be implicitely deleted when the program quits
-            maCol.add(vApplicationCallback);
+            //maCol.add(vApplicationCallback);
             LOGV("Added one Application Callback pointer");
         }
         return vApplicationCallback;

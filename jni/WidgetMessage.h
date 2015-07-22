@@ -11,7 +11,6 @@ public:
 	virtual ~WidgetMessage() override;
 
     virtual void init(nuint vcView, nuint vcDBObjectId) override;
-    virtual bool onInterceptTouchEvent(MotionEvent* ev) override;
     virtual void render();
 
     // View::OnClickListener
@@ -32,8 +31,8 @@ public:
 	Button* mText;
 	ToggleButton* mCheck;
 	ToggleButton* mBuzz;
-	StateListDrawable* mStateListCheck;
-	StateListDrawable* mStateListBuzz;
+	StateListDrawable** mStateListCheck;
+	StateListDrawable** mStateListBuzz;
 };
 
 class WidgetMessageOutbound : public WidgetMessage

@@ -74,7 +74,7 @@ class TOnTouchListener implements View.OnTouchListener
         long vcKey;
 		return w.mTVisitorViewView.nRun(w.mTGamma03, n,
 			(vcKey = w.tFrame.getKey(v)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTGamma03, n, -1, 2), v),
-			(vcKey = w.tFrame.getKey(event)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTGamma03, n, -1, 1), event)
+			w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTGamma03, n, -1, 1), event)
 		) != 0;
 	}
 }

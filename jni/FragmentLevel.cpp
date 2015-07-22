@@ -24,6 +24,24 @@ void FragmentLevel::onCreate(Bundle* vBundle)
     Fragment::onCreate(vBundle);
 }
 
+View* FragmentLevel::onCreateView(LayoutInflater* inflater, ViewGroup* parentView, Bundle* vBundle)
+{
+    return mFragmentView;
+}
+
+void FragmentLevel::onDetach()
+{
+    mFragmentView->removeAllViews();
+    if (mFragmentLayout.mcPriority != 0) {
+        w->mcMaxLevel--;
+        w->mcView = w->maRootLayoutItem[mcView].maFragmentLayout[w->mcMaxLevel].mcView;
+        w->maFragmentView[w->mcView]->init(w->mcView, mMenu, mcDBObjectId);
+    }
+    mMenu = nullptr;
+    mIsAdded = false;
+    Fragment::onDetach();
+}
+
 void FragmentLevel::onCreateOptionsMenu(Menu* menu, MenuInflater* inflater)
 {
     mMenu = menu;

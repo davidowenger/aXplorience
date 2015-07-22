@@ -36,8 +36,9 @@ public:
     bool cancelDiscovery();
     bool isDiscovering();
     void* getBondedDevices(); //List...<BluetoothDevice>
-    BluetoothServerSocket* listenUsingRfcommWithServiceRecord(const String& name, const String& uuid);
+    BluetoothServerSocket* listenUsingInsecureRfcommOn(int channel);
     BluetoothServerSocket* listenUsingInsecureRfcommWithServiceRecord(const String& name, const String& uuid);
+    BluetoothServerSocket* listenUsingRfcommWithServiceRecord(const String& name, const String& uuid);
 
     //TODO: restore Android API
     void discoverable();

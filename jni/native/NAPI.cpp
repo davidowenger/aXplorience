@@ -25,15 +25,21 @@ NReturn NAPI_tRun(NWrapper* w, NParam nVisitor, NParam nElement, NParam a, NPara
 NReturnObject NAPI_tRunObject(NWrapper* w, NParam a, NParam b)
 {
 	JNIEnv* jniEnv = (JNIEnv*)NAPI_tAttachCurrentThread(w);
-	return jniEnv->NewGlobalRef(jniEnv->CallObjectMethod(w->tFrame, w->jmidTFrameTRunObject, a, b));
+    NReturnObject vObjectLocal = jniEnv->CallObjectMethod(w->tFrame, w->jmidTFrameTRunObject, a, b);
+    jniEnv->ExceptionClear();
+    NReturnObject vObjectGlobal = jniEnv->NewGlobalRef(vObjectLocal);
+    jniEnv->DeleteLocalRef(vObjectLocal);
+	return vObjectGlobal;
 }
 
 NReturnObject NAPI_tRunString(NWrapper* w, const String& boxed)
 {
 	JNIEnv* jniEnv = (JNIEnv*)NAPI_tAttachCurrentThread(w);
-	NReturnObject ret = (NReturnObject)jniEnv->NewGlobalRef(jniEnv->NewStringUTF(boxed.c_str()));
-	jniEnv->ExceptionClear();
-	return ret;
+    NReturnObject vObjectLocal = jniEnv->NewStringUTF(boxed.c_str());
+    jniEnv->ExceptionClear();
+    NReturnObject vObjectGlobal = jniEnv->NewGlobalRef(vObjectLocal);
+    jniEnv->DeleteLocalRef(vObjectLocal);
+	return vObjectGlobal;
 }
 
 String NAPI_tGetString(NWrapper* w, NReturnObject tString)

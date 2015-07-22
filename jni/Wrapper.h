@@ -21,9 +21,11 @@ public:
     static const int kViewAdd = 6;
     static const int kViewDelete = 7;
     static const int kViewSave = 8;
+    static const int kViewEnable = kViewSave + 1;
+    static const int kViewBuzz = kViewEnable + 1;
 
     static const int SWIPE_MAX_OFF_PATH = 250;
-    static const int SWIPE_MIN_DISTANCE = 120;
+    static const int SWIPE_MIN_DISTANCE = 100;
     static const int SWIPE_THRESHOLD_VELOCITY = 250;
 
 	NWrapper* w;
@@ -34,19 +36,25 @@ public:
     DBHandler* dbh;
 
     TimeStamp mc10Secondes;
+    TimeStamp mc375Mili;
+    system_clock::duration mcSleep;
+
     std::string mac;
     std::string sServiceName;
     std::string sUuidService;
     std::string sUuidPeer;
     std::string sUuidSuffix;
     std::string sUuidMacSuffix;
+    bool maState[2];
 	BluetoothAdapter* dBluetoothAdapter;
 
 	nint cMaxOpUnit;
 	OpSquad* opSquad;
-	OpUnitCore* opUnitCore;
+    OpUnitCore* opUnitCore;
+    OpUnitUI* opUnitUI;
 	OpUnitServer* opUnitServer;
-	nint mOpUnitCoreId;
+    nint mOpUnitCoreId;
+    nint mOpUnitUIId;
 
 	BOHandlerMessage* mBOHandlerMessage;
 	DBObject* mDBObjectApplication;
@@ -63,6 +71,8 @@ public:
 
 	String* maMenu;
 	String* maMenuItem;
+    nuint mTouchState;
+    function<void()> mEventAction;
 
     nuint mcCategory;
 	String* maCategory;

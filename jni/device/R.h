@@ -12,6 +12,8 @@ public:
     public:
         static const int state_checked = 0x010100a0;
         static const int state_enabled = 0x0101009e;
+        static const int selectableItemBackground = 0x0101030e;
+        static const int selectableItemBackgroundBorderless = 0x0101045c;
     };
 
     class id : public Object

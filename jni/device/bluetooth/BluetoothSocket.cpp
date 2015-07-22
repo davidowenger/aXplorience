@@ -31,4 +31,9 @@ OutputStream* BluetoothSocket::getOutputStream()
     return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNEpsilon03, (NParam)this, (NParam)b));
 }
 
+int BluetoothSocket::getPort()
+{
+    return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNDzeta03, (NParam)this);
+}
+
 } // END namespace

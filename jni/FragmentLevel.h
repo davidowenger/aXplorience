@@ -12,6 +12,8 @@ public:
 
     virtual void init(nuint vcView, nuint vcDBObjectId = 1) = 0;
     virtual void onCreate(Bundle* vBundle) override;
+    virtual View* onCreateView(LayoutInflater* inflater, ViewGroup* parentView, Bundle* vBundle) override;
+    virtual void onDetach() override;
     virtual void onCreateOptionsMenu(Menu* menu, MenuInflater* inflater) override;
     virtual bool onOptionsItemSelected(MenuItem* item) override;
 

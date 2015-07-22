@@ -37,11 +37,9 @@ OpSquad::~OpSquad()
     int vIdDest = 0;
 
     for ( id = 0 ; id < mcMaxOpUnit ; ++id ) {
-        if (maOpUnit[id]->mThread) {
+        if (maOpUnit[id]) {
         	maOpUnit[id]->cancel();
         }
-    }
-    for ( id = 0 ; id < mcMaxOpUnit ; ++id ) {
         if (maOpUnit[id]->mThread) {
             maOpUnit[id]->mThread->join();
         }

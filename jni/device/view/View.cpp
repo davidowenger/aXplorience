@@ -82,7 +82,12 @@ void View::setBackgroundColor(int color)
 
 void View::setBackgroundDrawable(Drawable* background)
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNDzeta00, (NParam)this, (NParam)background);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNDzeta00, (NParam)this, (NParam)background);
+}
+
+void View::setBackgroundResource(int resid)
+{
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNRho00, (NParam)this, (NParam)resid);
 }
 
 void View::setId(int id)

@@ -14,6 +14,8 @@ public:
     BluetoothDevice* getRemoteDevice();
     InputStream* getInputStream();
     OutputStream* getOutputStream();
+    int getPort();
+
 
 private:
     BluetoothSocket(NNoObject* vNNoObject)

@@ -47,21 +47,4 @@ void FragmentLevel0::init(nuint vcView, nuint vcDBObjectId)
     }
 }
 
-View* FragmentLevel0::onCreateView(LayoutInflater* inflater, ViewGroup* parentView, Bundle* vBundle)
-{
-    return mFragmentView;
-}
-
-void FragmentLevel0::onDetach()
-{
-    if (mFragmentLayout.mcPriority != 0) {
-        w->mcMaxLevel--;
-        w->mcView = w->maRootLayoutItem[mcView].maFragmentLayout[w->mcMaxLevel].mcView;
-        w->maFragmentView[w->mcView]->init(w->mcView, mMenu, mcDBObjectId);
-    }
-    mFragmentView->removeAllViews();
-    mIsAdded = false;
-    Fragment::onDetach();
-}
-
 } // End namespace

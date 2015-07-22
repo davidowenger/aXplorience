@@ -140,8 +140,8 @@ public class TClozer extends TFrame
             w.mTVisitorGraphics = new TVisitorGraphics(w),
             w.mTVisitorIO = new TVisitorIO(w),
             w.mTVisitorOS = new TVisitorOS(w),
-            w.mTVisitorUtil = new TVisitorUtil(w),
-            w.mTVisitorView = new TVisitorView(w), //10
+            w.mTVisitorUtil = new TVisitorUtil(w), //10
+            w.mTVisitorView = new TVisitorView(w),
             w.mTVisitorViewView = new TVisitorViewView(w),
             w.mTVisitorViewViewGroup = new TVisitorViewViewGroup(w),
             w.mTVisitorWidget = new TVisitorWidget(w),

@@ -56,7 +56,8 @@ public:
 	virtual bool performClick();
 	virtual void requestLayout();
 	virtual void setBackgroundColor(int color);
-	virtual void setBackgroundDrawable(Drawable* background);
+    virtual void setBackgroundDrawable(Drawable* background);
+    virtual void setBackgroundResource(int resid);
     virtual void setId(int id);
 	virtual void setLayoutParams(View::LayoutParams* params);
 	virtual void setMinimumHeight(int minHeight);

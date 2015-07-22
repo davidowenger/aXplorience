@@ -4,7 +4,7 @@ namespace NSDEVICE
 {
 
 OpUnitListener::OpUnitListener(Wrapper* const w, OpUnit* vOpUnit, InputStream* vInputStream)
-	: OpUnit(w), mWrapper(w)
+	: OpUnit(w), mBuffer()
 {
     mOpUnitId = vOpUnit->mId;
     mOpUnitIdUnique = vOpUnit->mIdUnique;
@@ -24,8 +24,9 @@ void OpUnitListener::run()
     nint error;
 
     while (mAlive) {
+        //LOGE("OpUnitListener::run");
         vBuffer.assign("");
-        error = mInputStream->read(vBuffer, 256);
+        error = mInputStream->read(vBuffer, 0, 256);
 
     	if (error < 0) {
     	    LOGE(("Listener error while reading : " + to_string(error)).c_str());
@@ -34,16 +35,16 @@ void OpUnitListener::run()
         if (mAlive && vBuffer.length()) {
             sendOp(0, mOpUnitId, mWrapper->w->mNAlpha01, new OpMessage(vBuffer));
         }
-        this_thread::sleep_for(chrono::milliseconds(300));
+        this_thread::sleep_for(mWrapper->mcSleep*16);
     }
 	cancel();
-    LOGV("Listener stopping");
+    LOGD("Listener stopping");
     sendOp(0, mOpUnitId, mWrapper->w->mNAlpha03, new OpParam(mOpUnitIdUnique));
 }
 
 void OpUnitListener::cancel()
 {
-    LOGV("Listener canceled");
+    LOGD("Listener canceled");
 	mAlive = false;
 	mInputStream->close();
 }

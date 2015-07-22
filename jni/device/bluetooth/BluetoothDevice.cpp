@@ -74,16 +74,22 @@ BluetoothClass* BluetoothDevice::getBluetoothClass()
     return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNIota01, (NParam)this, (NParam)b));
 }
 
-BluetoothSocket* BluetoothDevice::createRfcommSocketToServiceRecord(const String& uuid)
+BluetoothSocket* BluetoothDevice::createInsecureRfcommSocket(int port)
 {
     BluetoothSocket* b = NWrapper::w->mNNoObject->pointer<BluetoothSocket>();
-    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNKappa01, (NParam)this, (NParam)b, NParamBox(NWrapper::w, uuid).n));
+    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNNu01, (NParam)this, (NParam)b, (NParam)port));
 }
 
 BluetoothSocket* BluetoothDevice::createInsecureRfcommSocketToServiceRecord(const String& uuid)
 {
     BluetoothSocket* b = NWrapper::w->mNNoObject->pointer<BluetoothSocket>();
     return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNLambda01, (NParam)this, (NParam)b, NParamBox(NWrapper::w, uuid).n));
+}
+
+BluetoothSocket* BluetoothDevice::createRfcommSocketToServiceRecord(const String& uuid)
+{
+    BluetoothSocket* b = NWrapper::w->mNNoObject->pointer<BluetoothSocket>();
+    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNKappa01, (NParam)this, (NParam)b, NParamBox(NWrapper::w, uuid).n));
 }
 
 vector<ParcelUuid*> BluetoothDevice::getUuids()

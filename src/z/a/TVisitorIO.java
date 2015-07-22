@@ -29,11 +29,11 @@ public class TVisitorIO extends TVisitor
 		return err;
 	}
 
-	// int read(String& buffer, int byteCount)
+	// int read(String& buffer, int byteOffset, int byteCount)
 	public long visit(TBeta00 element, long a, long b, long c, long d, long e)
 	{
 		long err = 0;
-		byte[] aByte = new byte[(int)b];
+		byte[] aByte = new byte[(int)d];
         String vString = "";
 
 		try {
@@ -82,10 +82,10 @@ public class TVisitorIO extends TVisitor
 	{
 		long err = 0;
 		try {
-            String vString = (String)w.tFrame.nRunObject(b);
-            byte[] vaByte = vString.getBytes();
-            ((OutputStream)w.sObject.get(a)).write(vaByte);
-            //((OutputStream)w.sObject.get(a)).write(((String)w.tFrame.nRunObject(b)).getBytes());
+            //String vString = (String)w.tFrame.nRunObject(b);
+            //byte[] vaByte = vString.getBytes();
+            //((OutputStream)w.sObject.get(a)).write(vaByte);
+            ((OutputStream)w.sObject.get(a)).write(((String)w.tFrame.nRunObject(b)).getBytes());
 		}
 		catch (IOException vException) {
 			if (w.doDebug) vException.printStackTrace();

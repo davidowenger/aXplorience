@@ -25,6 +25,7 @@ FragmentViewEdit::~FragmentViewEdit()
 
 void FragmentViewEdit::init(nuint vcView, Menu* menu, nuint vcDBObjectId)
 {
+    mTouchState = 0;
     mcView = vcView;
     mcDBObjectId = vcDBObjectId;
     maContent[0]->init(vcView, vcDBObjectId);
@@ -51,16 +52,18 @@ bool FragmentViewEdit::onMenuItemSelected(nint id)
     bool ret = false;
 
     if (id == R::id::home && mcDBObjectId == 1) {
-        w->mNActivity->sendOp(0, w->mOpUnitCoreId, w->w->mNIota00, new OpParam(Wrapper::kViewHome));
+        w->mNActivity->setView(Wrapper::kViewHome, 0);
+        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewHome));
         ret = true;
     }
     if (id == R::id::home && mcDBObjectId > 1) {
-        w->mNActivity->sendOp(0, w->mOpUnitCoreId, w->w->mNIota00, new OpParam(Wrapper::kViewDetails, mcDBObjectId));
+        w->mNActivity->setView(Wrapper::kViewDetails, mcDBObjectId);
+        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewDetails, mcDBObjectId));
         ret = true;
     }
     if (id == Wrapper::kViewSave && mcDBObjectId == 1) {
         // ADD
-        w->mNActivity->sendOp(0, w->mOpUnitCoreId, w->w->mNDelta00, new OpMessage(
+        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNDelta00, new OpMessage(
            to_string(((WidgetMessageEdit*)maContent[0])->mCategory->getSelectedItemPosition()),
            ((WidgetMessageEdit*)maContent[0])->mTitle->getText(),
            ((WidgetMessageEdit*)maContent[0])->mText->getText(),
@@ -70,7 +73,7 @@ bool FragmentViewEdit::onMenuItemSelected(nint id)
     }
     if (id == Wrapper::kViewSave && mcDBObjectId != 1) {
         // EDIT
-        w->mNActivity->sendOp(0, w->mOpUnitCoreId, w->w->mNTheta00, new OpMessage(
+        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNTheta00, new OpMessage(
            to_string(((WidgetMessageEdit*)maContent[0])->mCategory->getSelectedItemPosition()),
            ((WidgetMessageEdit*)maContent[0])->mTitle->getText(),
            ((WidgetMessageEdit*)maContent[0])->mText->getText(),
@@ -81,7 +84,7 @@ bool FragmentViewEdit::onMenuItemSelected(nint id)
         ret = true;
     }
     if (id == Wrapper::kViewDelete) {
-        w->mNActivity->sendOp(0, w->mOpUnitCoreId, w->w->mNEpsilon00, new OpParam(mcDBObjectId, true));
+        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNEpsilon00, new OpParam(mcDBObjectId, true));
         ret = true;
     }
     return ret;
@@ -92,34 +95,35 @@ bool FragmentViewEdit::onMenuItemSelected(nint id)
 //*******************************************************************************************
 bool FragmentViewEdit::onDown(MotionEvent* e)
 {
+    w->mTouchState = 0;
     return true;
 }
 
 bool FragmentViewEdit::onFling(MotionEvent* e1, MotionEvent* e2, float vVelocityX, float vVelocityY)
 {
-    mTouchState = 0;
+    w->mTouchState = 0;
     return false;
 }
 
 void FragmentViewEdit::onLongPress(MotionEvent* e)
 {
-    mTouchState = 0;
+    w->mTouchState = 0;
 }
 
 bool FragmentViewEdit::onScroll(MotionEvent* e1, MotionEvent* e2, float distanceX, float distanceY)
 {
-    mTouchState = 0;
+    w->mTouchState = 0;
     return false;
 }
 
 void FragmentViewEdit::onShowPress(MotionEvent* e)
 {
-    mTouchState = 0;
+    w->mTouchState = 0;
 }
 
 bool FragmentViewEdit::onSingleTapUp(MotionEvent* e)
 {
-    mTouchState = 0;
+    w->mTouchState = 0;
     return false;
 }
 

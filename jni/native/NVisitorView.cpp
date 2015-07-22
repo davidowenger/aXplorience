@@ -20,7 +20,10 @@ NReturn NVisitorView::visit(NAlpha03* element, NParam a, NParam b, NParam c, NPa
 {
     NReturn vcRet = 0;
     if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
-    if (b != -1) vcRet = ((GestureDetector::OnGestureListener*)a)->onDown((MotionEvent*)b);
+    if (b != -1) {
+        vcRet = ((GestureDetector::OnGestureListener*)a)->onDown((MotionEvent*)b);
+        delete (MotionEvent*)b;
+    }
     return vcRet;
 }
 
@@ -30,7 +33,11 @@ NReturn NVisitorView::visit(NBeta03* element, NParam a, NParam b, NParam c, NPar
     NReturn vcRet = 0;
     if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
     if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
-    if (b != -1) vcRet = ((GestureDetector::OnGestureListener*)a)->onFling((MotionEvent*)b, (MotionEvent*)c, (nfloat)*reinterpret_cast<ndouble*>(&d), (nfloat)*reinterpret_cast<ndouble*>(&e));
+    if (b != -1) {
+        vcRet = ((GestureDetector::OnGestureListener*)a)->onFling((MotionEvent*)b, (MotionEvent*)c, (nfloat)*reinterpret_cast<ndouble*>(&d), (nfloat)*reinterpret_cast<ndouble*>(&e));
+        delete (MotionEvent*)b;
+        delete (MotionEvent*)c;
+    }
     return vcRet;
 }
 
@@ -39,7 +46,10 @@ NReturn NVisitorView::visit(NGamma03* element, NParam a, NParam b, NParam c, NPa
 {
     NReturn vcRet = 0;
     if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
-    if (b != -1) ((GestureDetector::OnGestureListener*)a)->onLongPress((MotionEvent*)b);
+    if (b != -1) {
+        ((GestureDetector::OnGestureListener*)a)->onLongPress((MotionEvent*)b);
+        delete (MotionEvent*)b;
+    }
     return vcRet;
 }
 
@@ -49,7 +59,11 @@ NReturn NVisitorView::visit(NDelta03* element, NParam a, NParam b, NParam c, NPa
     NReturn vcRet = 0;
     if (b == -1 && c == 2) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
     if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
-    if (b != -1) vcRet = ((GestureDetector::OnGestureListener*)a)->onScroll((MotionEvent*)b, (MotionEvent*)c, (nfloat)*reinterpret_cast<nfloat*>(&d), (nfloat)*reinterpret_cast<nfloat*>(&e));
+    if (b != -1) {
+        vcRet = ((GestureDetector::OnGestureListener*)a)->onScroll((MotionEvent*)b, (MotionEvent*)c, (nfloat)*reinterpret_cast<ndouble*>(&d), (nfloat)*reinterpret_cast<ndouble*>(&e));
+        delete (MotionEvent*)b;
+        delete (MotionEvent*)c;
+    }
     return vcRet;
 }
 
@@ -58,7 +72,10 @@ NReturn NVisitorView::visit(NEpsilon03* element, NParam a, NParam b, NParam c, N
 {
     NReturn vcRet = 0;
     if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
-    if (b != -1) ((GestureDetector::OnGestureListener*)a)->onShowPress((MotionEvent*)b);
+    if (b != -1) {
+        ((GestureDetector::OnGestureListener*)a)->onShowPress((MotionEvent*)b);
+        delete (MotionEvent*)b;
+    }
     return vcRet;
 }
 
@@ -67,7 +84,10 @@ NReturn NVisitorView::visit(NDzeta03* element, NParam a, NParam b, NParam c, NPa
 {
     NReturn vcRet = 0;
     if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<MotionEvent>();
-    if (b != -1) vcRet = ((GestureDetector::OnGestureListener*)a)->onSingleTapUp((MotionEvent*)b);
+    if (b != -1) {
+        vcRet = ((GestureDetector::OnGestureListener*)a)->onSingleTapUp((MotionEvent*)b);
+        delete (MotionEvent*)b;
+    }
     return vcRet;
 }
 

@@ -81,6 +81,13 @@ public class TVisitorViewView extends TVisitor
         return 0;
     }
 
+    // void setBackgroundResource(int resid)
+    public long visit(TRho00 element, long a, long b, long c, long d, long e)
+    {
+        ((View)w.sObject.get(a)).setBackgroundResource((int)b);
+        return 0;
+    }
+
     // void setId(int id)
     public long visit(TEta00 element, long a, long b, long c, long d, long e)
     {

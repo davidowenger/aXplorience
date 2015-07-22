@@ -16,8 +16,8 @@ public:
     nint mOpUnitId;
     nint mOpUnitIdUnique;
     nint mOpUnitCoreId;
-    Wrapper* mWrapper;
     InputStream* mInputStream;
+    String mBuffer;
 };
 
 } // End namespace

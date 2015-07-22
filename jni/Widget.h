@@ -11,7 +11,6 @@ public:
         : LinearLayout(w->mApplication), w(w), mcView(0), mcDBObjectId(1)
     {
 	    setLayoutParams(new LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT, 1));
-        setBackgroundColor(w->maColor[0]);
     }
 
 	virtual ~Widget()

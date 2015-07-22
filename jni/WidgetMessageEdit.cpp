@@ -18,8 +18,7 @@ WidgetMessageEdit::WidgetMessageEdit(Wrapper* const w)
     setGravity(Gravity::LEFT|Gravity::TOP);
     setOrientation(LinearLayout::VERTICAL);
     setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT));
-    setPadding(0, 0, 0, 0);
-    setBackgroundColor(w->maColor[Theme::kColorApplicationBackground]);
+    setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
 
     AdapterCategory* vAdapterCategory = new AdapterCategory(w);
 
@@ -95,10 +94,10 @@ void WidgetMessageEdit::init(nuint vcView, nuint vcDBObjectId)
     mcDBObjectId = vcDBObjectId;
 
     mDBObject = w->mBOHandlerMessage->get(mcDBObjectId);
-    mcCategoryId = (nint)to_long(mDBObject->get("id_cat"));
+    mcCategoryId = (nint)to_long(mDBObject->get("sCategoryId"));
 
     mCategory->setSelection(mcCategoryId);
-    mTitle->setText(mDBObject->get("title"), TextView::NORMAL);
+    mTitle->setText(mDBObject->get("sTitle"), TextView::NORMAL);
     mText->setText(mDBObject->get("text"), TextView::NORMAL);
     mLink->setText(mDBObject->get("link"), TextView::NORMAL);
 
@@ -123,6 +122,7 @@ AdapterCategory::AdapterCategory(Wrapper* const w)
 
         if (i) {
             mTextView[i]->setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
+            mTextView[i]->setText(w->maCategory[i - 1]);
         }
     }
 
@@ -130,6 +130,16 @@ AdapterCategory::AdapterCategory(Wrapper* const w)
 
 AdapterCategory::~AdapterCategory()
 {
+    nuint i = 0;
+
+    if (mTextView) {
+        for (i = 0 ; i < w->mcCategory + 1 ; ++i) {
+            if (mTextView[i]) {
+                delete mTextView[i];
+            }
+        }
+        delete[] mTextView;
+    }
 }
 
 //*******************************************************************************************
@@ -137,7 +147,6 @@ AdapterCategory::~AdapterCategory()
 //*******************************************************************************************
 View* AdapterCategory::getDropDownView(int position, View* convertView, ViewGroup* parent)
 {
-    mTextView[position + 1]->setText(w->maCategory[position]);
     return mTextView[position + 1];
 }
 

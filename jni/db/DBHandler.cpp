@@ -116,17 +116,29 @@ String* DBObject::get()
 
 String DBObject::get(const String& field)
 {
-    return load()->maValue[mDBTableHandler->maFieldIndex[field]];
+    return load()->maValue[getFieldIndex(field)];
+}
+
+nuint DBObject::getFieldIndex(const String& field)
+{
+    nuint ret = 0;
+
+    if (mDBTableHandler->maFieldIndex.count(field)) {
+        ret = mDBTableHandler->maFieldIndex.at(field);
+    } else {
+        LOGE(("Error: field does not exists: #" + field).c_str());
+    }
+    return ret;
 }
 
 nlong DBObject::count(const String& field)
 {
-    return to_long(load()->maValue[mDBTableHandler->maFieldIndex[field]]);
+    return to_long(load()->maValue[getFieldIndex(field)]);
 }
 
 bool DBObject::is(const String& field)
 {
-    return load()->maValue[mDBTableHandler->maFieldIndex[field]] == w->dbh->TRUE;
+    return load()->maValue[getFieldIndex(field)] == w->dbh->TRUE;
 }
 
 DBObject* DBObject::set(String* aValue, nuint count)
@@ -142,12 +154,12 @@ DBObject* DBObject::set(String* aValue, nuint count)
 
 DBObject* DBObject::set(const String& field, const String& value)
 {
-    return load()->set(mDBTableHandler->maFieldIndex[field], value);
+    return load()->set(getFieldIndex(field), value);
 }
 
 DBObject* DBObject::set(const String& field, nlong value)
 {
-    return load()->set(mDBTableHandler->maFieldIndex[field], to_string(value));
+    return load()->set(getFieldIndex(field), to_string(value));
 }
 
 DBObject* DBObject::set(nint index, const String& value)
@@ -215,10 +227,9 @@ bool DBObject::apply(DBFilter* filtre, bool selected)
 }
 
 DBCollection::DBCollection(Wrapper* w, DBTableHandler* dbTableHandler)
-	: w(w), maDBObject(), isLoaded(false)
+    : w(w), mDBTableHandler(dbTableHandler), mDBFiltre(new DBFilter("", "", w->dbh->TRUE)), maDBObjectSorted(nullptr),
+      maDBObject(), isLoaded(false)
 {
-	mDBTableHandler = dbTableHandler;
-	mDBFiltre = new DBFilter("", "", w->dbh->TRUE);
 }
 
 DBCollection::~DBCollection()
@@ -250,26 +261,33 @@ DBCollection* DBCollection::load()
 
 DBCollection* DBCollection::sort(const String& field, bool ascending)
 {
-	load();
-	multimap<String,DBObject*> vaDBObjectSorted;
+    load();
 
-	for (DBObject* vDBObject : maDBObject) {
-		vaDBObjectSorted.emplace(vDBObject->get(field), vDBObject);
-	}
-	maDBObject.clear();
+    if (ascending) {
+         maDBObjectSorted = new multimap<String,DBObject*,Compare>(Compare([](const String& a, const String& b)->bool{return a < b;}));
+    } else {
+         maDBObjectSorted = new multimap<String,DBObject*,Compare>(Compare([](const String& a, const String& b)->bool{return a > b;}));
+    }
+    for (DBObject* vDBObject : maDBObject) {
+        maDBObjectSorted->emplace(vDBObject->get(field), vDBObject);
+    }
+    maDBObject.clear();
 
-	if (ascending) {
-		for (multimap<String,DBObject*>::value_type vPairSorted : vaDBObjectSorted) {
-			maDBObject.push_back(vPairSorted.second);
-		}
-	} else {
-		multimap<String,DBObject*>::reverse_iterator rit;
+    for (multimap<String,DBObject*,Compare>::value_type vPairSorted : *maDBObjectSorted) {
+        maDBObject.push_back(vPairSorted.second);
+    }
+    delete maDBObjectSorted;
+    return this;
+}
 
-		for (rit = vaDBObjectSorted.rbegin() ; rit != vaDBObjectSorted.rend() ; ++rit) {
-			maDBObject.push_back((*rit).second);
-		}
-	}
-	return this;
+DBCollection* DBCollection::sort(list<Sort> vaSort)
+{
+    load();
+
+    for (Sort vSort : vaSort) {
+        sort(vSort.mField, vSort.mIsAscending);
+    }
+    return this;
 }
 
 DBObject* DBCollection::get(nint index)
