@@ -9,7 +9,8 @@ class Wrapper
 public:
     static const int OPUNIT_TYPE_NONE = 0;
     static const int OPUNIT_TYPE_DEFAULT = OPUNIT_TYPE_NONE + 1;
-    static const int OPUNIT_TYPE_PEER = OPUNIT_TYPE_DEFAULT + 1;
+    static const int OPUNIT_TYPE_ACTIVITY = OPUNIT_TYPE_DEFAULT + 1;
+    static const int OPUNIT_TYPE_PEER = OPUNIT_TYPE_ACTIVITY + 1;
     static const int OPUNIT_TYPE_LISTENER = OPUNIT_TYPE_PEER + 1;
 
     static const int kViewNone = 0;
@@ -28,56 +29,75 @@ public:
     static const int SWIPE_MIN_DISTANCE = 100;
     static const int SWIPE_THRESHOLD_VELOCITY = 250;
 
-	NWrapper* w;
+    NWrapper* w;
 
     Application* mApplication;
     NActivity* mNActivity;
     String sFileDir;
     DBHandler* dbh;
 
-    TimeStamp mc10Secondes;
-    TimeStamp mc375Mili;
-    system_clock::duration mcSleep;
+    TimeStamp mc1Seconde;
+    system_clock::duration mMili;
 
     std::string mac;
     std::string sServiceName;
     std::string sUuidService;
-    std::string sUuidPeer;
-    std::string sUuidSuffix;
-    std::string sUuidMacSuffix;
-    bool maState[2];
-	BluetoothAdapter* dBluetoothAdapter;
+    BluetoothAdapter* dBluetoothAdapter;
 
-	nint cMaxOpUnit;
-	OpSquad* opSquad;
+    nint cMaxOpUnit;
+    OpSquad* opSquad;
     OpUnitCore* opUnitCore;
     OpUnitUI* opUnitUI;
-	OpUnitServer* opUnitServer;
+    OpUnitServer* opUnitServer;
+    OpUnitAnim* mOpUnitAnim;
+    nint mOpUnitServerId;
+    nint mOpUnitAppId;
     nint mOpUnitCoreId;
     nint mOpUnitUIId;
+    nint mOpUnitAnimId;
+    nint mcConnected;
+    list<Sort> maSort;
 
-	BOHandlerMessage* mBOHandlerMessage;
-	DBObject* mDBObjectApplication;
-	DBObject* mDBObjectSeedEdit;
+    nuint mcBTStateChange;
+    nuint mcBTState;
+    nuint mIsInterrupted;
+    nuint mcInterrupt;
+    String** mWriteBase;
+    nint mcWriteIndex;
+    nint mcWriteIndexMax;
+    ConcurrentCircularBuffer<String*>* maMessageAlive;
+    ConcurrentCircularBuffer<String*>* maMessageBuzz;
+    ConcurrentCircularBuffer<String*>* maMessageUpdate;
+    map<nuint,WidgetMessage*> maWidgetMessage;
+    list<WidgetMessage*> maWidgetMessageSorted;
 
-	FragmentManager* mFragmentManager;
-	Resources* mResources;
-	DisplayMetrics* mDisplayMetrics;
-	Configuration* mConfiguration;
+    BOHandlerMessage* mBOHandlerMessage;
+    DBObject* mDBObjectApplication;
+    DBObject* mDBObjectSeedEdit;
+
+    FragmentManager* mFragmentManager;
+    Resources* mResources;
+    DisplayMetrics* mDisplayMetrics;
+    Configuration* mConfiguration;
 
     nfloat mcDensity;
     nint mcWidthDp;
     nint mcTextSize;
 
-	String* maMenu;
-	String* maMenuItem;
+    String* maMenu;
+    String* maMenuItem;
     nuint mTouchState;
-    function<void()> mEventAction;
+    EventAction mEventAction;
+    nlong mEventLong0;
+    nlong mEventLong1;
+    String mEventString0;
 
     nuint mcCategory;
-	String* maCategory;
+    String* maCategory;
 
-    bool* maCategorySelected;
+    nuint mcBTStateOption;
+    String* maBTStateOption;
+
     nuint* maColor;
     Drawable** maDrawable;
 
@@ -89,8 +109,13 @@ public:
     LinearLayout* mMessageLayout;
     nuint mcView;
     nuint mcMaxLevel;
+    Menu* mMenu;
 
     WidgetHome* mWidgetHome;
+    WidgetMessageDetails* mWidgetMessageDetails;
+    WidgetMessageEdit* mWidgetMessageEdit;
+    WidgetSettings* mWidgetSettings;
+    WidgetAbout* mWidgetAbout;
 
     nuint mcFragmentView;
     FragmentView** maFragmentView;

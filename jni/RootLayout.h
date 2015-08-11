@@ -9,6 +9,7 @@ struct FragmentLayout
     nint mcView;
     nint mcPosition;
     nint mcPriority;
+    nint mcRootLayoutItem;
 };
 
 struct RootLayoutItem

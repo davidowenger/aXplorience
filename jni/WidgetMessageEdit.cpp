@@ -6,8 +6,9 @@ namespace NSDEVICE
 
 WidgetMessageEdit::WidgetMessageEdit(Wrapper* const w)
     : Widget(w), mcPadding((nint)(10*w->mcDensity)), mDBObject(nullptr), mcCategoryId(0),
-    mCategory(nullptr), mTitle(nullptr), mText(nullptr), mLink(nullptr)
+    mAdapterCategory(nullptr), mScrollView(nullptr), mContent(nullptr), mCategory(nullptr), mTitle(nullptr), mText(nullptr), mLink(nullptr)
 {
+    mAdapterCategory = new AdapterCategory(w);
     mScrollView = new ScrollView(w->mApplication);
     mContent = new LinearLayout(w->mApplication);
     mCategory = new Spinner(w->mNActivity);
@@ -20,8 +21,6 @@ WidgetMessageEdit::WidgetMessageEdit(Wrapper* const w)
     setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT));
     setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
 
-    AdapterCategory* vAdapterCategory = new AdapterCategory(w);
-
     mContent->setGravity(Gravity::LEFT|Gravity::TOP);
     mContent->setOrientation(LinearLayout::VERTICAL);
     mContent->setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT));
@@ -30,8 +29,8 @@ WidgetMessageEdit::WidgetMessageEdit(Wrapper* const w)
     mCategory->setGravity(Gravity::START);
     mCategory->setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT));
     mCategory->setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
-    mCategory->setAdapter(vAdapterCategory);
-    mCategory->setOnItemSelectedListener(vAdapterCategory);
+    mCategory->setAdapter(mAdapterCategory);
+    mCategory->setOnItemSelectedListener(mAdapterCategory);
 
     mTitle->setGravity(Gravity::START);
     mTitle->setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT));
@@ -49,7 +48,7 @@ WidgetMessageEdit::WidgetMessageEdit(Wrapper* const w)
     mText->setTextSize(w->mcTextSize);
     mText->setLines(3);
     mText->setHint("More description ...");
-    mText->setRawInputType(InputType::TYPE_CLASS_TEXT|InputType::TYPE_TEXT_VARIATION_NORMAL);
+    mText->setRawInputType(InputType::TYPE_CLASS_TEXT|InputType::TYPE_TEXT_VARIATION_LONG_MESSAGE);
     mText->setImeOptions(EditorInfo::IME_ACTION_NEXT|EditorInfo::IME_FLAG_NO_FULLSCREEN|EditorInfo::IME_FLAG_NO_EXTRACT_UI|EditorInfo::IME_FLAG_NAVIGATE_NEXT); //|EditorInfo::IME_FLAG_NO_ENTER_ACTION|EditorInfo::IME_MASK_ACTION
 
     mLink->setGravity(Gravity::START);
@@ -71,6 +70,9 @@ WidgetMessageEdit::WidgetMessageEdit(Wrapper* const w)
 
 WidgetMessageEdit::~WidgetMessageEdit()
 {
+    mContent->removeAllViews();
+    mScrollView->removeAllViews();
+
     if (mDBObject) {
        delete mDBObject;
     }
@@ -86,21 +88,26 @@ WidgetMessageEdit::~WidgetMessageEdit()
     if (mCategory) {
        delete mCategory;
     }
+    if (mContent) {
+       delete mContent;
+    }
+    if (mScrollView) {
+       delete mScrollView;
+    }
+    if (mAdapterCategory) {
+       delete mAdapterCategory;
+    }
 }
 
-void WidgetMessageEdit::init(nuint vcView, nuint vcDBObjectId)
+void WidgetMessageEdit::update(DBObject* vDBObject)
 {
-    mcView = vcView;
-    mcDBObjectId = vcDBObjectId;
-
-    mDBObject = w->mBOHandlerMessage->get(mcDBObjectId);
-    mcCategoryId = (nint)to_long(mDBObject->get("sCategoryId"));
+    mcDBObjectId = vDBObject->mId;
+    mcCategoryId = vDBObject->count("sCategoryId");
 
     mCategory->setSelection(mcCategoryId);
-    mTitle->setText(mDBObject->get("sTitle"), TextView::NORMAL);
-    mText->setText(mDBObject->get("text"), TextView::NORMAL);
-    mLink->setText(mDBObject->get("link"), TextView::NORMAL);
-
+    mTitle->setText(vDBObject->get("sTitle"), TextView::NORMAL);
+    mText->setText(vDBObject->get("text"), TextView::NORMAL);
+    mLink->setText(vDBObject->get("link"), TextView::NORMAL);
     requestLayout();
 }
 

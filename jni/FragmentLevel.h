@@ -10,7 +10,7 @@ public:
     FragmentLevel(Wrapper* vWrapper);
     virtual ~FragmentLevel();
 
-    virtual void init(nuint vcView, nuint vcDBObjectId = 1) = 0;
+    virtual void init(nuint vcView, DBObject* vDBObject = nullptr) = 0;
     virtual void onCreate(Bundle* vBundle) override;
     virtual View* onCreateView(LayoutInflater* inflater, ViewGroup* parentView, Bundle* vBundle) override;
     virtual void onDetach() override;
@@ -19,7 +19,6 @@ public:
 
     Wrapper* w;
     FrameLayout* mFragmentView;
-    Menu* mMenu;
 
     FragmentLayout mFragmentLayout;
     nuint mcView;

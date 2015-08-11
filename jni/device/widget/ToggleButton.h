@@ -11,13 +11,13 @@ friend NSNATIVE::NNoObject;
 public:
     ToggleButton(Context* context)
         : CompoundButton(NWrapper::w->mNNoObject->instance<CompoundButton>())
-	{
+    {
         NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNUpsilon00, (NParam)this, (NParam)context);
-	}
+    }
 
     virtual ~ToggleButton()
-	{
-	}
+    {
+    }
 
     void setChecked(bool checked)
     {

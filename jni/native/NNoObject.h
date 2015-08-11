@@ -30,16 +30,19 @@ public:
     template <class T>
     T* emplaceKey(T* vApplicationCallback, NReturn vUserCallback)
     {
-        static Col<T*> maCol;
         if ((NReturn)vApplicationCallback != vUserCallback) {
-            // Callback pointers initialized (with operator new) by the user have to be deleted by the user
+            // Unused pointers generated on-the-go by the application are deleted immediately
             delete vApplicationCallback;
+            // This global object already has a callback pointer
             vApplicationCallback = (T*)vUserCallback;
-        } else {
-            // Callback pointers sent to a listener (void onEvent(Event* e)) by the application will be implicitely deleted when the program quits
-            //maCol.add(vApplicationCallback);
+        }
+#ifdef DEBUG
+        else {
+            // A callback pointer has been generated and will have to be deleted by the user
+            // Except for some Event* that may be deleted automatically after the end of the callback event function
             LOGV("Added one Application Callback pointer");
         }
+#endif
         return vApplicationCallback;
     }
 };

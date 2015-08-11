@@ -9,9 +9,9 @@ class BaseBundle : public Object
 friend NSNATIVE::NNoObject;
 
 public:
-	virtual ~BaseBundle()
-	{
-	}
+    virtual ~BaseBundle()
+    {
+    }
 
 private:
     BaseBundle(NNoObject* vNNoObject)

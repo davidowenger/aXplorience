@@ -9,14 +9,14 @@ class Bundle : public BaseBundle
 friend NSNATIVE::NNoObject;
 
 public:
-	Bundle()
+    Bundle()
         : BaseBundle(NWrapper::w->mNNoObject->instance<BaseBundle>())
-	{
-	}
+    {
+    }
 
-	virtual ~Bundle()
-	{
-	}
+    virtual ~Bundle()
+    {
+    }
 
 protected:
     Bundle(NNoObject* vNNoObject)

@@ -9,9 +9,9 @@ class MotionEvent : public InputEvent
 friend NSNATIVE::NNoObject;
 
 public:
-	virtual ~MotionEvent()
-	{
-	}
+    virtual ~MotionEvent()
+    {
+    }
 
     float getX()
     {

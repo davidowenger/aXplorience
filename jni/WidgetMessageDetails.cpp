@@ -5,7 +5,7 @@ namespace NSDEVICE
 {
 
 WidgetMessageDetails::WidgetMessageDetails(Wrapper* const w)
-	: Widget(w), mcPadding((nint)(10*w->mcDensity)), mDBObject(nullptr), mcCategoryId(0), mCategory(nullptr), mTitle(nullptr), mText(nullptr), mLink(nullptr)
+    : Widget(w), mcPadding((nint)(10*w->mcDensity)), mDBObject(nullptr), mcCategoryId(0), mCategory(nullptr), mTitle(nullptr), mText(nullptr), mLink(nullptr)
 {
     mCategory = new TextView(w->mApplication);
     mTitle = new TextView(w->mApplication);
@@ -71,19 +71,16 @@ WidgetMessageDetails::~WidgetMessageDetails()
     }
 }
 
-void WidgetMessageDetails::init(nuint vcView, nuint vcDBObjectId)
+void WidgetMessageDetails::update(DBObject* vDBObject)
 {
-    mcView = vcView;
-    mcDBObjectId = vcDBObjectId;
-    mDBObject = w->mBOHandlerMessage->get(mcDBObjectId);
-    mcCategoryId = (nint)to_long(mDBObject->get("sCategoryId"));
+    mcDBObjectId = vDBObject->mId;
+    mcCategoryId = vDBObject->count("sCategoryId");
 
     mCategory->setBackgroundColor(w->maColor[Theme::kColorCategoryBackground + mcCategoryId*3]);
     mCategory->setText(w->maCategory[mcCategoryId]);
-    mTitle->setText(mDBObject->get("sTitle"));
-    mText->setText(mDBObject->get("text"));
-    mLink->setText(mDBObject->get("link"));
-
+    mTitle->setText(vDBObject->get("sTitle"));
+    mText->setText(vDBObject->get("text"));
+    mLink->setText(vDBObject->get("link"));
     requestLayout();
 }
 

@@ -25,15 +25,21 @@ public:
         return this;
     }
 
+    virtual FragmentTransaction* remove(Fragment* fragment)
+    {
+        NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNGamma03, (NParam)this, (NParam)fragment);
+        return this;
+    }
+
     virtual FragmentTransaction* replace(int containerViewId, Fragment* fragment)
     {
-        NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNGamma03, (NParam)this, (NParam)containerViewId, (NParam)fragment);
+        NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNDelta03, (NParam)this, (NParam)containerViewId, (NParam)fragment);
         return this;
     }
 
     virtual int commit()
     {
-        return (int)NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNDelta03, (NParam)this);
+        return (int)NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNEpsilon03, (NParam)this);
     }
 
 private:

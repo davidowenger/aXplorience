@@ -10,41 +10,40 @@ FragmentViewEdit::FragmentViewEdit(Wrapper* const w)
     setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT));
     setPadding(0, 0, 0, 0);
 
-    maContent = new Widget*[1];
-    maContent[0] = new WidgetMessageEdit(w);
-    addView(maContent[0]);
+    addView(w->mWidgetMessageEdit);
 }
 
 FragmentViewEdit::~FragmentViewEdit()
 {
-    if (maContent[0]) {
-       delete maContent[0];
-    }
-    delete maContent;
 }
 
-void FragmentViewEdit::init(nuint vcView, Menu* menu, nuint vcDBObjectId)
+void FragmentViewEdit::init(nuint vcView, DBObject* vDBObject)
 {
-    mTouchState = 0;
     mcView = vcView;
-    mcDBObjectId = vcDBObjectId;
-    maContent[0]->init(vcView, vcDBObjectId);
 
-    menu->removeItem(Wrapper::kViewAdd);
-    menu->removeItem(Wrapper::kViewEdit);
-    menu->removeItem(Wrapper::kViewDelete);
-    menu->removeItem(Wrapper::kViewSave);
+    if (vDBObject) {
+        mcDBObjectId = vDBObject->mId;
+        w->mWidgetMessageEdit->update(vDBObject);
+    }
+    if (w->mMenu) {
+        w->mMenu->removeItem(Wrapper::kViewAdd);
+        w->mMenu->removeItem(Wrapper::kViewEdit);
+        w->mMenu->removeItem(Wrapper::kViewDelete);
+        w->mMenu->removeItem(Wrapper::kViewSave);
 
-    MenuItem* vMenuItemDelete = menu->add(Menu::NONE, Wrapper::kViewDelete, 1, "Delete");
-    vMenuItemDelete->setIcon(w->maDrawable[8]);
-    vMenuItemDelete->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+        MenuItem* vMenuItemDelete = w->mMenu->add(Menu::NONE, Wrapper::kViewDelete, 1, "Delete");
+        vMenuItemDelete->setIcon(w->maDrawable[8]);
+        vMenuItemDelete->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+        delete vMenuItemDelete;
 
-    MenuItem* vMenuItemSave = menu->add(Menu::NONE, Wrapper::kViewSave, 2, "Save");
-    vMenuItemSave->setIcon(w->maDrawable[9]);
-    vMenuItemSave->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+        MenuItem* vMenuItemSave = w->mMenu->add(Menu::NONE, Wrapper::kViewSave, 2, "Save");
+        vMenuItemSave->setIcon(w->maDrawable[9]);
+        vMenuItemSave->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+        delete vMenuItemSave;
 
-    w->mActionBar->setDisplayHomeAsUpEnabled(true);
-    w->mActionBar->setHomeButtonEnabled(true);
+        w->mActionBar->setDisplayHomeAsUpEnabled(true);
+        w->mActionBar->setHomeButtonEnabled(true);
+    }
 }
 
 bool FragmentViewEdit::onMenuItemSelected(nint id)
@@ -52,39 +51,37 @@ bool FragmentViewEdit::onMenuItemSelected(nint id)
     bool ret = false;
 
     if (id == R::id::home && mcDBObjectId == 1) {
-        w->mNActivity->setView(Wrapper::kViewHome, 0);
-        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewHome));
+        w->mNActivity->sendOp(w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewHome));
         ret = true;
     }
     if (id == R::id::home && mcDBObjectId > 1) {
-        w->mNActivity->setView(Wrapper::kViewDetails, mcDBObjectId);
-        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewDetails, mcDBObjectId));
+        w->mNActivity->sendOp(w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewDetails, mcDBObjectId));
         ret = true;
     }
     if (id == Wrapper::kViewSave && mcDBObjectId == 1) {
         // ADD
-        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNDelta00, new OpMessage(
-           to_string(((WidgetMessageEdit*)maContent[0])->mCategory->getSelectedItemPosition()),
-           ((WidgetMessageEdit*)maContent[0])->mTitle->getText(),
-           ((WidgetMessageEdit*)maContent[0])->mText->getText(),
-           ((WidgetMessageEdit*)maContent[0])->mLink->getText()
+        w->mNActivity->sendOp(w->mOpUnitUIId, w->w->mNDelta00, new OpMessage(
+           to_string(w->mWidgetMessageEdit->mCategory->getSelectedItemPosition()),
+           w->mWidgetMessageEdit->mTitle->getText(),
+           w->mWidgetMessageEdit->mText->getText(),
+           w->mWidgetMessageEdit->mLink->getText()
         ));
         ret = true;
     }
     if (id == Wrapper::kViewSave && mcDBObjectId != 1) {
         // EDIT
-        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNTheta00, new OpMessage(
-           to_string(((WidgetMessageEdit*)maContent[0])->mCategory->getSelectedItemPosition()),
-           ((WidgetMessageEdit*)maContent[0])->mTitle->getText(),
-           ((WidgetMessageEdit*)maContent[0])->mText->getText(),
-           ((WidgetMessageEdit*)maContent[0])->mLink->getText(),
+        w->mNActivity->sendOp(w->mOpUnitUIId, w->w->mNTheta00, new OpMessage(
+           to_string(w->mWidgetMessageEdit->mCategory->getSelectedItemPosition()),
+           w->mWidgetMessageEdit->mTitle->getText(),
+           w->mWidgetMessageEdit->mText->getText(),
+           w->mWidgetMessageEdit->mLink->getText(),
            "",
            mcDBObjectId
         ));
         ret = true;
     }
     if (id == Wrapper::kViewDelete) {
-        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNEpsilon00, new OpParam(mcDBObjectId, true));
+        w->mNActivity->sendOp(w->mOpUnitUIId, w->w->mNEpsilon00, new OpParam(mcDBObjectId, true));
         ret = true;
     }
     return ret;

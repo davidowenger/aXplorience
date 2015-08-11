@@ -7,14 +7,14 @@ namespace NSNATIVE
 class NVisitorViewViewGroup : public NVisitor
 {
 public:
-	NVisitorViewViewGroup(NWrapper* w)
-		: NVisitor(w)
-	{
-	}
+    NVisitorViewViewGroup(NWrapper* w)
+        : NVisitor(w)
+    {
+    }
 
     virtual ~NVisitorViewViewGroup()
-	{
-	}
+    {
+    }
 
     //******************************************************************************************
     //******************************* ViewGroup events *****************************************

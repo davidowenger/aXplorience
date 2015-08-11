@@ -9,9 +9,9 @@ class AbsSpinner : public AdapterView
 friend NSNATIVE::NNoObject;
 
 public:
-	virtual ~AbsSpinner()
-	{
-	}
+    virtual ~AbsSpinner()
+    {
+    }
 
     virtual void setSelection(int position)
     {

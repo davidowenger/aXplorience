@@ -4,26 +4,6 @@
 namespace NSDEVICE
 {
 
-class WidgetMessageEdit : public Widget
-{
-public:
-    WidgetMessageEdit(Wrapper* w);
-    virtual ~WidgetMessageEdit() override;
-
-    virtual void init(nuint vcView, nuint vcDBObjectId) override;
-
-    nint mcPadding;
-    DBObject* mDBObject;
-    nint mcCategoryId;
-
-    ScrollView* mScrollView;
-    LinearLayout* mContent;
-    Spinner* mCategory;
-    EditText* mTitle;
-    EditText* mText;
-    EditText* mLink;
-};
-
 class AdapterCategory : public BaseAdapter, public AdapterView::OnItemSelectedListener
 {
 public:
@@ -44,6 +24,27 @@ public:
     Wrapper* w;
     nint mcPadding;
     TextView** mTextView;
+};
+
+class WidgetMessageEdit : public Widget
+{
+public:
+    WidgetMessageEdit(Wrapper* w);
+    virtual ~WidgetMessageEdit() override;
+
+    void update(DBObject* vDBObject);
+
+    nint mcPadding;
+    DBObject* mDBObject;
+    nint mcCategoryId;
+
+    AdapterCategory* mAdapterCategory;
+    ScrollView* mScrollView;
+    LinearLayout* mContent;
+    Spinner* mCategory;
+    EditText* mTitle;
+    EditText* mText;
+    EditText* mLink;
 };
 
 } // End namespace

@@ -1,13 +1,11 @@
 #include "Common.h"
 #include "Theme.h"
 
-#include <iomanip>
-
 namespace NSDEVICE
 {
-
 OpUnitUI::OpUnitUI(Wrapper* const w)
-	: OpUnit(w), mcProcessedDevice(0), mcTimeStampBroadcast(0), mcForce(0), mcRunningInitializations(0), mcDiscovery(0), mcDiscoveryDone(0), maMac()
+    : OpUnit(w), mcProcessedDevice(0), mcTimeStampPrevious(0), mcTimeStampNow(0), mcState(0), mcRunningInitializations(0),
+      mcDiscovery(0), mcDiscoveryDone(0), maMac(), mDBCollection(nullptr)
 {
 }
 
@@ -17,16 +15,8 @@ OpUnitUI::~OpUnitUI()
 
 void OpUnitUI::run()
 {
-    mWrapper->mOpUnitUIId = mId;
-
-    maSort.emplace_back(mWrapper->mDBObjectApplication->get("sSort0"), mWrapper->mDBObjectApplication->is("sAscending0"));
-    maSort.emplace_back(mWrapper->mDBObjectApplication->get("sSort1"), mWrapper->mDBObjectApplication->is("sAscending1"));
-    maSort.emplace_back(mWrapper->mDBObjectApplication->get("sSort2"), mWrapper->mDBObjectApplication->is("sAscending2"));
-
-    clear();
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNDelta01, (NParam)Wrapper::kViewHome, (NParam)1);
-    setView(Wrapper::kViewHome, 1);
-	handleOp();
+    sendOp(mWrapper->mOpUnitUIId, w->mNAlpha00, new Op());
+    handleOp();
     cancel();
 }
 
@@ -34,89 +24,147 @@ void OpUnitUI::handleOp()
 {
     Op* op;
     DBObject* vMessage;
-    TimeStamp vcTimeStampNow;
-    nint i = 0;
+    nint i;
+    mWrapper->maMessageAlive->add(new String("#2#3"));
 
     while (mAlive) {
-        //LOGE("OpUnitUI::handleOp");
-        vcTimeStampNow = system_clock::now().time_since_epoch().count();
+        mcTimeStampNow = system_clock::now().time_since_epoch().count();
 
-        if (vcTimeStampNow - mcTimeStampBroadcast > 2*mWrapper->mc10Secondes) {
-            mcTimeStampBroadcast = vcTimeStampNow;
-            DBCollection* vaMessage = mWrapper->mBOHandlerMessage->getMessagesToBroadcast();
+        if (mcState == 0 && mcTimeStampNow - mcTimeStampPrevious > 20*mWrapper->mc1Seconde) {
+            // Update messages time
+            mcTimeStampPrevious = mcTimeStampNow;
+            mDBCollection = mWrapper->mBOHandlerMessage->getMessagesToBroadcast();
+            i = mDBCollection->count();
 
-            for (i = 0 ; i < vaMessage->count() ; ++i) {
-                vMessage = vaMessage->get(i);
+            while (--i >= 0) {
+                vMessage = mDBCollection->get(i);
 
-                if (vMessage->is("sIn")) {
-                    if (vcTimeStampNow - vMessage->count("date") > 6*mWrapper->mc10Secondes) {
-                        archive(vMessage->count("id"), true);
-                    }
-                } else {
-                    vMessage->set("date", vcTimeStampNow)->commit();
+                if (!vMessage->is("sIn") && !vMessage->is("sArchivedUser")) {
+                    vMessage->set("sRevSource", vMessage->count("sRevSource") + 1);
+                    vMessage->set("date", mcTimeStampNow);
+                }
+                if (mcTimeStampNow - vMessage->count("date") > 60*mWrapper->mc1Seconde) {
+                    archive(vMessage->mId, true);
                 }
             }
-            delete vaMessage;
+            delete mDBCollection;
+            mcState = 1;
+        }
+        if (mcState == 1 && mcTimeStampNow - mcTimeStampPrevious > 5*mWrapper->mc1Seconde) {
+            LOGD("Persistence");
+            mWrapper->mBOHandlerMessage->clean();
+            mWrapper->mDBObjectSeedEdit->commit();
+            mWrapper->mDBObjectApplication->commit();
+            mcState = 2;
+        }
+        if (mcState == 2 && mcTimeStampNow - mcTimeStampPrevious > 10*mWrapper->mc1Seconde) {
+            // Broadcast alive messages
+            mDBCollection = mWrapper->mBOHandlerMessage->getMessagesToBroadcast()->sort(mWrapper->maSort);
+            i = mDBCollection->count();
+            String* vPacket = new String( i ? "" : "2#3#" );
+
+            while (--i >= 0) {
+                *vPacket += "2#" + mWrapper->mBOHandlerMessage->packId(mDBCollection->get(i)) + "3#";
+            }
+            mWrapper->maMessageAlive->add(vPacket);
+            delete mDBCollection;
+            mcState = 0;
         }
         op = nextOp();
 
         if (op) {
             execOp(op);
-            //HINT: use op->result here, before calling nextOp again
+            op = nextOp();
+
+            if (op) {
+                execOp(op);
+                op = nextOp();
+
+                if (op) {
+                    execOp(op);
+                    op = nextOp();
+
+                    if (op) {
+                        execOp(op);
+                    }
+                }
+            }
         }
-        this_thread::sleep_for(mWrapper->mcSleep);
+        this_thread::sleep_for(200*mWrapper->mMili);
     }
+    mWrapper->mBOHandlerMessage->clean();
+    mWrapper->mDBObjectSeedEdit->commit();
+    mWrapper->mDBObjectApplication->commit();
 }
 
-void OpUnitUI::addDrop(const String& packed)
+OpCallback* OpUnitUI::sendOp(int vcOpUnitId, NElement* vNElement, Op* vOp)
 {
-    nint vcDBObjectId = mWrapper->mBOHandlerMessage->addDrop(packed);
-    DBObject* vDBObject = mWrapper->mBOHandlerMessage->get(vcDBObjectId);
+    OpCallback* ret = nullptr;
 
-    if (!vDBObject->is("sIn") && vDBObject->is("sBuzzing")) {
-        vDBObject->set("sBuzzing", false);
-        vDBObject->commit();
-        sendOp(0, mWrapper->mOpUnitCoreId, mWrapper->w->mNMu00, new OpParam(vcDBObjectId));
+    if (mAlive && mOpSquad->maOpUnitType[vcOpUnitId] == Wrapper::OPUNIT_TYPE_ACTIVITY) {
+        vOp->mNElement = vNElement;
+        mWrapper->mNActivity->sendMessage((NParam)vOp);
+        ret = vOp->mOpCallback;
+    } else {
+        ret = OpUnit::sendOp(vcOpUnitId, vNElement, vOp);
     }
-    render();
-    delete vDBObject;
+    return ret;
+}
+
+void OpUnitUI::addDrop(String& vPacked)
+{
+    nint vcStart;
+    nint vcEnd;
+    mWrapper->mIsInterrupted = true;
+    LOGD(("Packed message received : #" + vPacked).c_str());
+
+    while (mAlive && (vcStart = vPacked.find("2#")) >= 0 && (vcEnd = vPacked.find("3#")) >= 0 && vcStart + 2 < vcEnd) {
+        mWrapper->mBOHandlerMessage->addDrop(this, vPacked.substr(vcStart + 2, vcEnd - (vcStart + 2)));
+        vPacked = vPacked.substr(vcEnd + 2);
+    }
+    mWrapper->mIsInterrupted = false;
 }
 
 void OpUnitUI::addSeed(const String& id_cat, const String& title, const String& text, const String& link)
 {
-    nint vcDBObjectId = mWrapper->mBOHandlerMessage->addSeed(id_cat, title, text, link);
-    clear();
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNDelta01, (NParam)Wrapper::kViewDetails, (NParam)vcDBObjectId);
-    setView(Wrapper::kViewDetails, vcDBObjectId);
+    DBObject* vDBObject = mWrapper->mBOHandlerMessage->addSeed(id_cat, title, text, link);
+    mWrapper->maMessageUpdate->add(new String("2#" + mWrapper->mBOHandlerMessage->pack(vDBObject) + "3#"));
+    sendOp(mWrapper->mOpUnitAppId, w->mNGamma01, new OpParam((NParam)mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(mWrapper->maSort)));
+    setView(Wrapper::kViewDetails, vDBObject);
+    mWrapper->mBOHandlerMessage->setMessage(mWrapper->mDBObjectSeedEdit, "0", "", "", "");
+    mWrapper->mDBObjectSeedEdit->commit();
 }
 
-void OpUnitUI::archive(nint vcDBObjectId, bool vIsArchived)
+void OpUnitUI::archive(nuint vcDBObjectId, bool vIsArchived)
 {
     DBObject* vDBObject = mWrapper->mBOHandlerMessage->get(vcDBObjectId);
     vDBObject->set("sArchivedAuto", vIsArchived);
-    vDBObject->commit();
-    clear();
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNDelta01, (NParam)Wrapper::kViewHome, (NParam)0);
-    setView(Wrapper::kViewHome);
+    sendOp(mWrapper->mOpUnitAppId, w->mNGamma01, new OpParam((NParam)mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(mWrapper->maSort)));
 }
 
-void OpUnitUI::buzz(nint vcDBObjectId, bool vIsBuzzed)
+void OpUnitUI::buzz(nuint vcDBObjectId, bool vIsBuzzed)
 {
+    mWrapper->mIsInterrupted = true;
     DBObject* vDBObject = mWrapper->mBOHandlerMessage->get(vcDBObjectId);
 
     if (vIsBuzzed && vDBObject->is("sEnabled") && !vDBObject->is("sBuzzed")) {
+        ++mWrapper->mcInterrupt;
         vDBObject->set("sBuzzed", true);
-        vDBObject->commit();
-        render();
-        sendOp(0, mWrapper->mOpUnitCoreId, mWrapper->w->mNMu00, new OpParam(0));
+        vDBObject->set("sRevRemote", vDBObject->count("sRevRemote") + 1);
+        mWrapper->maMessageBuzz->add(new String("2#" + mWrapper->mBOHandlerMessage->packId(vDBObject) + "3#"));
+        sendOp(mWrapper->mOpUnitAppId, w->mNEta01, new OpParam((NParam)vDBObject));
+        sendOp(mWrapper->mOpUnitAnimId, nullptr, new OpParam(0));
+        vDBObject = nullptr;
     }
     if (!vIsBuzzed) {
         vDBObject->set("sBuzzed", false);
-        vDBObject->commit();
-        mcForce = mcForce + 1;
-        render();
+        sendOp(mWrapper->mOpUnitAppId, w->mNEta01, new OpParam((NParam)vDBObject));
+        vDBObject = nullptr;
     }
-    delete vDBObject;
+    if (vDBObject) {
+        delete vDBObject;
+    }
+    mWrapper->mIsInterrupted = false;
 }
 
 void OpUnitUI::cancel()
@@ -124,79 +172,105 @@ void OpUnitUI::cancel()
     mAlive = false;
 }
 
-void OpUnitUI::clear()
-{
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNBeta01, (NParam)mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(maSort));
-}
-
-void OpUnitUI::discard(nint vcDBObjectId, bool vIsDeleted)
+void OpUnitUI::discard(nuint vcDBObjectId, bool vIsDeleted)
 {
     DBObject* vDBObject = mWrapper->mBOHandlerMessage->get(vcDBObjectId);
     vDBObject->set("sDeleted", vIsDeleted);
 
     if (!vDBObject->is("sIn")) {
+        vDBObject->set("sRevSource", vDBObject->count("sRevSource") + 1);
         vDBObject->set("sArchivedUser", !vDBObject->is("sEnabled") || vDBObject->is("sDeleted"));
+        mWrapper->maMessageUpdate->add(new String("2#" + mWrapper->mBOHandlerMessage->pack(vDBObject) + "3#"));
     }
-    vDBObject->commit();
-
-    mcForce = mcForce + 1;
-    clear();
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNDelta01, (NParam)Wrapper::kViewHome, (NParam)0);
-    setView(Wrapper::kViewHome);
+    setView(Wrapper::kViewHome, nullptr);
+    sendOp(mWrapper->mOpUnitAppId, w->mNGamma01, new OpParam((NParam)mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(mWrapper->maSort)));
+    mWrapper->mDBObjectSeedEdit->commit();
     delete vDBObject;
 }
 
-void OpUnitUI::enable(nint vcDBObjectId, bool vIsEnabled)
+void OpUnitUI::enable(nuint vcDBObjectId, bool vIsEnabled)
 {
     DBObject* vDBObject = mWrapper->mBOHandlerMessage->get(vcDBObjectId);
-    vDBObject->set("sEnabled", !vDBObject->is("sEnabled"));
+    vIsEnabled = !vDBObject->is("sEnabled");
+    vDBObject->set("sEnabled", vIsEnabled);
 
-    if (!vDBObject->is("sIn")) {
-        vDBObject->set("sArchivedUser", !vDBObject->is("sEnabled") || vDBObject->is("sDeleted"));
+    if (!vDBObject->is("sIn") && vIsEnabled) {
+        vDBObject->set("date", system_clock::now().time_since_epoch().count());
+        vDBObject->set("sArchivedAuto", false);
     }
-    vDBObject->commit();
-    mcForce = mcForce + 1;
-    render();
-
-    delete vDBObject;
+    if (!vDBObject->is("sIn")) {
+        vDBObject->set("sRevSource", vDBObject->count("sRevSource") + 1);
+        vDBObject->set("sArchivedUser", !vIsEnabled);
+        mWrapper->maMessageUpdate->add(new String("2#" + mWrapper->mBOHandlerMessage->pack(vDBObject) + "3#"));
+    }
+    sendOp(mWrapper->mOpUnitAppId, w->mNEta01, new OpParam((NParam)vDBObject));
+    mWrapper->mDBObjectSeedEdit->commit();
 }
 
-void OpUnitUI::render()
+void OpUnitUI::initUI()
 {
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNGamma01, (NParam)mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(maSort));
+    DBCollection* vDBCollection = mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(mWrapper->maSort);
+    sendOp(mWrapper->mOpUnitAppId, w->mNGamma01, new OpParam((NParam)vDBCollection));
 }
 
-void OpUnitUI::setSeed(nint vcDBObjectId, const String& id_cat, const String& title, const String& text, const String& link)
+void OpUnitUI::initView()
 {
-    mWrapper->mBOHandlerMessage->setMessage(vcDBObjectId, id_cat, title, text, link);
-    render();
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNDelta01, (NParam)Wrapper::kViewDetails, (NParam)vcDBObjectId);
-    setView(Wrapper::kViewDetails, vcDBObjectId);
+    sendOp(mWrapper->mOpUnitAppId, w->mNDelta01, new OpParam(mWrapper->mDBObjectApplication->count("sView"), (NParam)mWrapper->mBOHandlerMessage->get(mWrapper->mDBObjectApplication->count("sDBObjectId"))));
 }
 
-void OpUnitUI::setView(nint vcView, nint vcDBObjectId)
+void OpUnitUI::setSeed(nuint vcDBObjectId, const String& id_cat, const String& title, const String& text, const String& link)
 {
+    DBObject* vDBObject = mWrapper->mBOHandlerMessage->setMessage(vcDBObjectId, id_cat, title, text, link);
+    mWrapper->maMessageUpdate->add(new String("2#" + mWrapper->mBOHandlerMessage->pack(vDBObject) + "3#"));
+    setView(Wrapper::kViewDetails, vDBObject);
+    sendOp(mWrapper->mOpUnitAppId, w->mNGamma01, new OpParam((NParam)mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(mWrapper->maSort)));
+    mWrapper->mDBObjectSeedEdit->commit();
+}
+
+void OpUnitUI::setView(nint vcView, nuint vcDBObjectId)
+{
+    sendOp(mWrapper->mOpUnitAppId, w->mNDelta01, new OpParam(vcView, (NParam)( vcDBObjectId ? mWrapper->mBOHandlerMessage->get(vcDBObjectId) : nullptr )));
     mWrapper->mDBObjectApplication->set("sView", vcView);
     mWrapper->mDBObjectApplication->set("sDBObjectId", vcDBObjectId);
-    mWrapper->mDBObjectApplication->commit();
-  //mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNDelta01, (NParam)vcView, (NParam)vcDBObjectId);
+}
+
+void OpUnitUI::setView(nint vcView, DBObject* vDBObject)
+{
+    sendOp(mWrapper->mOpUnitAppId, w->mNDelta01, new OpParam(vcView, (NParam)vDBObject));
+    mWrapper->mDBObjectApplication->set("sView", vcView);
+    mWrapper->mDBObjectApplication->set("sDBObjectId", ( vDBObject ? vDBObject->mId : 0 ));
 }
 
 void OpUnitUI::sort(const String& vField, bool vIsAscending)
 {
     nuint vIndex = 0;
-    list<Sort>::iterator vIt = maSort.begin();
+    list<Sort>::iterator vIt = mWrapper->maSort.begin();
 
-    while (vIt != maSort.end()) {
-        vIt = ( vIt->mField == vField ? maSort.erase(vIt) : ++vIt );
+    while (vIt != mWrapper->maSort.end()) {
+        vIt = ( vIt->mField == vField ? mWrapper->maSort.erase(vIt) : ++vIt );
     }
-    maSort.emplace_back(vField, vIsAscending);
+    mWrapper->maSort.emplace_back(vField, vIsAscending);
 
-    for (Sort vSort : maSort) {
-        mWrapper->mDBObjectApplication->set("sSort" + to_string(vIndex), vSort.mField)->set("sAscending" + to_string(vIndex), vSort.mIsAscending)->commit();
+    for (Sort vSort : mWrapper->maSort) {
+        mWrapper->mDBObjectApplication->set("sSort" + to_string(vIndex), vSort.mField)->set("sAscending" + to_string(vIndex), vSort.mIsAscending);
         ++vIndex;
     }
-    mWrapper->w->dActivity->sendMessage((NParam)mWrapper->w->mNDzeta01, (NParam)mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(maSort));
+    sendOp(mWrapper->mOpUnitAppId, w->mNDzeta01, new Op());
+    sendOp(mWrapper->mOpUnitAppId, w->mNGamma01, new OpParam((NParam)mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(mWrapper->maSort)));
+}
+
+// void initUI()
+NReturn OpUnitUI::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    initUI();
+    return 0;
+}
+
+// void initView()
+NReturn OpUnitUI::visit(NBeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    initView();
+    return 0;
 }
 
 // nint addDrop(const String& packed)
@@ -213,45 +287,46 @@ NReturn OpUnitUI::visit(NDelta00* element, NParam a, NParam b, NParam c, NParam 
     return 0;
 }
 
-// void archive(nint vcDBObjectId, bool vIsArchived)
-//NReturn OpUnitUI::visit(NNu00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-//{
-//    archive((nint)a, (nint)b);
-//    return 0;
-//}
+// void render()
+NReturn OpUnitUI::visit(NNu00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    //FIXME: check source
+    sendOp(mWrapper->mOpUnitAppId, w->mNGamma01, new OpParam((NParam)mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(mWrapper->maSort)));
+    return 0;
+}
 
-// void buzz(nint vcDBObjectId, bool vIsBuzzed)
+// void buzz(nuint vcDBObjectId, bool vIsBuzzed)
 NReturn OpUnitUI::visit(NDzeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    buzz((nint)a, (nint)b);
+    buzz((nuint)a, (nint)b);
     return 0;
 }
 
-// void discard(nint vcDBObjectId, bool vIsArchived)
+// void discard(nuint vcDBObjectId, bool vIsArchived)
 NReturn OpUnitUI::visit(NEpsilon00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    discard((nint)a, (nint)b);
+    discard((nuint)a, (nint)b);
     return 0;
 }
 
-// void void setSeed(nint vcDBObjectId, const String& id_cat, const String& title, const String& text, const String& link)
+// void enable(nuint vcDBObjectId, bool vIsEnabled)
 NReturn OpUnitUI::visit(NXi00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    enable((nint)a, (nint)b);
+    enable((nuint)a, (nint)b);
     return 0;
 }
 
-// void void setSeed(nint vcDBObjectId, const String& id_cat, const String& title, const String& text, const String& link)
+// void setSeed(nuint vcDBObjectId, const String& id_cat, const String& title, const String& text, const String& link)
 NReturn OpUnitUI::visit(NTheta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    setSeed(b, ((OpMessage*)a)->mStringA, ((OpMessage*)a)->mStringB, ((OpMessage*)a)->mStringC, ((OpMessage*)a)->mStringD);
+    setSeed((nuint)b, ((OpMessage*)a)->mStringA, ((OpMessage*)a)->mStringB, ((OpMessage*)a)->mStringC, ((OpMessage*)a)->mStringD);
     return 0;
 }
 
-// void setView(nint vIndex, nint vcDBObjectId = 1)
+// void setView(nint vIndex, nuint vcDBObjectId)
 NReturn OpUnitUI::visit(NIota00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    setView((nint)a, (nint)b);
+    setView((nint)a, (nuint)b);
     return 0;
 }
 
@@ -262,10 +337,27 @@ NReturn OpUnitUI::visit(NEta00* element, NParam a, NParam b, NParam c, NParam d,
     return 0;
 }
 
-// get messages for braodcast
+// void clear()
 NReturn OpUnitUI::visit(NOmicron00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    return (NReturn)mWrapper->mBOHandlerMessage->getMessagesToBroadcast();
+    //FIXME: check source
+    sendOp(mWrapper->mOpUnitAppId, w->mNGamma01, new OpParam((NParam)mWrapper->mBOHandlerMessage->getMessagesToDisplay()->sort(mWrapper->maSort)));
+    return 0;
+}
+
+//
+NReturn OpUnitUI::visit(NRho00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    DBCollection* vDBCollection = mWrapper->mBOHandlerMessage->getMessagesToBroadcast()->sort(mWrapper->maSort);
+    nint i = vDBCollection->count();
+    String* vString = new String( i ? "" : "2#3#" );
+
+    while (--i >= 0) {
+        *vString += "2#" + mWrapper->mBOHandlerMessage->pack(vDBCollection->get(i)) + "3#";
+    }
+    sendOp(a, w->mNBeta00, new OpParam((NParam)vString, mWrapper->maMessageUpdate->mWriteIndex, mWrapper->maMessageBuzz->mWriteIndex, mWrapper->mcInterrupt));
+    delete vDBCollection;
+    return 0;
 }
 
 } // End namespace

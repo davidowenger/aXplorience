@@ -7,7 +7,7 @@ NWrapper* const NWrapper::w = new NWrapper();
 
 NWrapper* NWrapper::getInstance()
 {
-	return w;
+    return w;
 }
 
 } // END namespace

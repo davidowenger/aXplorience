@@ -5,100 +5,69 @@ namespace NSDEVICE
 {
 
 WidgetSettings::WidgetSettings(Wrapper* const w)
-	: Widget(w), mTextView(nullptr), mcPadding((nint)(5*w->mcDensity))
+    : Widget(w), mTextView(nullptr), maSettingItem(nullptr), mAdapterBTState(nullptr), mcPadding((nint)(10*w->mcDensity))
 {
     nuint i;
-    LinearLayout::LayoutParams* vLinearLayoutParams;
 
     mTextView = new TextView(w->mApplication);
-    maWidgetSettingsItem = new WidgetSettingsItem[2] {
-        { new LinearLayout(w->mNActivity), new TextView(w->mNActivity), new ToggleButton(w->mNActivity) },
-        { new LinearLayout(w->mNActivity), new TextView(w->mNActivity), new ToggleButton(w->mNActivity) }
+    maSettingItem = new SettingItem[1] {
+        { nullptr, nullptr, new Spinner(w->mNActivity) }
     };
-    maWidgetSettingsLabel = new String[2] {
-        "Enable Bluetooth",
-        "Show device"
-    };
+    mAdapterBTState = new AdapterBTState(w);
+
+    LinearLayout::LayoutParams vLayoutParams1 = LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT, 1);
     setGravity(Gravity::LEFT|Gravity::TOP);
     setOrientation(LinearLayout::VERTICAL);
-    setLayoutParams(new LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT, 1));
+    setLayoutParams(&vLayoutParams1);
     setPadding(mcPadding,mcPadding,mcPadding,mcPadding);
     setOnTouchListener(this);
 
-    mTextView->setGravity(Gravity::START);
-    mTextView->setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT));
+    LinearLayout::LayoutParams vLayoutParams2 = LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT);
+    mTextView->setGravity(Gravity::START|Gravity::TOP);
+    mTextView->setLayoutParams(&vLayoutParams2);
     mTextView->setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
     mTextView->setTextColor(w->maColor[Theme::kColorMessageText]);
     mTextView->setTextSize(w->mcTextSize);
     mTextView->setTypeface(Typeface::DEFAULT);
-    mTextView->setText("Be sure to enable Bluetooth. When enabled, use discoverability for your device to be seen.");
+    mTextView->setText("Be sure to have Bluetooth ENABLED and VISIBLE for your device to be seen. Only VISIBLE device can connect to not VISIBLE ones.");
     mTextView->setOnTouchListener(this);
 
     addView(mTextView);
 
-    for (i = 0 ; i < 2 ; ++i) {
-        vLinearLayoutParams = new LinearLayout::LayoutParams(ViewGroup::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT);
-        vLinearLayoutParams->setMargins(mcPadding,mcPadding,mcPadding,mcPadding);
+    for (i = 0 ; i < 1 ; ++i) {
+        LinearLayout::LayoutParams vLinearLayoutParams3 =  LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT);
+        maSettingItem[i].mSettingView->setLayoutParams(&vLinearLayoutParams3);
+        maSettingItem[i].mSettingView->setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
+        ((Spinner*)maSettingItem[i].mSettingView)->setGravity(Gravity::START|Gravity::TOP);
+        ((Spinner*)maSettingItem[i].mSettingView)->setAdapter(mAdapterBTState);
+        ((Spinner*)maSettingItem[i].mSettingView)->setOnItemSelectedListener(mAdapterBTState);
 
-        maWidgetSettingsItem[i].mLinearLayout->setGravity(Gravity::LEFT);
-        maWidgetSettingsItem[i].mLinearLayout->setOrientation(LinearLayout::HORIZONTAL);
-        maWidgetSettingsItem[i].mLinearLayout->setLayoutParams(vLinearLayoutParams);
-        maWidgetSettingsItem[i].mLinearLayout->setPadding(0,0,0,0);
-        maWidgetSettingsItem[i].mLinearLayout->setOnTouchListener(this);
-
-        maWidgetSettingsItem[i].mTextView->setGravity(Gravity::LEFT|Gravity::CENTER_VERTICAL);
-        maWidgetSettingsItem[i].mTextView->setLayoutParams(new LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT,1));
-        maWidgetSettingsItem[i].mTextView->setPadding(mcPadding,mcPadding,mcPadding,mcPadding);
-        maWidgetSettingsItem[i].mTextView->setLines(1);
-        maWidgetSettingsItem[i].mTextView->setTextColor(w->maColor[Theme::kColorMessageText]);
-        maWidgetSettingsItem[i].mTextView->setTextSize(w->mcTextSize);
-        maWidgetSettingsItem[i].mTextView->setTypeface(Typeface::DEFAULT);
-        maWidgetSettingsItem[i].mTextView->setText(maWidgetSettingsLabel[i]);
-        maWidgetSettingsItem[i].mTextView->setOnTouchListener(this);
-
-        maWidgetSettingsItem[i].mToggleButton->setMinimumHeight(w->maDrawable[0]->getIntrinsicHeight());
-        maWidgetSettingsItem[i].mToggleButton->setLayoutParams(new LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT,1));
-        maWidgetSettingsItem[i].mToggleButton->setPadding(0,0,0,0);
-        maWidgetSettingsItem[i].mToggleButton->setEnabled(true);
-        maWidgetSettingsItem[i].mToggleButton->setOnClickListener(this);
-        maWidgetSettingsItem[i].mToggleButton->setOnTouchListener(this);
-
-        maWidgetSettingsItem[i].mLinearLayout->addView(maWidgetSettingsItem[i].mTextView);
-        maWidgetSettingsItem[i].mLinearLayout->addView(maWidgetSettingsItem[i].mToggleButton);
-
-        addView(maWidgetSettingsItem[i].mLinearLayout);
-        delete vLinearLayoutParams;
+        addView(maSettingItem[i].mSettingView);
     }
 }
 
 WidgetSettings::~WidgetSettings()
 {
+    nint i;
+
     if (mTextView) {
        delete mTextView;
     }
-}
-
-void WidgetSettings::init(nuint vcView, nuint vcDBObjectId)
-{
-    mcView = vcView;
-    mcDBObjectId = vcDBObjectId;
-
-    maWidgetSettingsItem[0].mToggleButton->setChecked(w->dBluetoothAdapter->isEnabled());
-    maWidgetSettingsItem[1].mToggleButton->setChecked(w->dBluetoothAdapter->getScanMode() == w->dBluetoothAdapter->SCAN_MODE_CONNECTABLE_DISCOVERABLE);
-
-    requestLayout();
-}
-
-//*******************************************************************************************
-//**************************************  OnClickListener  **********************************
-//*******************************************************************************************
-void WidgetSettings::onClick(View* vView)
-{
-    if (vView == maWidgetSettingsItem[0].mToggleButton) {
-        w->mNActivity->sendOp(0, w->mOpUnitCoreId, w->w->mNOmicron00, new OpParam(maWidgetSettingsItem[0].mToggleButton->isChecked(), maWidgetSettingsItem[1].mToggleButton->isChecked()));
+    if (maSettingItem) {
+        for (i = 0 ; i < 1 ; ++i) {
+            delete maSettingItem[i].mSettingLayout;
+            delete maSettingItem[i].mSettingLabel;
+            delete maSettingItem[i].mSettingView;
+        }
+        delete[] maSettingItem;
     }
-    if (vView == maWidgetSettingsItem[1].mToggleButton) {
-        w->mNActivity->sendOp(0, w->mOpUnitCoreId, w->w->mNOmicron00, new OpParam(maWidgetSettingsItem[0].mToggleButton->isChecked(), maWidgetSettingsItem[1].mToggleButton->isChecked()));
+}
+
+void WidgetSettings::init()
+{
+    if (mAdapterBTState->mcBTStateChange == w->mcBTStateChange) {
+        ((Spinner*)maSettingItem[0].mSettingView)->setSelection(2 - w->mcBTState);
+        requestLayout();
     }
 }
 
@@ -107,32 +76,88 @@ void WidgetSettings::onClick(View* vView)
 //*******************************************************************************************
 bool WidgetSettings::onTouch(View* vView, MotionEvent* event)
 {
-    ToggleButton* vToggleButton0;
-    ToggleButton* vToggleButton1;
-    Wrapper* vWrapper = w;
-
-    if (w->mTouchState == 1 && vView == maWidgetSettingsItem[0].mToggleButton) {
-        w->mTouchState = 2;
-        vToggleButton0 = maWidgetSettingsItem[0].mToggleButton;
-        vToggleButton1 = maWidgetSettingsItem[1].mToggleButton;
-        w->mEventAction = function<void()>([vWrapper,vToggleButton0,vToggleButton1]()->void{
-            vToggleButton0->setChecked(!vToggleButton0->isChecked());
-            vWrapper->mNActivity->sendOp(0, vWrapper->mOpUnitCoreId, vWrapper->w->mNOmicron00, new OpParam(vToggleButton0->isChecked(), vToggleButton1->isChecked()));
-        });
-    }
-    if (w->mTouchState == 1 && vView == maWidgetSettingsItem[1].mToggleButton) {
-        w->mTouchState = 2;
-        vToggleButton0 = maWidgetSettingsItem[0].mToggleButton;
-        vToggleButton1 = maWidgetSettingsItem[1].mToggleButton;
-        w->mEventAction = function<void()>([vWrapper,vToggleButton0,vToggleButton1]()->void{
-            vToggleButton1->setChecked(!vToggleButton1->isChecked());
-            vWrapper->mNActivity->sendOp(0, vWrapper->mOpUnitCoreId, vWrapper->w->mNOmicron00, new OpParam(vToggleButton0->isChecked(), vToggleButton1->isChecked()));
-        });
-    }
     if (w->mTouchState == 3) {
         w->mTouchState = 0;
     }
     return true;
+}
+
+//*******************************************************************************************
+//************************************ AdapterBTState **************************************
+//*******************************************************************************************
+AdapterBTState::AdapterBTState(Wrapper* const w)
+    : BaseAdapter(), w(w), mcBTStateChange(0), mcTextViewIndex(0), mcPadding((nint)(10*w->mcDensity)), mTextView(nullptr)
+{
+    nuint i = 0;
+    mTextView = new TextView*[w->mcBTStateOption + 1]();
+
+    for (i = 0 ; i < w->mcBTStateOption + 1 ; ++i) {
+        mTextView[i] = new TextView(w->mNActivity);
+        mTextView[i]->setLayoutParams(new AbsListView::LayoutParams(AbsListView::LayoutParams::MATCH_PARENT, AbsListView::LayoutParams::MATCH_PARENT));
+        mTextView[i]->setTextColor(w->maColor[Theme::kColorMessageText]);
+        mTextView[i]->setTextSize(w->mcTextSize);
+
+        if (i) {
+            mTextView[i]->setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
+            mTextView[i]->setText(w->maBTStateOption[i - 1]);
+        }
+    }
+}
+
+AdapterBTState::~AdapterBTState()
+{
+    nuint i = 0;
+
+    if (mTextView) {
+        for (i = 0 ; i < w->mcBTStateOption + 1 ; ++i) {
+            if (mTextView[i]) {
+                delete mTextView[i];
+            }
+        }
+        delete[] mTextView;
+    }
+}
+
+//*******************************************************************************************
+//************************************ BaseAdapter ******************************************
+//*******************************************************************************************
+View* AdapterBTState::getDropDownView(int position, View* convertView, ViewGroup* parent)
+{
+    return mTextView[position + 1];
+}
+
+int AdapterBTState::getCount()
+{
+    return w->mcBTStateOption;
+}
+
+Object* AdapterBTState::getItem(int position)
+{
+    return nullptr;
+}
+
+long long int AdapterBTState::getItemId(int position)
+{
+    return position;
+}
+
+View* AdapterBTState::getView(int position, View* convertView, ViewGroup* parent)
+{
+    mTextView[0]->setText(w->maBTStateOption[position]);
+    return mTextView[0];
+}
+
+//*******************************************************************************************
+//******************** AdapterView::OnItemSelectedListener **********************************
+//*******************************************************************************************
+void AdapterBTState::onItemSelected(AdapterView* parent, View* view, int pos, long id)
+{
+    ++mcBTStateChange;
+    w->mNActivity->sendOp(w->mOpUnitCoreId, w->w->mNEpsilon00, new OpParam(2 - ((Spinner*)w->mWidgetSettings->maSettingItem[0].mSettingView)->getSelectedItemPosition()));
+}
+
+void AdapterBTState::onNothingSelected(AdapterView* parent)
+{
 }
 
 } // End namespace

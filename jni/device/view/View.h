@@ -48,24 +48,24 @@ public:
         OnTouchListener();
     };
 
-	View(Context* context);
-	virtual ~View();
-	virtual Drawable* getBackground();
+    View(Context* context);
+    virtual ~View();
+    virtual Drawable* getBackground();
     virtual int getId();
-	virtual void invalidate();
-	virtual bool performClick();
-	virtual void requestLayout();
-	virtual void setBackgroundColor(int color);
+    virtual void invalidate();
+    virtual bool performClick();
+    virtual void requestLayout();
+    virtual void setBackgroundColor(int color);
     virtual void setBackgroundDrawable(Drawable* background);
     virtual void setBackgroundResource(int resid);
     virtual void setId(int id);
-	virtual void setLayoutParams(View::LayoutParams* params);
-	virtual void setMinimumHeight(int minHeight);
-	virtual void setMinimumWidth(int minWidth);
-	virtual void setOnClickListener(View::OnClickListener* l);
-	virtual void setOnTouchListener(View::OnTouchListener* l);
-	virtual void setPadding(int left, int top, int right, int bottom);
-	virtual void setVisibility(int visibility);
+    virtual void setLayoutParams(View::LayoutParams* params);
+    virtual void setMinimumHeight(int minHeight);
+    virtual void setMinimumWidth(int minWidth);
+    virtual void setOnClickListener(View::OnClickListener* l);
+    virtual void setOnTouchListener(View::OnTouchListener* l);
+    virtual void setPadding(int left, int top, int right, int bottom);
+    virtual void setVisibility(int visibility);
 private:
     View(NNoObject* vNNoObject);
 };

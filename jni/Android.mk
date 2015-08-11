@@ -44,6 +44,7 @@ LOCAL_SRC_FILES := \
 	FragmentLevel1.cpp \
 	FragmentLevel0.cpp \
 	RootLayout.cpp \
+	OpUnitAnim.cpp \
 	OpUnitListener.cpp \
 	OpUnitPeer.cpp \
 	OpUnitServer.cpp \
@@ -56,18 +57,3 @@ LOCAL_LDLIBS := \
 	-lm
 
 include $(BUILD_SHARED_LIBRARY)
-
-#Network.cpp \
-
-#LOCAL_CFLAGS := -Werror
-#LOCAL_CFLAGS := -std=gnu++11
-#LOCAL_CPP_FEATURES += exceptions
-#LOCAL_CPPFLAGS += -fexceptions
-#LOCAL_CPPFLAGS := -std=gnu++11
-#LOCAL_CPPFLAGS += -std=c++11
-
-#LOCAL_LDLIBS := \
-#	-llog \
-#	-ljnigraphics \
-#	-lm \
-#	-lGLESv2

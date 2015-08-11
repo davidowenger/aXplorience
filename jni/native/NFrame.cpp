@@ -4,7 +4,7 @@ namespace NSNATIVE
 {
 
 NFrame::NFrame(NWrapper* w)
-	: NVisitor(w)
+    : NVisitor(w)
 {
 }
 

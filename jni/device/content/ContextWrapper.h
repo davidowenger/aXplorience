@@ -9,9 +9,9 @@ class ContextWrapper : public Context
 friend NSNATIVE::NNoObject;
 
 public:
-	virtual ~ContextWrapper()
-	{
-	}
+    virtual ~ContextWrapper()
+    {
+    }
 
     virtual Resources* getResources()
     {

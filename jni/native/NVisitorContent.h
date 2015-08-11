@@ -7,14 +7,14 @@ namespace NSNATIVE
 class NVisitorContent : public NVisitor
 {
 public:
-	NVisitorContent(NWrapper* w)
-		: NVisitor(w)
-	{
-	}
+    NVisitorContent(NWrapper* w)
+        : NVisitor(w)
+    {
+    }
 
     virtual ~NVisitorContent()
-	{
-	}
+    {
+    }
 };
 
 } // END namespace

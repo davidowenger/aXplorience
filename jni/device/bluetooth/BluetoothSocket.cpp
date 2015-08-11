@@ -5,12 +5,12 @@ namespace NSDEVICE
 
 int BluetoothSocket::connect()
 {
-	return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNAlpha03, (NParam)this);
+    return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNAlpha03, (NParam)this);
 }
 
 int BluetoothSocket::close()
 {
-	return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNBeta03, (NParam)this);
+    return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNBeta03, (NParam)this);
 }
 
 BluetoothDevice* BluetoothSocket::getRemoteDevice()

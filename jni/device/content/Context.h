@@ -9,9 +9,9 @@ class Context : public Object
 friend NSNATIVE::NNoObject;
 
 public:
-	virtual ~Context()
-	{
-	}
+    virtual ~Context()
+    {
+    }
 
 //    virtual Context* getApplicationContext()
 //    {

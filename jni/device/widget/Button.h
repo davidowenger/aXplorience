@@ -11,13 +11,13 @@ friend NSNATIVE::NNoObject;
 public:
     Button(Context* context)
         : TextView(NWrapper::w->mNNoObject->instance<TextView>())
-	{
+    {
         NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNIota00, (NParam)this, (NParam)context);
-	}
+    }
 
-	virtual ~Button()
-	{
-	}
+    virtual ~Button()
+    {
+    }
 
 private:
     Button(NNoObject* vNNoObject)

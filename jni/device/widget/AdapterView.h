@@ -48,9 +48,9 @@ public:
         virtual void onItemClick(AdapterView* parent, View* view, int position, long id) = 0;
     };
 
-	virtual ~AdapterView()
-	{
-	}
+    virtual ~AdapterView()
+    {
+    }
 
     virtual int getSelectedItemPosition()
     {

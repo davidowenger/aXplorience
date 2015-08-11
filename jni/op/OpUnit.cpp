@@ -4,14 +4,14 @@ namespace NSDEVICE
 {
 
 OpUnit::OpUnit(Wrapper* vWrapper)
-	: NVisitor(vWrapper->w), mWrapper(vWrapper), mIdUnique(0)
+    : NVisitor(vWrapper->w), mWrapper(vWrapper), mIdUnique(0)
 {
-	mId = -1;
+    mId = -1;
     mcUnitType = Wrapper::OPUNIT_TYPE_DEFAULT;
     mAlive = true;
     mAliveThread = true;
-	mOpSquad = nullptr;
-	mThread = nullptr;
+    mOpSquad = nullptr;
+    mThread = nullptr;
     mNEnv = nullptr;
 }
 
@@ -32,34 +32,35 @@ void OpUnit::init(OpSquad* vOpSquad)
 
 void* OpUnit::getLocalStorage()
 {
-    //String sId = to_string(this_thread::get_id());
     //TODO
     return nullptr;
 }
 
 OpUnit* OpUnit::start()
 {
-	if (mThread == nullptr) {
-		mThread = new thread(&OpUnit::onOpUnitStart, this);
-	}
-	return this;
+    if (mThread == nullptr) {
+        mThread = new thread(&OpUnit::onOpUnitStart, this);
+    }
+    return this;
 }
 
 void OpUnit::onOpUnitStart()
 {
-	mNEnv = (NEnv*)w->nFrame->tAttachCurrentThread();
-	run();
+    mNEnv = (NEnv*)w->nFrame->tAttachCurrentThread();
+    run();
     mAlive = false;
-    //HINT: Prevent receiving too many additionnal Op since this thread is dead
-	mOpSquad->maOpUnitType[mId] = 0;
+    //HINT: Prevent receiving too many additional Op since this thread is dead
+    mOpSquad->maOpUnitType[mId] = 0;
     //HINT: Op sent AFTER clear() by some concurrent thread WILL be deleted when the OpSquad is deleted
     mOpSquad->clear(mId);
-	w->nFrame->tDetachCurrentThread();
+    w->nFrame->tDetachCurrentThread();
     mAliveThread = false;
 }
 
 void OpUnit::run()
 {
+    handleOp();
+    cancel();
 }
 
 void OpUnit::cancel()
@@ -70,18 +71,18 @@ void OpUnit::cancel()
 Op* OpUnit::nextOp()
 {
     Op* vOp = nullptr;
-	int id = mOpSquad->mcMaxOpUnit;
-	while (mAlive && --id >= 0 && !(vOp = mOpSquad->maCol[mId][id]->next())) { }
-	return vOp;
+    nint id = -1;
+    while (mAlive && ++id < mOpSquad->mcMaxOpUnit && !(vOp = mOpSquad->maConcurrentQueue[mId][id]->next())) { }
+    return vOp;
 }
 
-OpCallback* OpUnit::sendOp(int vcOpUnitType, int vcOpUnitId, NElement* vNElement, Op* vOp)
+OpCallback* OpUnit::sendOp(int vcOpUnitId, NElement* vNElement, Op* vOp)
 {
     OpCallback* vOpCallback = nullptr;
 
-    if (mOpSquad->maOpUnitType[vcOpUnitId] && (!vcOpUnitType || mOpSquad->maOpUnitType[vcOpUnitId] == vcOpUnitType)) {
+    if (mAlive && mOpSquad->maOpUnitType[vcOpUnitId]) {
         vOp->mNElement = vNElement;
-        mOpSquad->maCol[vcOpUnitId][mId]->add(vOp);
+        mOpSquad->maConcurrentQueue[vcOpUnitId][mId]->add(vOp);
         vOpCallback = vOp->mOpCallback;
     }
     return vOpCallback;
@@ -89,7 +90,7 @@ OpCallback* OpUnit::sendOp(int vcOpUnitType, int vcOpUnitId, NElement* vNElement
 
 NReturn OpUnit::sendOpForResult(int vcOpUnitType, int vcOpUnitId, NElement* vNElement, Op* vOp)
 {
-    OpCallback* vOpCallback = sendOp(vcOpUnitType, vcOpUnitId, vNElement, vOp);
+    OpCallback* vOpCallback = sendOp(vcOpUnitId, vNElement, vOp);
 
     while (mAlive && !*vOpCallback->mDone) {
         this_thread::sleep_for(chrono::milliseconds(300));
@@ -108,28 +109,13 @@ void OpUnit::handleOp()
 
         if (op) {
             execOp(op);
-        } else {
-            this_thread::sleep_for(chrono::milliseconds(300));
         }
+        this_thread::sleep_for(chrono::milliseconds(200));
     }
 }
 
 bool OpUnit::waitOp(TimeStamp vcMilisecondes, NElement* vNElement)
 {
-//    Op* vOp = nullptr;
-//    bool vAlive = true;
-//    TimeStamp vcTimeStampStart = steady_clock::now().time_since_epoch().count();
-//    TimeStamp vcTimeStampNow;
-//
-//    while (vAlive && ((vcTimeStampNow = steady_clock::now().time_since_epoch().count()) - vcTimeStampStart < vcMilisecondes)) {
-//        if ((vOp = nextOp()) && vOp->mNElement == vNElement) {
-//            execOp(vOp);
-//            vAlive = false;
-//        } else {
-//            this_thread::sleep_for(chrono::milliseconds(300));
-//        }
-//    }
-//    return vAlive*1;
     return false;
 }
 
@@ -141,6 +127,7 @@ void OpUnit::execOp(Op* vOp)
         *vOp->mOpCallback->mNReturn = vNReturn;
         *vOp->mOpCallback->mDone = true;
     }
+    delete vOp;
 }
 
 } // End namespace

@@ -15,10 +15,10 @@ public:
     static const int SHOW_AS_ACTION_WITH_TEXT = 4;
     static const int SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW = 8;
 
-	virtual ~MenuItem()
-	{
+    virtual ~MenuItem()
+    {
         NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
-	}
+    }
 
     virtual int getItemId()
     {

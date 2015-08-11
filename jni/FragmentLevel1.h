@@ -10,7 +10,7 @@ public:
     FragmentLevel1(Wrapper* vWrapper);
     virtual ~FragmentLevel1() override;
 
-    virtual void init(nuint vcView, nuint vcDBObjectId = 1) override;
+    virtual void init(nuint vcView, DBObject* vDBObject = nullptr) override;
 };
 
 } // End namespace

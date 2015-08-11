@@ -3,236 +3,203 @@
 namespace NSDEVICE
 {
 
-OpUnitPeer::OpUnitPeer(Wrapper* const w, BluetoothSocket* dPeerSocket)
-    : OpUnit(w), mUuid(), mBuffer(), mcTimeStampBroadcast(0), mcForce(0), mServerSocket(nullptr), mInputStream(nullptr), mOutputStream(nullptr), mDropHandler(nullptr),
-      mOpUnitListener(nullptr), msMac(), mPeerSocket(dPeerSocket), mPeerDevice(nullptr)
+OpUnitPeer::OpUnitPeer(Wrapper* const w, BluetoothServerSocket* vBluetoothServerSocket, BluetoothSocket* vBluetoothSocket, BluetoothDevice* vBluetoothDevice, const String& vsMac)
+    : OpUnit(w), mConnected(false), mAliveListener(true), mcOrigin(1), mBuzzIndex(0), mUpdateIndex(0), mcInterruptDone(0), mcTimeStampBroadcast(0),
+      maMessageAlive(nullptr), maMessageBuzz(nullptr), maMessageUpdate(nullptr),
+      mBluetoothServerSocket(vBluetoothServerSocket), mBluetoothSocket(vBluetoothSocket), mInputStream(nullptr), mOutputStream(nullptr), mBluetoothDevice(vBluetoothDevice),
+      msMac(vsMac)
 {
-    mcOrigin = 1;
     mcUnitType = Wrapper::OPUNIT_TYPE_PEER;
 }
 
-OpUnitPeer::OpUnitPeer(Wrapper* const w, BluetoothDevice* dPeerDevice)
-    : OpUnit(w), mUuid(), mBuffer(), mcTimeStampBroadcast(0), mcForce(0), mServerSocket(nullptr), mInputStream(nullptr), mOutputStream(nullptr), mDropHandler(nullptr),
-      mOpUnitListener(nullptr), msMac(), mPeerSocket(nullptr), mPeerDevice(dPeerDevice)
+OpUnitPeer::OpUnitPeer(Wrapper* const w, BluetoothDevice* vBluetoothDevice, const String& vsMac)
+    : OpUnit(w), mConnected(false), mAliveListener(true), mcOrigin(2), mBuzzIndex(0), mUpdateIndex(0), mcInterruptDone(0), mcTimeStampBroadcast(0),
+      maMessageAlive(nullptr), maMessageBuzz(nullptr), maMessageUpdate(nullptr),
+      mBluetoothServerSocket(nullptr), mBluetoothSocket(nullptr), mInputStream(nullptr), mOutputStream(nullptr), mBluetoothDevice(vBluetoothDevice),
+      msMac(vsMac)
 {
-    mcOrigin = 2;
     mcUnitType = Wrapper::OPUNIT_TYPE_PEER;
 }
 
 OpUnitPeer::~OpUnitPeer()
 {
-//    if (mInputStream) {
-//        delete mInputStream;
-//    }
-//    if (mOutputStream) {
-//        delete mOutputStream;
-//    }
-//	if (mPeerDevice) {
-//		delete mPeerDevice;
-//	}
-//	if (mPeerSocket) {
-//		delete mPeerSocket;
-//	}
-//    if (mServerSocket) {
-//        delete mServerSocket;
-//    }
+    if (mBluetoothDevice) {
+        delete mBluetoothDevice;
+    }
+    if (mInputStream) {
+        delete mInputStream;
+    }
+    if (mOutputStream) {
+        delete mOutputStream;
+    }
+    if (mBluetoothSocket) {
+        delete mBluetoothSocket;
+    }
 }
 
 void OpUnitPeer::run()
 {
-    if (mcOrigin == 1) {
-        mPeerDevice = mPeerSocket->getRemoteDevice();
-        msMac = mWrapper->opUnitCore->parseMac(mPeerDevice->getAddress());
+    nint vChannel = -1;
 
-//        mAlive &= (mPeerSocket != nullptr);
-//
-//        if (mAlive) {
-//            // channel = mPeerSocket.getPort();
-//            mPeerDevice = mPeerSocket->getRemoteDevice();
-//            msMac = mWrapper->opUnitCore->parseMac(mPeerDevice->getAddress());
-//            LOGD(("Server accepted client at : #" + msMac).c_str());
-//            mPeerSocket->close();
-//            mUuid = mWrapper->sUuidMacSuffix;
-//            mUuid.insert(8, 1, '-').insert(4, 1, '-');
-//            mUuid = mWrapper->sUuidPeer + mUuid + "-" + msMac;
-//            // BluetoothServerSocket listenUsingRfcommOn(int channel)
-//            mAlive &= ((mServerSocket = mWrapper->dBluetoothAdapter->listenUsingInsecureRfcommWithServiceRecord(mWrapper->sServiceName + " Second", mUuid)) != nullptr);
-//        }
-//        if (mAlive) {
-//            LOGD(("Server accepting the client for 7.5 seconds on second UUID : #" + mUuid).c_str());
-//            mAlive &= ((mPeerSocket = mServerSocket->accept(7500)) != nullptr);
-//            mServerSocket->close();
-//        }
+    if (mcOrigin == 1) {
+        LOGD(("Server accepted client with mac : #" + msMac).c_str());
+        vChannel = mBluetoothServerSocket->getChannel();
+        mBluetoothServerSocket->close();
+        delete mBluetoothServerSocket;
+
+        if (vChannel == -1) {
+            vChannel = mBluetoothSocket->getPort();
+        }
+        mBluetoothSocket->close();
+
+        if (msMac == "E02A82CF0845" || msMac == "680571EDCCBE" || msMac == "E4B021A5443F" || msMac == "889B390B59E5") {
+            mConnected = (vChannel != -1);
+        }
+        if (mConnected) {
+            mBluetoothServerSocket = mWrapper->dBluetoothAdapter->listenUsingInsecureRfcommOn(vChannel);
+        }
+        if (mConnected && mBluetoothServerSocket) {
+            delete mBluetoothSocket;
+            mBluetoothSocket = mBluetoothServerSocket->accept(7500);
+            mConnected &= (mBluetoothSocket != nullptr);
+            mBluetoothServerSocket->close();
+            delete mBluetoothServerSocket;
+        }
+        // Unblock server
+        sendOp(mWrapper->mOpUnitServerId, w->mNAlpha00, new Op());
+
+        if (mConnected) {
+            LOGD(("Server connected to client on channel : #" + to_string(vChannel)).c_str());
+        }
     }
     if (mcOrigin == 2) {
-        mAlive &= (mPeerDevice != nullptr);
-        nint vChannel = -1;
+        LOGD(("Client trying server at address : #" + msMac).c_str());
 
-        if (mAlive) {
-            msMac = mWrapper->opUnitCore->parseMac(mPeerDevice->getAddress());
-
-            if (msMac == "E02A82CF0845" || msMac == "680571EDCCBE" || msMac == "E4B021A5443F") {
-                mAlive &= ((mPeerSocket = mPeerDevice->createInsecureRfcommSocketToServiceRecord(mWrapper->sUuidService + mWrapper->sUuidSuffix)) != nullptr);
-            } else {
-                mAlive &= false; //((mPeerSocket = mPeerDevice->createInsecureRfcommSocketToServiceRecord(mWrapper->sUuidService + "2222-0000-0000-000000000000")) != nullptr);
-            }
+        if (msMac == "E02A82CF0845" || msMac == "680571EDCCBE" || msMac == "E4B021A5443F" || msMac == "889B390B59E5") {
+            mConnected = ((mBluetoothSocket = mBluetoothDevice->createInsecureRfcommSocketToServiceRecord(mWrapper->sUuidService + msMac)) != nullptr);
         }
-        if (mAlive) {
-            LOGD(("Client trying server at address : #" + msMac).c_str());
-            mAlive &= (mPeerSocket->connect() == 0);
-            mAlive &= ((vChannel = mPeerSocket->getPort()) != -1);
-            mPeerSocket->close();
+        if (mConnected) {
+            mConnected &= (mBluetoothSocket->connect() == 0);
+            mConnected &= ((vChannel = mBluetoothSocket->getPort()) != -1);
+            mBluetoothSocket->close();
         }
-        if (mAlive) {
-            LOGD(("Client trying server on channel : #" + to_string(vChannel)).c_str());
-            mAlive &= ((mPeerSocket = mPeerDevice->createInsecureRfcommSocket(vChannel)) != nullptr);
+        if (mConnected) {
+            delete mBluetoothSocket;
+            mConnected &= ((mBluetoothSocket = mBluetoothDevice->createInsecureRfcommSocket(vChannel)) != nullptr);
+            this_thread::sleep_for(1500*mWrapper->mMili);
+            mConnected &= (mBluetoothSocket->connect() == 0);
         }
-        if (mAlive) {
-            this_thread::sleep_for(chrono::milliseconds(1500));
-            mAlive &= (mPeerSocket->connect() == 0);
-        }
-        if (mAlive) {
+        if (mConnected) {
             LOGD(("Client connected to server on channel : #" + to_string(vChannel)).c_str());
-            mAlive &= (bool)sendOpForResult(0, mWrapper->mOpUnitCoreId, w->mNUpsilon00, new OpParamForResult((NParam)mPeerSocket->getRemoteDevice()));
         }
-//        if (mAlive) {
-//            LOGD(("Client trying server at : #" + msMac).c_str());
-//            mAlive &= (mPeerSocket->connect() == 0);
-//            mUuid = msMac;
-//            mUuid.insert(8, 1, '-').insert(4, 1, '-');
-//            mUuid = mWrapper->sUuidPeer + mUuid + "-" + mWrapper->sUuidMacSuffix;
-//            mPeerSocket->close();
-//        }
-//        if (mAlive) {
-//            mAlive &= ((mPeerSocket = mPeerDevice->createInsecureRfcommSocketToServiceRecord(mUuid)) != nullptr);
-//        }
-//        if (mAlive) {
-//            this_thread::sleep_for(chrono::milliseconds(3500));
-//            LOGD(("Client now trying second UUID on server : #" + mUuid).c_str());
-//            mAlive &= (mPeerSocket->connect() == 0);
-//        }
     }
-    if (mAlive) {
-        mAlive &= ((mOutputStream = mPeerSocket->getOutputStream()) != nullptr);
+    if (mConnected) {
+        mConnected &= ((mOutputStream = mBluetoothSocket->getOutputStream()) != nullptr);
+        mConnected &= ((mInputStream = mBluetoothSocket->getInputStream()) != nullptr);
     }
-    // Tell the Core Unit to restart discorvery ?
-    sendOp(0, mWrapper->mOpUnitCoreId, w->mNKappa00, new OpMessage());
-    if (mAlive) {
-        LOGW(("Client/Server connection established with peer : #" + msMac).c_str());
-        //this_thread::sleep_for(chrono::milliseconds(720)); // wait before read ?
-        mInputStream = mPeerSocket->getInputStream();
-        sendOp(0, mWrapper->mOpUnitCoreId, w->mNPi00, new OpParam((nlong)this, (nlong)mInputStream));
+    // Initialization ended, now try to register the connection
+    sendOp(mWrapper->mOpUnitCoreId, w->mNGamma00, new OpMessage(msMac, "", "", "", "", (NParam)this, mcOrigin, mConnected));
+
+    if (mConnected) {
+        mConnected = false;
         handleOp();
-        LOGW(("Lost Client/Server connection with peer : #" + msMac).c_str());
-    }
-    LOGD(("Connection canceled with Client or Server : #" + msMac).c_str());
-    // Tell the Core Unit that the initialization ended
-    sendOp(0, mWrapper->mOpUnitCoreId, w->mNRho00, new OpMessage(msMac));
-    cancel();
-}
 
-void OpUnitPeer::handleOp()
-{
-    Op* op;
-    String vPacket;
-    TimeStamp vcTimeStampNow;
-    DBCollection* vaMessage = nullptr;
-    nint i = 0;
-
-    while (mAlive) {
-        vcTimeStampNow = system_clock::now().time_since_epoch().count();
-
-        if (vcTimeStampNow - mcTimeStampBroadcast > mWrapper->mc10Secondes/11 && (!vaMessage || i == vaMessage->count())) {
-            if (vaMessage) {
-                delete vaMessage;
-            }
-            mcTimeStampBroadcast = vcTimeStampNow;
-            vaMessage = (DBCollection*)sendOpForResult(0, mWrapper->mOpUnitUIId, w->mNOmicron00, new OpMessageForResult());
-            i = 0;
-        }
-        if (vaMessage && i < vaMessage->count()) {
-            vPacket = mWrapper->mBOHandlerMessage->pack(vaMessage->get(i++));
-        } else {
-            vPacket = "keep-alive=1";
-        }
-        write(vPacket);
-        op = nextOp();
-
-        if (op) {
-            execOp(op);
-            //Hint: use op->result here, before calling nextOp again
-        }
-        this_thread::sleep_for(mWrapper->mcSleep*16);
-    }
-}
-
-// Receive from peer
-NReturn OpUnitPeer::visit(NAlpha01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    String vPacked;
-    nint vcStart;
-    nint vcEnd;
-    mBuffer += ((OpMessage*)a)->mStringA;
-    LOGD(("Data received from : #" + msMac).c_str());
-
-    while (mAlive && (vcStart = mBuffer.find("2#")) >= 0) {
-        mBuffer = mBuffer.substr(vcStart + 2);
-
-        if ((vcEnd = mBuffer.find("3#")) >= 0) {
-            LOGI(("Packed message received from : #" + msMac).c_str());
-            vPacked = mBuffer.substr(0, vcEnd);
-            mBuffer = mBuffer.substr(vcEnd + 2);
-            sendOp(0, mWrapper->mOpUnitUIId, w->mNGamma00, new OpMessage(vPacked));
+        if (mConnected) {
+            mAlive = true;
+            sendOp(mWrapper->mOpUnitCoreId, w->mNEta00, new OpMessage(msMac));
         }
     }
-    return 0;
-}
-
-// Send data to this peer
-NReturn OpUnitPeer::visit(NBeta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    write(((OpMessage*)a)->mStringA);
-    return 0;
-}
-
-// Listener is dead
-NReturn OpUnitPeer::visit(NAlpha03* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-   if (a == mIdUnique) {
-       LOGD("Peer stopping because listener stopped");
-       mAlive = false;
-   }
-   return 0;
-}
-
-nint OpUnitPeer::write(String packet)
-{
-    //this_thread::sleep_for(chrono::milliseconds(1500));
-    LOGI(("Sending packed message to : #" + msMac).c_str());
-    nint error = mOutputStream->write("2#" + packet + "3#");
-
-	if (error) {
-        LOGE(("Peer error on writing to : #" + msMac).c_str());
-        mInputStream->close();
-	}
-    return error;
-}
-
-void OpUnitPeer::cancel()
-{
-    LOGD("Peer canceled");
     if (mInputStream) {
         mInputStream->close();
     }
     if (mOutputStream) {
         mOutputStream->close();
     }
-    if (mPeerSocket) {
-        mPeerSocket->close();
+    if (mBluetoothSocket) {
+        mBluetoothSocket->close();
     }
-    if (mServerSocket) {
-        mServerSocket->close();
+    if (mConnected) {
+        LOGW(("Lost Client/Server connection with peer : #" + msMac).c_str());
+        while (mAliveListener) {
+            this_thread::sleep_for(200*mWrapper->mMili);
+        };
     }
+    LOGD("Peer canceled");
+}
+
+void OpUnitPeer::handleOp()
+{
+    Op* op;
+    TimeStamp vcTimeStampNow;
+
+    maMessageAlive = mWrapper->maMessageAlive;
+    maMessageBuzz = mWrapper->maMessageBuzz;
+    maMessageUpdate = mWrapper->maMessageUpdate;
+    mBuzzIndex = maMessageBuzz->mSize;
+    mUpdateIndex = maMessageUpdate->mSize;
+
+    while (mAlive && mUpdateIndex == maMessageUpdate->mSize && mBuzzIndex == maMessageBuzz->mSize) {
+        this_thread::sleep_for(200*mWrapper->mMili);
+        op = nextOp();
+
+        if (op) {
+            execOp(op);
+        }
+    }
+    while (mAlive) {
+        vcTimeStampNow = system_clock::now().time_since_epoch().count();
+
+        while (mBuzzIndex != maMessageBuzz->mWriteIndex) {
+            mBuzzIndex = (mBuzzIndex + 1)%maMessageBuzz->mSize;
+            write(*(maMessageBuzz->read(mBuzzIndex)));
+            ++mcInterruptDone;
+        }
+        if (!mWrapper->mIsInterrupted && mcInterruptDone == mWrapper->mcInterrupt && mUpdateIndex != maMessageUpdate->mWriteIndex) {
+            mUpdateIndex = (mUpdateIndex + 1)%maMessageUpdate->mSize;
+            write(*(maMessageUpdate->read(mUpdateIndex)));
+        }
+        if (!mWrapper->mIsInterrupted && mcInterruptDone == mWrapper->mcInterrupt && vcTimeStampNow - mcTimeStampBroadcast > 15*mWrapper->mc1Seconde) {
+            mcTimeStampBroadcast = vcTimeStampNow;
+            write(*(maMessageAlive->read()));
+        }
+        this_thread::sleep_for(200*mWrapper->mMili);
+    }
+}
+
+void OpUnitPeer::write(const String& packet)
+{
+    LOGI(("Sending packed message: #" + packet + " to #" + msMac).c_str());
+    nint error = mOutputStream->write(packet);
+
+    if (error) {
+        LOGE(("Peer error on writing to : #" + msMac).c_str());
+        mAlive = false;
+    }
+}
+
+// Register connection
+NReturn OpUnitPeer::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    mConnected = (bool)a;
+
+    if (!mConnected) {
+        mAlive = false;
+    }
+    if (mConnected) {
+        LOGW(("Client/Server connection established with peer : #" + msMac).c_str());
+    }
+    return 0;
+}
+
+// Begin communication
+NReturn OpUnitPeer::visit(NBeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    write(*(String*)a);
+    mUpdateIndex = b;
+    mBuzzIndex = c;
+    mcInterruptDone = d;
+    delete (String*)a;
+    return 0;
 }
 
 } // End namespace

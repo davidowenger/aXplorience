@@ -7,7 +7,7 @@ namespace NSNATIVE
 class NVisitorView : public NVisitor
 {
 public:
-	NVisitorView(NWrapper* w);
+    NVisitorView(NWrapper* w);
    ~NVisitorView();
 
     //*******************************************************************************************

@@ -6,33 +6,34 @@ namespace NSDEVICE
 
 class Table_Message : public DBTable
 {
-	void init() {
-		aField = {
-			"id",
-			"mac",
-			"id_drop",
+    void init() {
+        aField = {
+            "sId",
+            "sIdMessage",
+            "mac",
+            "sRevSource",
+            "sRevBuzz",
+            "sRevRemote",
+            "sArchivedUser",
+            "sCategoryId",
+            "sTitle",
+            "text",
+            "link",
             "sIn",
-			"sCategoryId",
-			"date",
-			"sTitle",
-			"text",
-			"link",
-			"sEnabled",
+            "date",
+            "sEnabled",
+            "sBuzzed",
             "sDeleted",
             "sArchivedAuto",
-            "sArchivedUser",
-            "sBuzzed",
-            "sBuzzedIndex",
-            "sBuzzing",
-		};
-	}
+        };
+    }
 };
 
 class Table_Application : public DBTable
 {
-	void init() {
-		aField = {
-			"id",
+    void init() {
+        aField = {
+            "sId",
             "sDBObjectId",
             "sView",
             "sSort0",
@@ -41,12 +42,12 @@ class Table_Application : public DBTable
             "sAscending1",
             "sSort2",
             "sAscending2",
-			"sCategory0",
-			"sCategory1",
-			"sCategory2",
-			"sCategory3",
-		};
-	}
+            "sCategory0",
+            "sCategory1",
+            "sCategory2",
+            "sCategory3",
+        };
+    }
 };
 
 } // End namespace

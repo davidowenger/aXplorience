@@ -25,10 +25,10 @@ public:
         }
     };
 
-	virtual ~ContextMenu()
-	{
+    virtual ~ContextMenu()
+    {
         NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
-	}
+    }
 
 private:
     ContextMenu(NNoObject* vNNoObject)

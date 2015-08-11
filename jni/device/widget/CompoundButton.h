@@ -10,8 +10,8 @@ friend NSNATIVE::NNoObject;
 
 public:
     virtual ~CompoundButton()
-	{
-	}
+    {
+    }
 
     virtual void setButtonDrawable(Drawable* d)
     {

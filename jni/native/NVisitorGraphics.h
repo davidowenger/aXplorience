@@ -7,14 +7,14 @@ namespace NSNATIVE
 class NVisitorGraphics : public NVisitor
 {
 public:
-	NVisitorGraphics(NWrapper* w)
-		: NVisitor(w)
-	{
-	}
+    NVisitorGraphics(NWrapper* w)
+        : NVisitor(w)
+    {
+    }
 
     virtual ~NVisitorGraphics()
-	{
-	}
+    {
+    }
 };
 
 } // END namespace

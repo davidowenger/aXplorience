@@ -14,7 +14,7 @@ protected:
     }
 
 public:
-	virtual ~SpinnerAdapter()
+    virtual ~SpinnerAdapter()
     {
     }
 

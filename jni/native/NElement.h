@@ -7,12 +7,12 @@ namespace NSNATIVE
 class NElement
 {
 public:
-	static int counter;
+    static int counter;
 
-	NElement();
-	virtual ~NElement();
+    NElement();
+    virtual ~NElement();
 
-	virtual NReturn accept(NVisitor* visitor, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) = 0;
+    virtual NReturn accept(NVisitor* visitor, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) = 0;
 
     const int i;
 };

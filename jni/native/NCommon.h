@@ -15,7 +15,7 @@
 //*******************************************************************************
 
 #define TARGET_ANDROID
-#define CONFIG_DEBUG
+//#define CONFIG_DEBUG
 #define LOG_TAG "aXplorience"
 
 //*******************************************************************************
@@ -36,12 +36,6 @@
 
 #include <android/log.h>
 #include <jni.h>
-
-//#include <string>
-//#include <iostream>
-//#include <assert.h>
-//#include <sys/types.h>
-//#include <android/bitmap.h>
 
 #ifdef CONFIG_DEBUG
 
@@ -66,8 +60,10 @@
 #define LOGPRINTW(...)
 #define LOGPRINTE(...)
 
-#define DEBUG 0
+#define LOGV(...)
+#define LOGD(...)
 #define LOGI(...)
+#define LOGW(...)
 #define LOGE(...)
 
 #endif // CONFIG_DEBUG
@@ -76,8 +72,8 @@ namespace std
 {
 
 struct Tab {
-	string* a;
-	int length;
+    string* a;
+    int length;
 };
 
 template <typename T>
@@ -169,7 +165,6 @@ class NFrame;
 
 using namespace NSNATIVE;
 
-#include "CircularConcurrentList.h"
 #include "native/NNoObject.h"
 #include "native/NElement.h"
 #include "native/NWrapper.h"
@@ -215,18 +210,18 @@ using namespace NSNATIVE;
 #include "device/view/ContextThemeWrapper.h"
 #include "device/view/View.h"
 #include "device/view/ViewGroup.h"
-#include "device/app/ActionBar.h"
-#include "device/app/Application.h"
-#include "device/app/Activity.h"
-#include "device/app/Fragment.h"
-#include "device/app/FragmentTransaction.h"
-#include "device/app/FragmentManager.h"
 #include "device/io/InputStream.h"
 #include "device/io/OutputStream.h"
 #include "device/bluetooth/BluetoothSocket.h"
 #include "device/bluetooth/BluetoothServerSocket.h"
 #include "device/bluetooth/BluetoothDevice.h"
 #include "device/bluetooth/BluetoothAdapter.h"
+#include "device/app/ActionBar.h"
+#include "device/app/Application.h"
+#include "device/app/Activity.h"
+#include "device/app/Fragment.h"
+#include "device/app/FragmentTransaction.h"
+#include "device/app/FragmentManager.h"
 
 #include "device/widget/Adapter.h"
 #include "device/widget/SpinnerAdapter.h"

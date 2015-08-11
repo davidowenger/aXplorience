@@ -11,9 +11,9 @@ friend NSNATIVE::NNoObject;
 public:
     StateListDrawable()
         : DrawableContainer(NWrapper::w->mNNoObject->instance<DrawableContainer>())
-	{
+    {
         NWrapper::w->mNVisitorGraphics->tRun(NWrapper::w->mNAlpha00, (NParam)this);
-	}
+    }
 
     virtual ~StateListDrawable()
     {

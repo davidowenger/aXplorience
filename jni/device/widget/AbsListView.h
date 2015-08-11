@@ -31,9 +31,9 @@ public:
         }
     };
 
-	virtual ~AbsListView()
-	{
-	}
+    virtual ~AbsListView()
+    {
+    }
 
 private:
     AbsListView(NNoObject* vNNoObject)

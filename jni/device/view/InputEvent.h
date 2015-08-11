@@ -9,9 +9,9 @@ class InputEvent : public Object
 friend NSNATIVE::NNoObject;
 
 public:
-	virtual ~InputEvent()
-	{
-	}
+    virtual ~InputEvent()
+    {
+    }
 
 private:
     InputEvent(NNoObject* vNNoObject)

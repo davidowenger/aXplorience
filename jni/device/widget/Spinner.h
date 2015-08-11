@@ -11,13 +11,13 @@ friend NSNATIVE::NNoObject;
 public:
     Spinner(Context* context)
         : AbsSpinner(NWrapper::w->mNNoObject->instance<AbsSpinner>())
-	{
+    {
         NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNPi00, (NParam)this, (NParam)context);
-	}
+    }
 
-	virtual ~Spinner()
-	{
-	}
+    virtual ~Spinner()
+    {
+    }
 
     virtual void setGravity(int gravity)
     {

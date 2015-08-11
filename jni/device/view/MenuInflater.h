@@ -10,8 +10,8 @@ friend NSNATIVE::NNoObject;
 
 public:
     virtual ~MenuInflater()
-	{
-	}
+    {
+    }
 
 private:
     MenuInflater(NNoObject* vNNoObject)

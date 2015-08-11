@@ -16,10 +16,10 @@ NReturn NAPI_tDeleteGlobalRef(NWrapper* w, NParamObject vGlobalRef);
 extern "C" {
 #endif
 
-JNIEXPORT NReturn JNICALL Java_z_a_TFrame_nInit(JNIEnv* env, jobject tFrame, NParam cState);
-JNIEXPORT NReturn JNICALL Java_z_a_TFrame_nCancel(JNIEnv* env, jobject tFrame);
-JNIEXPORT NReturn JNICALL Java_z_a_TVisitor_nRun(JNIEnv* env, jobject obj, NParam nVisitor, NParam nElement, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0);
-JNIEXPORT NReturnObject JNICALL Java_z_a_TVisitor_nRunObject(JNIEnv* env, jobject obj, NParam a = 0, NParam b = -1);
+JNIEXPORT NReturn JNICALL Java_y_b_TFrame_nInit(JNIEnv* env, jobject tFrame, NParam cState);
+JNIEXPORT NReturn JNICALL Java_y_b_TFrame_nCancel(JNIEnv* env, jobject tFrame);
+JNIEXPORT NReturn JNICALL Java_y_b_TVisitor_nRun(JNIEnv* env, jobject obj, NParam nVisitor, NParam nElement, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0);
+JNIEXPORT NReturnObject JNICALL Java_y_b_TVisitor_nRunObject(JNIEnv* env, jobject obj, NParam a = 0, NParam b = -1);
 
 #ifdef __cplusplus
 }
@@ -28,6 +28,3 @@ JNIEXPORT NReturnObject JNICALL Java_z_a_TVisitor_nRunObject(JNIEnv* env, jobjec
 } // END namespace
 
 #endif
-
-//JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* jvm, void* reserved);
-//JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* jvm, void* reserved);

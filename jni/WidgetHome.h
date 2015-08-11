@@ -4,17 +4,13 @@
 namespace NSDEVICE
 {
 
-class WidgetHome : public Widget, public View::OnClickListener, public View::OnTouchListener
+class WidgetHome : public Widget, public View::OnTouchListener
 {
 public:
-	WidgetHome(Wrapper* w);
-	virtual ~WidgetHome() override;
+    WidgetHome(Wrapper* w);
+    virtual ~WidgetHome() override;
 
-    virtual void init(nuint vcView, nuint vcDBObjectId) override;
-    virtual void initHeader();
-
-    // View::OnClickListener
-    virtual void onClick(View* v) override;
+    void initHeader();
 
     // View::OnTouchListener
     virtual bool onTouch(View* v, MotionEvent* event) override;

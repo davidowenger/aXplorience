@@ -10,17 +10,22 @@ friend NSNATIVE::NVisitorAppActivity;
 friend NSNATIVE::NNoObject;
 
 public:
-	Activity()
+    Activity()
         : ContextThemeWrapper(NWrapper::w->mNNoObject->instance<ContextThemeWrapper>())
-	{
+    {
         NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNAlpha00, (NParam)this);
-	}
+    }
 
-	virtual ~Activity()
-	{
-	}
+    virtual ~Activity()
+    {
+    }
 
-	Activity* getInstance(NWrapper* const vNWrapper);
+    Activity* getInstance(NWrapper* const vNWrapper);
+
+    virtual void finish()
+    {
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEta00, (NParam)this);
+    }
 
     virtual ActionBar* getActionBar()
     {
@@ -40,25 +45,25 @@ public:
         return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDelta00, (NParam)this, (NParam)b));
     }
 
-	virtual void setContentView(View* view)
-	{
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEpsilon00, (NParam)this, (NParam)view);
-	}
+    virtual void setContentView(View* view)
+    {
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEpsilon00, (NParam)this, (NParam)view);
+    }
 
-	virtual void sendMessage(NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0)
-	{
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDzeta00, (NParam)this, (NParam)a, (NParam)b, (NParam)c, (NParam)d);
-	}
+    virtual void sendMessage(long long int m)
+    {
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDzeta00, (NParam)this, (NParam)m);
+    }
 
 protected:
     //******************************************************************************************
     //************************************* Activity events ************************************
     //* This passes the call back to the default implementation if the method is not overriden *
     //******************************************************************************************
-	virtual void onCreate(Bundle* savedInstanceState)
-	{
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNAlpha03, (NParam)this, (NParam)savedInstanceState);
-	}
+    virtual void onCreate(Bundle* savedInstanceState)
+    {
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNAlpha03, (NParam)this, (NParam)savedInstanceState);
+    }
 
     virtual void onRestart()
     {
@@ -88,44 +93,45 @@ protected:
         NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNDzeta03, (NParam)this);
     }
 
-	virtual void onDestroy()
-	{
-		// Called only if the system must not recover memory in an emergency
-		// Clean memory here
-		NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEta03, (NParam)this);
-	}
+    virtual void onDestroy()
+    {
+        // Called only if the system must not recover memory in an emergency
+        // Clean memory here
+        NWrapper::w->mNVisitorAppActivity->tRun(NWrapper::w->mNEta03, (NParam)this);
+    }
 
     virtual void onActivityResult(int action, int requestCode, int resultCode, int extra)
     {
     }
 
-	virtual void onReceiveDiscoveryFinished()
-	{
-	}
+    virtual void onReceiveDiscoveryFinished()
+    {
+    }
 
-	virtual void onReceiveDiscoveryStarted()
-	{
-	}
+    virtual void onReceiveDiscoveryStarted()
+    {
+    }
 
-	virtual void onReceiveFoundDevice(BluetoothDevice* dBluetoothDevice)
-	{
-	}
+    virtual void onReceiveFoundDevice(BluetoothDevice* dBluetoothDevice)
+    {
+        delete dBluetoothDevice;
+    }
 
-	virtual void onReceiveLocalName(String localName)
-	{
-	}
+    virtual void onReceiveLocalName(const String& localName)
+    {
+    }
 
-	virtual void onReceiveState(int state, int statePrevious)
-	{
-	}
+    virtual void onReceiveState(int state, int statePrevious)
+    {
+    }
 
-	virtual void onReceiveScanMode(int mode, int modePrevious)
-	{
-	}
+    virtual void onReceiveScanMode(int mode, int modePrevious)
+    {
+    }
 
-	virtual void handleMessage(NParam a, NParam b, NParam c, NParam d)
-	{
-	}
+    virtual void handleMessage(long long int m)
+    {
+    }
 
 private:
     Activity(NNoObject* vNNoObject)

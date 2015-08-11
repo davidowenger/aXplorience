@@ -11,11 +11,11 @@ friend NSNATIVE::NNoObject;
 public:
     enum BufferType { EDITABLE, NORMAL, SPANNABLE };
 
-	TextView(Context* context)
+    TextView(Context* context)
         : View(NWrapper::w->mNNoObject->instance<View>())
-	{
-		NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNIota00, (NParam)this, (NParam)context);
-	}
+    {
+        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNIota00, (NParam)this, (NParam)context);
+    }
 
     virtual ~TextView()
     {
@@ -62,9 +62,9 @@ public:
     }
 
     virtual void setText(const String& text)
-	{
-		NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNPi00, (NParam)this, NParamBox(NWrapper::w, text).n);
-	}
+    {
+        NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNPi00, (NParam)this, NParamBox(NWrapper::w, text).n);
+    }
 
     virtual void setTextColor(int color)
     {

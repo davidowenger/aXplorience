@@ -9,7 +9,7 @@ class BluetoothAdapter : public Object
 friend NSNATIVE::NNoObject;
 
 public:
-	const int ERROR = -1 >> 1;
+    const int ERROR = -1 >> 1;
     const int STATE_OFF = 10;
     const int STATE_TURNING_ON = 11;
     const int STATE_ON = 12;

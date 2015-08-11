@@ -9,13 +9,13 @@ class LinearLayout : public ViewGroup
 friend NSNATIVE::NNoObject;
 
 public:
-	static const int HORIZONTAL = 0;
-	static const int VERTICAL = HORIZONTAL + 1;
+    static const int HORIZONTAL = 0;
+    static const int VERTICAL = HORIZONTAL + 1;
 
-	static const int SHOW_DIVIDER_NONE = 0;
-	static const int SHOW_DIVIDER_BEGINNING = SHOW_DIVIDER_NONE + 1;
-	static const int SHOW_DIVIDER_MIDDLE = SHOW_DIVIDER_BEGINNING + 1;
-	static const int SHOW_DIVIDER_END = SHOW_DIVIDER_MIDDLE + 1;
+    static const int SHOW_DIVIDER_NONE = 0;
+    static const int SHOW_DIVIDER_BEGINNING = SHOW_DIVIDER_NONE + 1;
+    static const int SHOW_DIVIDER_MIDDLE = SHOW_DIVIDER_BEGINNING + 1;
+    static const int SHOW_DIVIDER_END = SHOW_DIVIDER_MIDDLE + 1;
 
     class LayoutParams : public ViewGroup::MarginLayoutParams
     {
@@ -46,19 +46,19 @@ public:
         }
     };
 
-	LinearLayout(Context* context)
+    LinearLayout(Context* context)
         : ViewGroup(NWrapper::w->mNNoObject->instance<ViewGroup>())
-	{
-	    NParam a = (NParam)this;
+    {
+        NParam a = (NParam)this;
         NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNGamma00, a, (NParam)context);
         //NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)context);
-	}
+    }
 
-	virtual ~LinearLayout()
-	{
-	}
+    virtual ~LinearLayout()
+    {
+    }
 
-	virtual void invalidate()
+    virtual void invalidate()
     {
         NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNDelta00, (NParam)this);
     }
@@ -68,18 +68,18 @@ public:
         NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNEpsilon00, (NParam)this, (NParam)gravity);
     }
 
-	virtual void requestLayout()
+    virtual void requestLayout()
     {
         NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNDzeta00, (NParam)this);
     }
 
-	virtual void setOrientation(int orientation)
+    virtual void setOrientation(int orientation)
     {
         NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNEta00, (NParam)this, (NParam)orientation);
     }
 
 private:
-	LinearLayout(NNoObject* vNNoObject)
+    LinearLayout(NNoObject* vNNoObject)
         : ViewGroup(NWrapper::w->mNNoObject->instance<ViewGroup>())
     {
     }

@@ -13,36 +13,36 @@ View::LayoutParams::~LayoutParams()
 
 View::OnClickListener::OnClickListener()
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNAlpha03, (NParam)this);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNAlpha03, (NParam)this);
 }
 
 View::OnClickListener::~OnClickListener()
 {
-	NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
+    NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
 }
 
 View::OnCreateContextMenuListener::OnCreateContextMenuListener()
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNBeta03, (NParam)this);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNBeta03, (NParam)this);
 }
 View::OnCreateContextMenuListener::~OnCreateContextMenuListener()
 {
-	NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
+    NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
 }
 
 View::OnTouchListener::OnTouchListener()
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNGamma03, (NParam)this);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNGamma03, (NParam)this);
 }
 
 View::OnTouchListener::~OnTouchListener()
 {
-	NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
+    NWrapper::w->nFrame->tRun(NWrapper::w->mNDelta00, (NParam)this);
 }
 
 View::View(Context* context)
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNAlpha00, (NParam)this);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNAlpha00, (NParam)this);
 }
 
 View::~View()
@@ -57,7 +57,7 @@ Drawable* View::getBackground()
 
 int View::getId()
 {
-	return (nint)NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNBeta00, (NParam)this);
+    return (nint)NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNBeta00, (NParam)this);
 }
 
 void View::invalidate()
@@ -72,12 +72,12 @@ bool View::performClick()
 
 void View::requestLayout()
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNDelta00, (NParam)this);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNDelta00, (NParam)this);
 }
 
 void View::setBackgroundColor(int color)
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNEpsilon00, (NParam)this, (NParam)color);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNEpsilon00, (NParam)this, (NParam)color);
 }
 
 void View::setBackgroundDrawable(Drawable* background)
@@ -92,12 +92,12 @@ void View::setBackgroundResource(int resid)
 
 void View::setId(int id)
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNEta00, (NParam)this, (NParam)id);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNEta00, (NParam)this, (NParam)id);
 }
 
 void View::setLayoutParams(View::LayoutParams* params)
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNTheta00, (NParam)this, (NParam)params);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNTheta00, (NParam)this, (NParam)params);
 }
 
 void View::setMinimumHeight(int minHeight)
@@ -122,12 +122,12 @@ void View::setOnTouchListener(View::OnTouchListener* l)
 
 void View::setPadding(int left, int top, int right, int bottom)
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNKappa00, (NParam)this, (NParam)left, (NParam)top, (NParam)right, (NParam)bottom);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNKappa00, (NParam)this, (NParam)left, (NParam)top, (NParam)right, (NParam)bottom);
 }
 
 void View::setVisibility(int visibility)
 {
-	NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNLambda00, (NParam)this, (NParam)visibility);
+    NWrapper::w->mNVisitorViewView->tRun(NWrapper::w->mNLambda00, (NParam)this, (NParam)visibility);
 }
 
 View::View(NNoObject* vNNoObject)

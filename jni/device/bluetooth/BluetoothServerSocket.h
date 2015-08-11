@@ -9,9 +9,9 @@ class BluetoothServerSocket
 friend NSNATIVE::NNoObject;
 
 public:
-	BluetoothSocket* accept();
-	BluetoothSocket* accept(int timeout);
-	int getChannel();
+    BluetoothSocket* accept();
+    BluetoothSocket* accept(int timeout);
+    int getChannel();
     void close();
 
 private:

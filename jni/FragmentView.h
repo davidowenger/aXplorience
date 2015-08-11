@@ -8,12 +8,15 @@ class FragmentView : public LinearLayout, public GestureDetector::OnGestureListe
 {
 public:
     FragmentView(Wrapper* const w)
-        : LinearLayout(w->mApplication), w(w), maContent(nullptr), mViewSource(nullptr), mcView(0), mcDBObjectId(1), mTouchState(0), mX(0.0), mY(0.0), mT(0)
+        : LinearLayout(w->mApplication), w(w), mWidget(nullptr), mcView(0), mcDBObjectId(1), mIsInbound(true), mX(0.0), mY(0.0), mT(0)
     {
     }
 
     virtual ~FragmentView()
     {
+        if (mWidget) {
+            delete mWidget;
+        }
     }
 
     virtual void onCreateMenu(Menu* menu)
@@ -25,7 +28,7 @@ public:
         return false;
     }
 
-    virtual void init(nuint vcView, Menu* vMenu, nuint vcDBObjectId) = 0;
+    virtual void init(nuint vcView, DBObject* vDBObject) = 0;
 
     //*******************************************************************************************
     //************************************** OnGestureListener  *********************************
@@ -59,13 +62,11 @@ public:
     }
 
     Wrapper* w;
-    Widget** maContent;
-    View* mViewSource;
-    function<void()> mEventAction;
+    Widget* mWidget;
 
     nuint mcView;
     nuint mcDBObjectId;
-    nuint mTouchState;
+    bool mIsInbound;
     nfloat mX;
     nfloat mY;
     nlong mT;

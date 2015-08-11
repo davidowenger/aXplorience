@@ -7,16 +7,16 @@ namespace NSNATIVE
 class NVisitor
 {
 public:
-	static int counter;
+    static int counter;
 
-	NVisitor(NWrapper* const w);
-	virtual ~NVisitor();
+    NVisitor(NWrapper* const w);
+    virtual ~NVisitor();
 
-	NReturn tRun(NElement* nElement, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0);
-	NReturnObject tRunObject(NParam a = 0, NParam b = -1);
-	NReturn defaultVisit(NElement* nElement);
+    NReturn tRun(NElement* nElement, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0);
+    NReturnObject tRunObject(NParam a = 0, NParam b = -1);
+    NReturn defaultVisit(NElement* nElement);
 
-	NReturn nRun(NElement* nElement, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0);
+    NReturn nRun(NElement* nElement, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0);
 
     virtual NReturn visit(NAlpha00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) { return defaultVisit(element); }
     virtual NReturn visit(NBeta00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) { return defaultVisit(element); }

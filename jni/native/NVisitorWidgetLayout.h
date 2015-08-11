@@ -7,14 +7,14 @@ namespace NSNATIVE
 class NVisitorWidgetLayout : public NVisitor
 {
 public:
-	NVisitorWidgetLayout(NWrapper* w)
-		: NVisitor(w)
-	{
-	}
+    NVisitorWidgetLayout(NWrapper* w)
+        : NVisitor(w)
+    {
+    }
 
    ~NVisitorWidgetLayout()
-	{
-	}
+    {
+    }
 };
 
 } // END namespace

@@ -9,14 +9,18 @@ class OutputStream : public Object
 friend NSNATIVE::NNoObject;
 
 public:
-	int close()
-	{
-		return (nint)NWrapper::w->mNVisitorIO->tRun(NWrapper::w->mNAlpha01, (NParam)this);
-	}
+    virtual ~OutputStream()
+    {
+    }
+
+    int close()
+    {
+        return (nint)NWrapper::w->mNVisitorIO->tRun(NWrapper::w->mNAlpha01, (NParam)this);
+    }
 
     int write(const string& packet)
     {
-		return (nint)NWrapper::w->mNVisitorIO->tRun(NWrapper::w->mNBeta01, (NParam)this, NParamBox(NWrapper::w, packet).n);
+        return (nint)NWrapper::w->mNVisitorIO->tRun(NWrapper::w->mNBeta01, (NParam)this, NParamBox(NWrapper::w, packet).n);
     }
 
 private:

@@ -1,129 +1,176 @@
 #include "Common.h"
 
+#include <iomanip>
+
 namespace NSDEVICE
 {
 
 DBFile::DBFile(Wrapper* w, const String& fileName)
-	: w(w), msFileName(fileName), maData()
+    : w(w), msFileName(fileName), mFileStream(new fstream()), maData(new map<nulong,String>()), mcValid(0xFFFFFFFFFFFFFFFF)
 {
-	mFileStream = new fstream();
+    mFileStream->open(w->sFileDir + "/" + msFileName + ".persist", ios_base::binary | ios_base::out | ios_base::app );
+    mFileStream->clear();
+    mFileStream->close();
+    mFileStream->clear();
+    mFileStream->open(w->sFileDir + "/" + msFileName, ios_base::binary | ios_base::out | ios_base::app );
+    mFileStream->clear();
+    mFileStream->close();
 }
 
 DBFile::~DBFile()
 {
-	// Any open file is automatically closed when the fstream object is destroyed
-	//delete mFileStream;
+    // Any open file is automatically closed when the fstream object is destroyed
+    delete mFileStream;
 }
 
 int DBFile::init()
 {
-	int ret = 1;
+    String value;
+    map<nulong,String>::iterator it;
 
-	if (open() == 0) {
-		String key;
-		String value;
+    nulong key = 0;
+    int ret = 1;
+    bool vIsValid = false;
 
-		while (mFileStream->good()) {
-			key.assign("");
-			value.assign("");
-			getline(*mFileStream, key);
-			getline(*mFileStream, value);
+    if (open() == 0) {
+        while (!vIsValid && mFileStream->good()) {
+            value.assign("");
+            mFileStream->read((char*)&key, sizeof(nulong));
+            getline(*mFileStream, value);
 
-			if (!key.empty()) {
-			    value = regex_replace(value, regex("n#"), String("\n"));
-			    value = regex_replace(value, regex("@(@|#)"), String("$1"));
-			    maData[to_long(key)] = value;
-			}
-		}
-		close();
-		ret = 0;
-	}
-	return ret;
+            if (key != mcValid) {
+                value = regex_replace(value, regex("n#"), String("\n"));
+                value = regex_replace(value, regex("@(@|#)"), String("$1"));
+                (*maData)[key] = value;
+            } else {
+                vIsValid = true;
+            }
+        }
+        ret = !vIsValid;
+    }
+    close();
+
+    if (!vIsValid) {
+        delete maData;
+        maData = new map<nulong,String>();
+
+        if (open(".persist") == 0) {
+            while (!vIsValid && mFileStream->good()) {
+                value.assign("");
+                mFileStream->read((char*)&key, sizeof(nulong));
+                getline(*mFileStream, value);
+
+                if (key != mcValid) {
+                    value = regex_replace(value, regex("n#"), String("\n"));
+                    value = regex_replace(value, regex("@(@|#)"), String("$1"));
+                    (*maData)[key] = value;
+                } else {
+                    vIsValid = true;
+                }
+            }
+            if (!vIsValid) {
+                delete maData;
+                maData = new map<nulong,String>();
+            }
+            close();
+
+            if (open() == 0) {
+                for ( it = maData->begin() ; it != maData->end() ; ++it ) {
+                    value = regex_replace(it->second, regex("(@|#)"), String("@$1"));
+                    value = regex_replace(value, regex("\n"), String("n#"));
+                    mFileStream->write((char*)&it->first, sizeof(nulong));
+                    *mFileStream << value << '\n';
+                }
+                mFileStream->write((char*)&mcValid, sizeof(nulong));
+                *mFileStream << '\n';
+                ret = 0;
+            }
+        }
+        close();
+    }
+    return ret;
 }
 
 void DBFile::state(const String& mode)
 {
-	LOGE(String(
-		"File [" + msFileName +
-		"] stream@[" + std::to_string(mFileStream) +
-		"] path[" + w->sFileDir  + "/"
-		"] mode[" + mode +
-		"] eof[" + to_string(mFileStream->eof()) +
-		"] fail[" + to_string(mFileStream->fail()) +
-		"] bad[" + to_string(mFileStream->bad()) +
-		"] %c").c_str()
-	);
+    LOGE(String(
+        "File [" + msFileName +
+        "] stream@[" + std::to_string(mFileStream) +
+        "] path[" + w->sFileDir  + "/"
+        "] mode[" + mode +
+        "] eof[" + to_string(mFileStream->eof()) +
+        "] fail[" + to_string(mFileStream->fail()) +
+        "] bad[" + to_string(mFileStream->bad()) +
+        "] %c").c_str()
+    );
 }
 
-int DBFile::open()
+int DBFile::open(const String& vSuffix)
 {
-    int ret = 0;
     mFileStream->clear();
-    mFileStream->open(w->sFileDir + "/" + msFileName, ios_base::binary | ios_base::out | ios_base::app );
-
-    if (!mFileStream->good()) {
-        state("w+");
-        close();
-        mFileStream = nullptr;
-        ret = 1;
-    }
-    if (mFileStream) {
-        close();
-        mFileStream->clear();
-        mFileStream->open(w->sFileDir + "/" + msFileName, ios_base::binary| ios_base::out | ios_base::in );
-    }
-    if (mFileStream && !mFileStream->good()) {
-        state("rw");
-        close();
-        mFileStream = nullptr;
-        ret = 2;
-    }
-    return ret;
+    mFileStream->open(w->sFileDir + "/" + msFileName + vSuffix, ios_base::binary| ios_base::out | ios_base::in );
+    return !mFileStream->good();
 }
 
 int DBFile::close()
 {
-    nint ret = 1;
-    if (mFileStream) {
-        mFileStream->clear();
-        mFileStream->close();
-        ret = !mFileStream->good();
-    }
-    return ret;
+    mFileStream->clear();
+    mFileStream->close();
+    return !mFileStream->good();
 }
 
 String DBFile::get(nulong key)
 {
-	return maData[key];
+    return (*maData)[key];
 }
 
 void DBFile::set(nulong key, const String& value)
 {
-	maData[key] = value;
+    (*maData)[key] = value;
+}
+
+void DBFile::erase(nulong key)
+{
+    maData->erase(key);
 }
 
 int DBFile::commit()
 {
-	int ret = 1;
     map<nulong,String>::iterator it;
-    String vStringLine;
+    String value;
 
-	if (open() == 0) {
-		for ( it = maData.begin() ; it != maData.end() ; ++it ) {
-		    vStringLine = regex_replace(it->second , regex("(@|#)"), String("@$1"));
-            vStringLine = regex_replace(it->second, regex("\n"), String("n#"));
-			*mFileStream << to_string(it->first) << endl;
-			*mFileStream << vStringLine << endl;
-		}
-		close();
-		ret = 0;
-	}
-	return ret;
+    int ret = 2;
+
+    if (open(".persist") == 0) {
+        for ( it = maData->begin() ; it != maData->end() ; ++it ) {
+            value = regex_replace(it->second, regex("(@|#)"), String("@$1"));
+            value = regex_replace(value, regex("\n"), String("n#"));
+            mFileStream->write((char*)&it->first, sizeof(nulong));
+            *mFileStream << value << '\n';
+        }
+        mFileStream->write((char*)&mcValid, sizeof(nulong));
+        *mFileStream << '\n';
+        ret = 1;
+        close();
+        if (open() == 0) {
+            for ( it = maData->begin() ; it != maData->end() ; ++it ) {
+                value = regex_replace(it->second, regex("(@|#)"), String("@$1"));
+                value = regex_replace(value, regex("\n"), String("n#"));
+                mFileStream->write((char*)&it->first, sizeof(nulong));
+                *mFileStream << value << '\n';
+            }
+            mFileStream->write((char*)&mcValid, sizeof(nulong));
+            *mFileStream << '\n';
+            ret = 0;
+        }
+    }
+    close();
+    return ret;
 }
 
 void DBFile::clear()
 {
-	maData.clear();
+    maData->clear();
 }
 
 } // End namespace

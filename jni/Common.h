@@ -7,7 +7,6 @@
 #include <unordered_set>
 #include <list>
 #include <forward_list>
-//#include <iomanip>
 
 using namespace std::chrono;
 using NSNATIVE::NWrapper;
@@ -19,9 +18,14 @@ typedef mutex Mutex;
 typedef system_clock::duration::rep TimeStamp;
 
 class OpSquad;
+class OpUnitUI;
 class Widget;
-class WidgetMessage;
 class WidgetHome;
+class WidgetMessage;
+class WidgetMessageDetails;
+class WidgetMessageEdit;
+class WidgetSettings;
+class WidgetAbout;
 class FragmentViewEdit;
 class FragmentViewDetails;
 class FragmentViewSettings;
@@ -30,9 +34,12 @@ class FragmentViewHome;
 class FragmentView;
 class NActivity;
 class Wrapper;
+
+typedef void(*EventAction)(Wrapper* w);
 }
 
-#include "CircularConcurrentList.h"
+#include "ConcurrentCircularBuffer.h"
+#include "ConcurrentQueue.h"
 #include "db/DBFile.h"
 #include "db/DBHandler.h"
 
@@ -43,12 +50,12 @@ class Wrapper;
 #include "Tables.h"
 #include "BOMessage.h"
 #include "RootLayout.h"
-//#include "Network.h"
+#include "OpUnitAnim.h"
+#include "OpUnitPeer.h"
 #include "OpUnitListener.h"
 #include "OpUnitCore.h"
 #include "OpUnitUI.h"
 #include "OpUnitServer.h"
-#include "OpUnitPeer.h"
 #include "FragmentLevel.h"
 #include "FragmentLevel0.h"
 #include "FragmentLevel1.h"

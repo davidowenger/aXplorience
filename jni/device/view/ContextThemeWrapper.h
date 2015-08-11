@@ -9,9 +9,9 @@ class ContextThemeWrapper : public ContextWrapper
 friend NSNATIVE::NNoObject;
 
 public:
-	virtual ~ContextThemeWrapper()
-	{
-	}
+    virtual ~ContextThemeWrapper()
+    {
+    }
 
     virtual Resources* getResources()
     {

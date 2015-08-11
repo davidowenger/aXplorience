@@ -6,69 +6,59 @@ namespace NSDEVICE
 FragmentViewDetails::FragmentViewDetails(Wrapper* const w)
     : FragmentView(w)
 {
+    mWidget = new Widget(w);
+
     setOrientation(LinearLayout::HORIZONTAL);
     setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT));
     setPadding(0, 0, 0, 0);
-
-    maContent = new Widget*[2];
-
-    if (w->mcWidthDp < 480) {
-        maContent[0] = new WidgetMessageDetails(w);
-        maContent[1] = nullptr;
-        addView(maContent[0]);
-    } else {
-        maContent[0] = new WidgetMessageDetails(w);
-        maContent[1] = new Widget(w);
-        addView(maContent[1]);
-        addView(maContent[0]);
-    }
 }
 
 FragmentViewDetails::~FragmentViewDetails()
 {
-    if (maContent[0]) {
-       delete maContent[0];
-    }
-    if (maContent[1]) {
-       delete maContent[1];
-    }
-    delete maContent;
 }
 
-void FragmentViewDetails::init(nuint vcView, Menu* menu, nuint vcDBObjectId)
+void FragmentViewDetails::init(nuint vcView, DBObject* vDBObject)
 {
     mcView = vcView;
-    mcDBObjectId = vcDBObjectId;
-    maContent[0]->init(vcView, vcDBObjectId);
 
-    removeAllViews();
+    if (vDBObject) {
+        mcDBObjectId = vDBObject->mId;
+        mIsInbound = vDBObject->is("sIn");
+        w->mWidgetMessageDetails->update(vDBObject);
+    }
+    if (w->mMenu) {
+        removeAllViews();
 
-    if (w->mcMaxLevel == 1) {
-        if (w->mcWidthDp < 480) {
-            addView(maContent[0]);
-        } else {
-            addView(maContent[1]);
-            addView(maContent[0]);
+        if (w->mcMaxLevel == 1) {
+            if (w->mcWidthDp >= 480) {
+                addView(mWidget);
+            }
+            addView(w->mWidgetMessageDetails);
+
+            w->mMenu->removeItem(Wrapper::kViewAdd);
+            w->mMenu->removeItem(Wrapper::kViewEdit);
+            w->mMenu->removeItem(Wrapper::kViewDelete);
+            w->mMenu->removeItem(Wrapper::kViewSave);
+
+            MenuItem* vMenuItemDelete = w->mMenu->add(Menu::NONE, Wrapper::kViewDelete, 1, "Delete");
+            vMenuItemDelete->setIcon(w->maDrawable[8]);
+            vMenuItemDelete->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+            delete vMenuItemDelete;
+
+            if (!mIsInbound) {
+                MenuItem* vMenuItemEdit = w->mMenu->add(Menu::NONE, Wrapper::kViewEdit, 2, "Edit");
+                vMenuItemEdit->setIcon(w->maDrawable[7]);
+                vMenuItemEdit->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+                delete vMenuItemEdit;
+            }
+            MenuItem* vMenuItemAdd = w->mMenu->add(Menu::NONE, Wrapper::kViewAdd, 3, "Add");
+            vMenuItemAdd->setIcon(w->maDrawable[10]);
+            vMenuItemAdd->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+            delete vMenuItemAdd;
+
+            w->mActionBar->setDisplayHomeAsUpEnabled(true);
+            w->mActionBar->setHomeButtonEnabled(true);
         }
-        menu->removeItem(Wrapper::kViewAdd);
-        menu->removeItem(Wrapper::kViewEdit);
-        menu->removeItem(Wrapper::kViewDelete);
-        menu->removeItem(Wrapper::kViewSave);
-
-        MenuItem* vMenuItemDelete = menu->add(Menu::NONE, Wrapper::kViewDelete, 1, "Delete");
-        vMenuItemDelete->setIcon(w->maDrawable[8]);
-        vMenuItemDelete->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
-
-        MenuItem* vMenuItemEdit = menu->add(Menu::NONE, Wrapper::kViewEdit, 2, "Edit");
-        vMenuItemEdit->setIcon(w->maDrawable[7]);
-        vMenuItemEdit->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
-
-        MenuItem* vMenuItemAdd = menu->add(Menu::NONE, Wrapper::kViewAdd, 3, "Add");
-        vMenuItemAdd->setIcon(w->maDrawable[10]);
-        vMenuItemAdd->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
-
-        w->mActionBar->setDisplayHomeAsUpEnabled(true);
-        w->mActionBar->setHomeButtonEnabled(true);
     }
 }
 
@@ -82,22 +72,19 @@ bool FragmentViewDetails::onMenuItemSelected(nint id)
     bool ret = false;
 
     if (id == R::id::home) {
-        w->mNActivity->setView(Wrapper::kViewHome, 0);
-        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewHome));
+        w->mNActivity->sendOp(w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewHome));
         ret = true;
     }
     if (id == Wrapper::kViewDelete) {
-        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNEpsilon00, new OpParam(mcDBObjectId, true));
+        w->mNActivity->sendOp(w->mOpUnitUIId, w->w->mNEpsilon00, new OpParam(mcDBObjectId, true));
         ret = true;
     }
     if (id == Wrapper::kViewEdit) {
-        w->mNActivity->setView(Wrapper::kViewEdit, mcDBObjectId);
-        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewEdit, mcDBObjectId));
+        w->mNActivity->sendOp(w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewEdit, mcDBObjectId));
         ret = true;
     }
     if (id == Wrapper::kViewAdd) {
-        w->mNActivity->setView(Wrapper::kViewAdd, 1);
-        w->mNActivity->sendOp(0, w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewAdd, 1));
+        w->mNActivity->sendOp(w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewAdd, 1));
         ret = true;
     }
     return ret;
@@ -110,7 +97,7 @@ bool FragmentViewDetails::onDown(MotionEvent* e)
 {
     if (w->mTouchState == 0) {
         w->mTouchState = 1;
-        w->mEventAction = function<void()>([]()->void{});
+        w->mEventAction = [](Wrapper* w)->void{};
         LOGV("NEW EVENT");
         mX = e->getX();
         mY = e->getY();
@@ -121,14 +108,14 @@ bool FragmentViewDetails::onDown(MotionEvent* e)
 
 bool FragmentViewDetails::onFling(MotionEvent* e1, MotionEvent* e2, float vVelocityX, float vVelocityY)
 {
-    w->mTouchState = 3;
+    w->mTouchState = ( w->mTouchState == 2 ? 3 : 0 );
     return true;
 }
 
 void FragmentViewDetails::onLongPress(MotionEvent* e)
 {
-    w->mTouchState = 3;
-    w->mEventAction();
+    w->mTouchState = ( w->mTouchState == 2 ? 3 : 0 );
+    w->mEventAction(w);
 }
 
 bool FragmentViewDetails::onScroll(MotionEvent* e1, MotionEvent* e2, float distanceX, float distanceY)
@@ -137,7 +124,7 @@ bool FragmentViewDetails::onScroll(MotionEvent* e1, MotionEvent* e2, float dista
     nfloat vY = e2->getY() - mY;
     nfloat vD = (e2->getEventTime() - mT)/1000.0;
     bool ret = abs(vX) > Wrapper::SWIPE_MIN_DISTANCE && abs(vY) < Wrapper::SWIPE_MAX_OFF_PATH && abs(vX/vD) > Wrapper::SWIPE_THRESHOLD_VELOCITY;
-    w->mTouchState = 3;
+    w->mTouchState = ( w->mTouchState == 2 ? 3 : 0 );
 
     LOGV(("Duration : #" + to_string(vD)).c_str());
     LOGV(("Distance X: #" + to_string(vX) + " Y: #" + to_string(vY)).c_str());
@@ -153,20 +140,20 @@ bool FragmentViewDetails::onScroll(MotionEvent* e1, MotionEvent* e2, float dista
                 vNext = ((WidgetMessage*)w->mMessageLayout->getChildAt((vIndex + vSize + ( vX > 0 ? 1 : -1))%vSize))->mcDBObjectId;
             }
         }
-        w->mNActivity->setView(Wrapper::kViewDetails, vNext);
+        w->mNActivity->sendOp(w->mOpUnitUIId, w->w->mNIota00, new OpParam(Wrapper::kViewDetails, vNext));
     }
     return ret;
 }
 
 void FragmentViewDetails::onShowPress(MotionEvent* e)
 {
-    w->mTouchState = 3;
+    w->mTouchState = ( w->mTouchState == 2 ? 3 : 0 );
 }
 
 bool FragmentViewDetails::onSingleTapUp(MotionEvent* e)
 {
-    w->mTouchState = 3;
-    w->mEventAction();
+    w->mTouchState = ( w->mTouchState == 2 ? 3 : 0 );
+    w->mEventAction(w);
     return true;
 }
 

@@ -11,9 +11,9 @@ friend NSNATIVE::NNoObject;
 public:
     EditText(Context* context)
         : TextView(NWrapper::w->mNNoObject->instance<TextView>())
-	{
+    {
         NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNMu00, (NParam)this, (NParam)context);
-	}
+    }
 
     virtual ~EditText()
     {

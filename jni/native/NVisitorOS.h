@@ -7,14 +7,14 @@ namespace NSNATIVE
 class NVisitorOS : public NVisitor
 {
 public:
-	NVisitorOS(NWrapper* w)
-		: NVisitor(w)
-	{
-	}
+    NVisitorOS(NWrapper* w)
+        : NVisitor(w)
+    {
+    }
 
    ~NVisitorOS()
-	{
-	}
+    {
+    }
 };
 
 } // END namespace

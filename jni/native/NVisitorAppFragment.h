@@ -58,15 +58,6 @@ public:
         return vcRet;
     }
 
-    //void onViewStateRestored(Bundle vBundle)
-    NReturn visit(NEpsilon01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-    {
-        NReturn vcRet = 0;
-        if (b == -1 && c == 1) vcRet = (NReturn)NWrapper::w->mNNoObject->pointer<Bundle>();
-        if (b != -1) ((Fragment*)a)->onViewStateRestored((Bundle*)b);
-        return vcRet;
-    }
-
     //void onStart()
     NReturn visit(NDzeta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {

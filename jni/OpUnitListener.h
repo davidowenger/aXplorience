@@ -7,15 +7,12 @@ namespace NSDEVICE
 class OpUnitListener : public OpUnit
 {
 public:
-	OpUnitListener(Wrapper* w, OpUnit* mOpUnit, InputStream* vInputStream);
+    OpUnitListener(Wrapper* w, OpUnitPeer* vOpUnitPeer);
    ~OpUnitListener();
 
     virtual void run() override;
-    virtual void cancel() override;
 
-    nint mOpUnitId;
-    nint mOpUnitIdUnique;
-    nint mOpUnitCoreId;
+    OpUnitPeer* mOpUnitPeer;
     InputStream* mInputStream;
     String mBuffer;
 };

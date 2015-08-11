@@ -12,33 +12,32 @@ FragmentLevel1::~FragmentLevel1()
 {
 }
 
-void FragmentLevel1::init(nuint vcView, nuint vcDBObjectId)
+void FragmentLevel1::init(nuint vcView, DBObject* vDBObject)
 {
     mcLevel = 1;
     mcView = vcView;
     mFragmentLayout = w->maRootLayoutItem[mcView].maFragmentLayout[mcLevel];
-    mcDBObjectId = vcDBObjectId;
+    mcDBObjectId = ( vDBObject ? vDBObject->mId : 0 );
 
     if (mFragmentLayout.mcPriority != 0) {
         w->mcMaxLevel = w->maRootLayoutItem[mcView].mcMaxLevel;
         w->mcView = w->maRootLayoutItem[mcView].maFragmentLayout[w->mcMaxLevel].mcView;
 
         mFragmentView->removeAllViews();
+        w->maFragmentView[mFragmentLayout.mcView]->init(mFragmentLayout.mcView, vDBObject);
         mFragmentView->addView(w->maFragmentView[mFragmentLayout.mcView]);
     }
     if (mFragmentLayout.mcPriority != 0 && !mIsAdded) {
+        mIsAdded = true;
         FragmentTransaction* vFragmentTransaction = w->mFragmentManager->beginTransaction();
         vFragmentTransaction->add(w->mRootLayoutId, this);
         vFragmentTransaction->addToBackStack();
         vFragmentTransaction->commit();
-        mIsAdded = true;
+        delete vFragmentTransaction;
     }
     if (mFragmentLayout.mcPriority == 0 && mIsAdded) {
-        w->mFragmentManager->popBackStack();
         mIsAdded = false;
-    }
-    if (mFragmentLayout.mcPriority != 0 && mMenu) {
-        w->maFragmentView[mFragmentLayout.mcView]->init(mFragmentLayout.mcView, mMenu, mcDBObjectId);
+        w->mFragmentManager->popBackStack();
     }
 }
 

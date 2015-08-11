@@ -4,49 +4,30 @@
 namespace NSDEVICE
 {
 
-class WidgetMessage : public Widget, public View::OnClickListener, public View::OnTouchListener
+class WidgetMessage : public Widget, public View::OnTouchListener
 {
 public:
-	WidgetMessage(Wrapper* w);
-	virtual ~WidgetMessage() override;
+    WidgetMessage(Wrapper* w);
+    virtual ~WidgetMessage() override;
 
-    virtual void init(nuint vcView, nuint vcDBObjectId) override;
-    virtual void render();
-
-    // View::OnClickListener
-    virtual void onClick(View* v) override;
+    void render();
+    void update(DBObject* vDBObject);
 
     // View::OnTouchListener
     virtual bool onTouch(View* v, MotionEvent* event) override;
 
     nint mcPadding;
-    DBObject* mDBObject;
     nint mcCategoryId;
     bool mIsInbound;
-	bool mcIsEnabled;
+    bool mIsEnabled;
+    bool mIsBuzzed;
 
     LinearLayout* mLeft;
     LinearLayout* mRight;
     ImageButton* mCategory;
-	Button* mText;
-	ToggleButton* mCheck;
-	ToggleButton* mBuzz;
-	StateListDrawable** mStateListCheck;
-	StateListDrawable** mStateListBuzz;
-};
-
-class WidgetMessageOutbound : public WidgetMessage
-{
-public:
-	WidgetMessageOutbound(Wrapper* w);
-	virtual ~WidgetMessageOutbound() override;
-};
-
-class WidgetMessageInbound : public WidgetMessage
-{
-public:
-	WidgetMessageInbound(Wrapper* w);
-	virtual ~WidgetMessageInbound() override;
+    Button* mText;
+    ImageButton* mCheck;
+    ImageButton* mBuzz;
 };
 
 } // End namespace

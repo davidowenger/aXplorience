@@ -17,7 +17,7 @@ OpCallback::~OpCallback()
 }
 
 Op::Op(NElement* vNElement, nlong a, nlong b, nlong c, nlong d, nlong e, OpCallback* vOpCallback)
-	: mNElement(vNElement), mOpCallback(vOpCallback), a(a), b(b), c(c), d(d), e(e)
+    : mNElement(vNElement), mOpCallback(vOpCallback), a(a), b(b), c(c), d(d), e(e)
 {
 }
 

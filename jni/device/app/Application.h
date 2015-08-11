@@ -9,9 +9,9 @@ class Application : public ContextWrapper
 friend NSNATIVE::NNoObject;
 
 public:
-	virtual ~Application()
-	{
-	}
+    virtual ~Application()
+    {
+    }
 
 private:
     Application(NNoObject* vNNoObject)

@@ -9,10 +9,10 @@ OpSquad::OpSquad(Wrapper* vWrapper, int cMaxOpUnit)
     int vIdDest = 0;
 
     mIdUnique = 0;
-	mWrapper = vWrapper;
-	mcMaxOpUnit = cMaxOpUnit;
-	maOpUnit = new OpUnit*[mcMaxOpUnit];
-    maCol = new Col<Op*>**[mcMaxOpUnit];
+    mWrapper = vWrapper;
+    mcMaxOpUnit = cMaxOpUnit;
+    maOpUnit = new OpUnit*[mcMaxOpUnit];
+    maConcurrentQueue = new ConcurrentQueue<Op*>**[mcMaxOpUnit];
     maOpUnitType = new int[mcMaxOpUnit];
 
     for ( vIdSrc = 0 ; vIdSrc < mcMaxOpUnit ; ++vIdSrc ) {
@@ -23,10 +23,10 @@ OpSquad::OpSquad(Wrapper* vWrapper, int cMaxOpUnit)
         maOpUnitType[vIdSrc] = 0;
     }
     for ( vIdDest = 0 ; vIdDest < mcMaxOpUnit ; ++vIdDest ) {
-        maCol[vIdDest] = new Col<Op*>*[mcMaxOpUnit];
+        maConcurrentQueue[vIdDest] = new ConcurrentQueue<Op*>*[mcMaxOpUnit];
 
         for ( vIdSrc = 0 ; vIdSrc < mcMaxOpUnit ; ++vIdSrc ) {
-            maCol[vIdDest][vIdSrc] = new Col<Op*>();
+            maConcurrentQueue[vIdDest][vIdSrc] = new ConcurrentQueue<Op*>();
         }
     }
 }
@@ -38,39 +38,41 @@ OpSquad::~OpSquad()
 
     for ( id = 0 ; id < mcMaxOpUnit ; ++id ) {
         if (maOpUnit[id]) {
-        	maOpUnit[id]->cancel();
+            maOpUnit[id]->cancel();
         }
+    }
+    for ( id = mcMaxOpUnit - 1 ; id >= 0 ; --id ) {
         if (maOpUnit[id]->mThread) {
             maOpUnit[id]->mThread->join();
         }
     }
-    for ( id = 0 ; id < mcMaxOpUnit ; ++id ) {
+    for ( id = mcMaxOpUnit - 1 ; id >= 0 ; --id ) {
         if (maOpUnit[id]->mThread) {
-        	delete maOpUnit[id];
+            delete maOpUnit[id];
         }
     }
     if (maOpUnit != nullptr) {
         delete[] maOpUnit;
     }
     for ( vIdDest = 0 ; vIdDest < mcMaxOpUnit ; ++vIdDest ) {
-        if (maCol[vIdDest] != nullptr) {
+        if (maConcurrentQueue[vIdDest] != nullptr) {
             for ( id = 0 ; id < mcMaxOpUnit ; ++id ) {
-                if (maCol[vIdDest][id] != nullptr) {
-                    delete maCol[vIdDest][id];
+                if (maConcurrentQueue[vIdDest][id] != nullptr) {
+                    delete maConcurrentQueue[vIdDest][id];
                 }
             }
-            delete[] maCol[vIdDest];
+            delete[] maConcurrentQueue[vIdDest];
         }
     }
-    if (maCol != nullptr) {
-        delete[] maCol;
+    if (maConcurrentQueue != nullptr) {
+        delete[] maConcurrentQueue;
     }
 }
 
 OpUnit* OpSquad::add(OpUnit* vOpUnit, bool autoclean)
 {
     // This function is thread-safe when used by 1 unique "manager" thread
-	int id;
+    int id;
     OpUnit* vOpUnitTemp = nullptr;
 
     vOpUnit->init(this);
@@ -93,7 +95,7 @@ OpUnit* OpSquad::add(OpUnit* vOpUnit, bool autoclean)
             vOpUnitTemp = vOpUnit;
         }
         //HINT: end critical section
-	}
+    }
     return vOpUnitTemp;
 }
 
@@ -102,7 +104,7 @@ void OpSquad::clear(int vIdDead)
     int id;
 
     for ( id = 0 ; id < mcMaxOpUnit ; ++id ) {
-        maCol[vIdDead][id]->clear();
+        maConcurrentQueue[vIdDead][id]->clear();
     }
 }
 

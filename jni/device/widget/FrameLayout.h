@@ -11,15 +11,15 @@ friend NSNATIVE::NNoObject;
 public:
     FrameLayout(Context* context)
         : ViewGroup(NWrapper::w->mNNoObject->instance<ViewGroup>())
-	{
+    {
         NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNAlpha00, (NParam)this, (NParam)context);
-	}
+    }
 
-	virtual ~FrameLayout()
-	{
-	}
+    virtual ~FrameLayout()
+    {
+    }
 
-	virtual void setVisibility(int visibility)
+    virtual void setVisibility(int visibility)
     {
         NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNBeta00, (NParam)this, (NParam)visibility);
     }

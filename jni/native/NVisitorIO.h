@@ -7,14 +7,14 @@ namespace NSNATIVE
 class NVisitorIO : public NVisitor
 {
 public:
-	NVisitorIO(NWrapper* w)
-		: NVisitor(w)
-	{
-	}
+    NVisitorIO(NWrapper* w)
+        : NVisitor(w)
+    {
+    }
 
    ~NVisitorIO()
-	{
-	}
+    {
+    }
 };
 
 } // END namespace

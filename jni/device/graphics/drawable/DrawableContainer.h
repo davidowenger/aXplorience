@@ -9,9 +9,9 @@ class DrawableContainer : public Drawable
 friend NSNATIVE::NNoObject;
 
 public:
-	virtual ~DrawableContainer()
-	{
-	}
+    virtual ~DrawableContainer()
+    {
+    }
 
 private:
     DrawableContainer(NNoObject* vNNoObject)

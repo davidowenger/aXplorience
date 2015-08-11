@@ -9,9 +9,9 @@ class LayoutInflater : public Object
 friend NSNATIVE::NNoObject;
 
 public:
-	virtual ~LayoutInflater()
-	{
-	}
+    virtual ~LayoutInflater()
+    {
+    }
 
 private:
     LayoutInflater(NNoObject* vNNoObject)

@@ -15,7 +15,7 @@ protected:
     }
 
 public:
-	virtual ~BaseAdapter()
+    virtual ~BaseAdapter()
     {
     }
 

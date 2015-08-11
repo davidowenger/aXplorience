@@ -11,13 +11,13 @@ friend NSNATIVE::NNoObject;
 public:
     ImageButton(Context* context)
         : ImageView(NWrapper::w->mNNoObject->instance<ImageView>())
-	{
+    {
         NWrapper::w->mNVisitorWidget->tRun(NWrapper::w->mNOmicron00, (NParam)this, (NParam)context);
-	}
+    }
 
-	virtual ~ImageButton()
-	{
-	}
+    virtual ~ImageButton()
+    {
+    }
 
 private:
     ImageButton(NNoObject* vNNoObject)

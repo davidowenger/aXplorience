@@ -13,9 +13,9 @@ public:
 
     ImageView(Context* context)
         : View(NWrapper::w->mNNoObject->instance<View>())
-	{
+    {
         NWrapper::w->mNVisitorWidgetView->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)context);
-	}
+    }
 
     virtual ~ImageView()
     {

@@ -35,14 +35,15 @@ public:
         MarginLayoutParams(NNoObject* vNNoObject);
     };
 
-	virtual ~ViewGroup();
+    virtual ~ViewGroup();
     virtual void addView(View* view);
     virtual void addView(View* view, int index);
     virtual View* getChildAt(int index);
     virtual int getChildCount();
     virtual bool onInterceptTouchEvent(MotionEvent* ev);
     virtual void removeAllViews();
-	virtual void requestLayout();
+    virtual void removeViewAt(int index);
+    virtual void requestLayout();
 private:
     ViewGroup(NNoObject* vNNoObject);
 };

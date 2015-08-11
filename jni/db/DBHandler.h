@@ -1,6 +1,9 @@
 #ifndef __DBHandler_H__
 #define __DBHandler_H__
 
+#define kTrue "1"
+#define kFalse "0"
+
 namespace NSDEVICE
 {
 class DBTableHandler;
@@ -11,96 +14,98 @@ class DBFilter;
 class DBTable
 {
 public:
-	DBTable()
-  	    : table(), aField(), cField(0)
-	{
-	}
+    DBTable()
+          : table(), aField(), cField(0)
+    {
+    }
 
-	virtual ~DBTable()
-	{
-	}
+    virtual ~DBTable()
+    {
+    }
 
-	DBTable* load()
-	{
-		init();
-		cField = aField.size();
-		return this;
-	}
+    DBTable* load()
+    {
+        init();
+        cField = aField.size();
+        return this;
+    }
 
-	virtual void init() = 0;
+    virtual void init() = 0;
 
-	String table;
-	vector<String> aField;
-	nuint cField;
+    String table;
+    vector<String> aField;
+    nuint cField;
 };
 
 class DBHandler
 {
 public:
-	const String PREFIX;
-	const String TRUE;
-	const String FALSE;
+    const String PREFIX;
 
-	DBHandler(Wrapper* w);
+    DBHandler(Wrapper* w);
    ~DBHandler();
 
     template<typename T> void add(const String& sTable)
     {
-    	if (!maTable.count(sTable)) {
-    		maTable[sTable] = function<DBTable*()>([]()->DBTable*{return new T;});
-    	}
+        if (!maTable.count(sTable)) {
+            maTable[sTable] = function<DBTable*()>([]()->DBTable*{return new T;});
+        }
     }
 
     void init();
     DBTableHandler* get(const String& table);
 
-	Wrapper* w;
-	map<String,DBTableHandler*> maTableHandler;
-	map<String,function<DBTable*()>> maTable;
+    Wrapper* w;
+    map<String,DBTableHandler*> maTableHandler;
+    map<String,function<DBTable*()>> maTable;
 };
 
 class DBTableHandler
 {
 public:
-	DBTableHandler(Wrapper* w, DBTable* dbTable);
+    DBTableHandler(Wrapper* w, DBTable* dbTable);
    ~DBTableHandler();
 
     nint load();
-	void drop();
-	DBObject* getInstance();
-	DBObject* getInstance(const String& id);
-	DBCollection* getCollection();
+    void drop();
+    DBObject* getInstance();
+    DBObject* getInstance(nuint id);
+    DBCollection* getCollection();
 
-	Wrapper* w;
-	DBTable* mDBTable;
-	DBFile* mDBFile;
-	unordered_map<string,nuint> maFieldIndex;
+    Wrapper* w;
+    DBTable* mDBTable;
+    DBFile* mDBFile;
+    unordered_map<string,nuint>* maFieldIndex;
 };
 
 class DBObject
 {
 public:
-	DBObject(Wrapper* w, DBTableHandler* dbTableHandler, const String& id);
+    DBObject(Wrapper* w, DBTableHandler* dbTableHandler, nuint id);
    ~DBObject();
 
-	DBObject* load();
-	String* get();
-	String get(const String& field);
-	nuint getFieldIndex(const String& field);
+    bool apply(DBFilter* filtre, bool selected);
+    DBObject* commit();
     nlong count(const String& field);
+    void drop();
+    String* get();
+    String get(const String& field);
+    nuint getFieldIndex(const String& field);
     bool is(const String& field);
-	DBObject* set(String* aValue, nuint count);
-	DBObject* set(const String& field, const String& value);
+    DBObject* set(String* aValue, nuint count);
+    DBObject* set(const String& field, const String& value);
     DBObject* set(const String& field, nlong value);
-	DBObject* set(nint index, const String& value);
-	DBObject* commit();
-	bool apply(DBFilter* filtre, bool selected);
+    DBObject* set(nint index, const String& value);
 
-	Wrapper* w;
-	DBTableHandler* mDBTableHandler;
-	String mId;
-	String* maValue;
-	bool mIsCache;
+    bool mIsCache;
+    nuint mcField;
+    nuint mId;
+
+    Wrapper* w;
+    DBTableHandler* mDBTableHandler;
+    map<nulong,String>* maData;
+    unordered_map<string,nuint>* maFieldIndex;
+    String* maValue;
 };
 
 class Sort
@@ -123,23 +128,25 @@ public:
     DBCollection(Wrapper* w, DBTableHandler* dbTableHandler);
    ~DBCollection();
 
-	DBCollection* load();
-	DBObject* get(nint index);
+    DBCollection* load();
+    DBObject* get(nuint index);
     DBCollection* sort(list<Sort> vaSort);
     DBCollection* sort(const String& field, bool ascending = true);
     DBCollection* filter(const String& field, const String& value, const String& op);
     DBCollection* filter(const String& field, nlong value, const String& op);
-	DBCollection* filter(DBFilter* left, DBFilter* right, const String& op);
-	nint count();
+    DBCollection* filter(DBFilter* left, DBFilter* right, const String& op);
+    nuint count();
 
-	Wrapper* w;
-	DBTableHandler* mDBTableHandler;
-	DBFilter* mDBFiltre;
+    bool isLoaded;
+    nuint mcField;
+
+    Wrapper* w;
+    DBTableHandler* mDBTableHandler;
+    map<nulong,String>* maData;
+    DBFilter* mDBFiltre;
     multimap<String,DBObject*,Compare>* maDBObjectSorted;
 
     vector<DBObject*> maDBObject;
-
-    bool isLoaded;
 };
 
 class DBFilter
@@ -189,12 +196,12 @@ public:
 
     virtual ~DBFilter()
     {
-    	if (mLeft) {
-    		delete mLeft;
-    	}
-    	if (mRight) {
-    		delete mRight;
-    	}
+        if (mLeft) {
+            delete mLeft;
+        }
+        if (mRight) {
+            delete mRight;
+        }
     }
 
     DBFilter* mLeft;

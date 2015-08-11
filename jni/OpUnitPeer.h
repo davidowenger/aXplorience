@@ -7,35 +7,36 @@ namespace NSDEVICE
 class OpUnitPeer : public OpUnit
 {
 public:
-	OpUnitPeer(Wrapper* w, BluetoothSocket* dPeerSocket);
-	OpUnitPeer(Wrapper* const w, BluetoothDevice* dPeerDevice);
-	virtual ~OpUnitPeer() override;
+    OpUnitPeer(Wrapper* const w, BluetoothServerSocket* vBluetoothServerSocket, BluetoothSocket* vBluetoothSocket, BluetoothDevice* vBluetoothDevice, const String& vsMac);
+    OpUnitPeer(Wrapper* const w, BluetoothDevice* vBluetoothDevice, const String& vsMac);
+    virtual ~OpUnitPeer() override;
 
     virtual void run() override;
-    virtual void cancel() override;
     virtual void handleOp() override;
 
-    virtual NReturn visit(NAlpha01* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
-    virtual NReturn visit(NBeta01* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
-    virtual NReturn visit(NAlpha03* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
+    virtual NReturn visit(NAlpha00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
+    virtual NReturn visit(NBeta00* element, NParam a = 0, NParam b = 0, NParam c = 0, NParam d = 0, NParam e = 0) override;
 
-    int write(String packet);
-    int waitMessage(String& vBuffer, TimeStamp vcSecondesTimeout);
+    void write(const String& packet);
 
-	int mcOrigin;
-    String mUuid;
-    String mBuffer;
+    bool mConnected;
+    bool mAliveListener;
+    nuint mcOrigin;
+    nuint mBuzzIndex;
+    nuint mUpdateIndex;
+    nuint mcInterruptDone;
     TimeStamp mcTimeStampBroadcast;
-    nuint mcForce;
 
-	BluetoothServerSocket* mServerSocket;
+    ConcurrentCircularBuffer<String*>* maMessageAlive;
+    ConcurrentCircularBuffer<String*>* maMessageBuzz;
+    ConcurrentCircularBuffer<String*>* maMessageUpdate;
+    BluetoothServerSocket* mBluetoothServerSocket;
+    BluetoothSocket* mBluetoothSocket;
     InputStream* mInputStream;
     OutputStream* mOutputStream;
-    DBTableHandler* mDropHandler;
-    OpUnitListener* mOpUnitListener;
+    BluetoothDevice* mBluetoothDevice;
+
     String msMac;
-    BluetoothSocket* mPeerSocket;
-    BluetoothDevice* mPeerDevice;
 };
 
 } // End namespace

@@ -13,122 +13,151 @@ BOHandlerMessage::~BOHandlerMessage()
 {
 }
 
-nuint BOHandlerMessage::addDrop(String packed)
+void BOHandlerMessage::addDrop(OpUnitUI* vOpUnitUI, String packed)
 {
     //FIXME: UTF8 compatibility
-    int i;
-    TimeStamp vcTimeStampNow = system_clock::now().time_since_epoch().count();
+    nint i;
+    DBCollection* vDBCollection;
+    DBObject* vExisting;
+    DBObject* vReceived;
     vector<string> aValue = split(packed, String("1#"));
-    nuint vcDBObjectId = 0;
+    nulong vSize = aValue.size();
 
-    for (i = 0 ; i < (int)aValue.size() ; ++i) {
-        aValue[i] = regex_replace(aValue[i], regex("@(@|#)"), String("$1"));
-    }
-    DBObject* vReceived = h->getInstance()->set(aValue.data(), aValue.size());
-    DBCollection* c = h->getCollection()->filter("mac", vReceived->get("mac"), "=")->filter("id_drop", vReceived->get("id_drop"), "=");
+    if (vSize >= 5) {
+        vDBCollection = h->getCollection()->filter("sIdMessage", aValue[0], "=")->filter("mac", aValue[1], "=");
 
-    if (c->count() > 0) {
-        DBObject* vExisting = c->get(0);
-        vcDBObjectId = (nuint)to_long(vExisting->get("id"));
+        if (vDBCollection->count()) {
+            vExisting = vDBCollection->get(0);
 
-        if (!vExisting->is("sIn")) {
-            if (!vExisting->is("sBuzzed") && vReceived->is("sBuzzed") && vExisting->get("sBuzzedIndex") == vReceived->get("sBuzzedIndex")) {
-                if (!vExisting->is("sArchivedUser")) vExisting->set("sBuzzed", true);
-                vExisting->set("sBuzzedIndex", (nuint)vExisting->count("sBuzzedIndex") + 1);
-                vExisting->set("sBuzzing", true);
+            if (vExisting->is("sIn") && vExisting->count("sRevBuzz") == to_long(aValue[3]) && vExisting->count("sRevRemote") < to_long(aValue[4])) {
+                // Remote buzz request on INBOUND message
+                ++w->mcInterrupt;
+                vExisting->set("sRevRemote", aValue[4]);
+                w->maMessageBuzz->add(new String("2#" + packId(vExisting) + "3#"));
             }
-        } else {
-            setMessage(vcDBObjectId, vReceived->get("sCategoryId"), vReceived->get("sTitle"), vReceived->get("text"), vReceived->get("link"));
-            vExisting->set("date", vReceived->get("date"));
-            vExisting->set("sArchivedAuto", vcTimeStampNow - vReceived->count("date") > 6*w->mc10Secondes);
-            vExisting->set("sArchivedUser", vReceived->get("sArchivedUser"));
+            if (!vExisting->is("sIn") && !vExisting->is("sArchivedUser") && vExisting->get("sRevBuzz") == aValue[3] && vExisting->get("sRevRemote") != aValue[4]) {
+                // Buzzed OUTBOUND message
+                ++w->mcInterrupt;
+                vOpUnitUI->sendOp(w->mOpUnitAnimId, nullptr, new OpParam(vExisting->mId));
+                vExisting->set("sRevBuzz", vExisting->count("sRevBuzz") + 1);
+                vExisting->set("sRevRemote", "1");
+                w->maMessageBuzz->add(new String("2#" + packId(vExisting) + "3#"));
+                vExisting->set("sBuzzed", kTrue);
+                vOpUnitUI->sendOp(w->mOpUnitAppId, w->w->mNEta01, new OpParam((NParam)get(vExisting->mId)));
+            }
+            if (vExisting->is("sIn") && vExisting->count("sRevSource") < to_long(aValue[2])) {
+                // Alive INBOUND message
+                bool vIsArchivedAuto = vExisting->is("sArchivedAuto");
+                vExisting->set("sRevSource", aValue[2]);
+                vExisting->set("date", vOpUnitUI->mcTimeStampNow);
+                vExisting->set("sArchivedAuto", kFalse);
 
-            if (vExisting->is("sBuzzed") && !vReceived->is("sBuzzed") && vExisting->count("sBuzzedIndex") < vReceived->count("sBuzzedIndex")) {
-                vExisting->set("sBuzzed", false);
+                if (vSize > 5) {
+                    // Updated INBOUND message
+                    w->maMessageUpdate->add(new String("2#" + packed + "3#"));
+                    //TODO: apply regex at split
+                    i = vSize;
+
+                    while (--i >= 0) {
+                        aValue[i] = regex_replace(aValue[i], regex("@(@|#)"), String("$1"));
+                    }
+                    //FIXME: do not use temporary database object
+                    vReceived = h->getInstance()->set(aValue.data(), vSize);
+                    vExisting->set("sArchivedUser", vReceived->get("sArchivedUser"));
+                    setMessage(vExisting, vReceived->get("sCategoryId"), vReceived->get("sTitle"), vReceived->get("text"), vReceived->get("link"));
+                    vReceived->drop();
+                    vOpUnitUI->sendOp(w->mOpUnitAppId, w->w->mNGamma01, new OpParam((NParam)getMessagesToDisplay()->sort(w->maSort)));
+                    delete vReceived;
+                }
+                if (vSize == 5 && vIsArchivedAuto && !vExisting->is("sArchivedUser") && !vExisting->is("sDelete")) {
+                    vOpUnitUI->sendOp(w->mOpUnitAppId, w->w->mNGamma01, new OpParam((NParam)getMessagesToDisplay()->sort(w->maSort)));
+                }
             }
-            if (!vExisting->is("sBuzzed")) {
-                vExisting->set("sBuzzedIndex", vReceived->get("sBuzzedIndex"));
+            if (vExisting->is("sIn") && vExisting->count("sRevBuzz") < to_long(aValue[3])) {
+                // Response to buzzed INBOUND message
+                ++w->mcInterrupt;
+                vExisting->set("sRevBuzz", aValue[3]);
+                vExisting->set("sRevRemote", aValue[4]);
+                w->maMessageBuzz->add(new String("2#" + packId(vExisting) + "3#"));
+                vExisting->set("sBuzzed", kFalse);
+                vOpUnitUI->sendOp(w->mOpUnitAppId, w->w->mNEta01, new OpParam((NParam)get(vExisting->mId)));
             }
+        } else if (vSize > 5) {
+            // New INBOUND message
+            //TODO: apply regex at split
+            i = vSize;
+
+            while (--i >= 0) {
+                aValue[i] = regex_replace(aValue[i], regex("@(@|#)"), String("$1"));
+            }
+            //FIXME: do not use temporary database object values
+            vReceived = h->getInstance()->set(aValue.data(), aValue.size());
+            vReceived->set("sIn", kTrue);
+            vReceived->set("date", vOpUnitUI->mcTimeStampNow);
+            vReceived->set("sEnabled", kTrue);
+            vReceived->set("sBuzzed", kFalse);
+            vReceived->set("sDeleted", kFalse);
+            vReceived->set("sArchivedAuto", kFalse);
+            w->maMessageUpdate->add(new String("2#" + pack(vReceived) + "3#"));
+            vOpUnitUI->sendOp(w->mOpUnitAppId, w->w->mNGamma01, new OpParam((NParam)getMessagesToDisplay()->sort(w->maSort)));
+            delete vReceived;
         }
-        vExisting->commit();
-    } else {
-        vReceived->set("sIn", true);
-        vReceived->set("sEnabled", true);
-        vReceived->set("sDeleted", false);
-        vReceived->set("sArchivedAuto", vcTimeStampNow - vReceived->count("date") > 6*w->mc10Secondes);
-        vReceived->set("sArchivedUser", false);
-        vReceived->set("sBuzzed", false);
-        vReceived->commit();
-        vcDBObjectId = (nuint)to_long(vReceived->get("id"));
+        delete vDBCollection;
     }
-    delete vReceived;
-    delete c;
-    return vcDBObjectId;
 }
 
-nuint BOHandlerMessage::addSeed(const String& id_cat, const String& title, const String& text, const String& link)
+DBObject* BOHandlerMessage::addSeed(const String& id_cat, const String& title, const String& text, const String& link)
 {
     DBObject* vDBObject = h->getInstance();
+    vDBObject->set("sIdMessage", vDBObject->mId);
     vDBObject->set("mac", w->mac);
-    vDBObject->set("sIn", false);
+    vDBObject->set("sRevSource", "1");
+    vDBObject->set("sRevBuzz", "1");
+    vDBObject->set("sRevRemote", "1");
+    vDBObject->set("sArchivedUser", kFalse);
+    vDBObject->set("sIn", kFalse);
     vDBObject->set("date", system_clock::now().time_since_epoch().count());
-    vDBObject->set("sEnabled", true);
-    vDBObject->set("sDeleted", false);
-    vDBObject->set("sArchivedAuto", false);
-    vDBObject->set("sArchivedUser", false);
-    vDBObject->set("sBuzzed", false);
-    vDBObject->set("sBuzzedIndex", 0);
-    vDBObject->commit();
+    vDBObject->set("sEnabled", kTrue);
+    vDBObject->set("sBuzzed", kFalse);
+    vDBObject->set("sDeleted", kFalse);
+    vDBObject->set("sArchivedAuto", kFalse);
+    setMessage(vDBObject, id_cat, title, text, link);
+    return vDBObject;
+}
 
-    String vsDBObjectId = vDBObject->get("id");
-    vDBObject->set("id_drop", vsDBObjectId);
-    vDBObject->commit();
-    delete vDBObject;
+void BOHandlerMessage::clean()
+{
+    nint i;
+    DBCollection* vDBCollection = h->getCollection()->filter(
+        f(f("sIn", kFalse, "="), f("sDeleted", kTrue, "="), "AND"),
+        f(f("sIn", kTrue, "="), f("sArchivedAuto", kTrue, "="), "AND"),
+        "OR"
+    );
+    nint vCount = vDBCollection->count();
 
-    nuint vcDBObjectId = (nuint)to_long(vsDBObjectId);
-    setMessage(vcDBObjectId, id_cat, title, text, link);
-
-    return vcDBObjectId;
+    for (i = 0 ; i < vCount ; ++i) {
+        vDBCollection->get(i)->drop();
+    }
+    delete vDBCollection;
 }
 
 DBObject* BOHandlerMessage::get(nuint id)
 {
-    return h->getInstance(to_string(id));
+    return h->getInstance(id);
 }
-
-DBCollection* BOHandlerMessage::getDrops()
-{
-    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("sIn", true, "=");
-}
-
-//DBCollection* BOHandlerMessage::getMessages()
-//{
-//    return h->getCollection()->filter("id", "1", "!=")->filter("sArchivedAuto", false, "=");
-//}
-
-//DBCollection* BOHandlerMessage::getMessagesSorted()
-//{
-//    DBHelper n;
-//    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("sArchivedAuto", false, "=")
-//            ->filter(n.f("sIn", false, "="), n.f("sArchivedUser", false, "="), "OR")
-//            ->sort(w->mDBObjectApplication->get("sSort"), w->mDBObjectApplication->is("sAscending"));
-//}
 
 DBCollection* BOHandlerMessage::getMessagesToBroadcast()
 {
-    return h->getCollection()->filter("id", "1", "!=")->filter("sArchivedAuto", false, "=")
-            ->filter(f("sIn", false, "="), f("sArchivedUser", false, "="), "OR");
+    return h->getCollection()->filter("sId", "1", "!=")
+            ->filter("sArchivedAuto", kFalse, "=");
 }
 
 DBCollection* BOHandlerMessage::getMessagesToDisplay()
 {
-    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("sArchivedAuto", false, "=")
-            ->filter(f("sIn", false, "="), f("sArchivedUser", false, "="), "OR");
-}
-
-DBCollection* BOHandlerMessage::getSeeds()
-{
-    return h->getCollection()->filter("id", "1", "!=")->filter("sDeleted", false, "=")->filter("sIn", false, "=");
+    return h->getCollection()->filter("sId", "1", "!=")
+            ->filter(f("sIn", kFalse, "="), f("sArchivedAuto", kFalse, "="), "OR")
+            ->filter(f("sIn", kFalse, "="), f("sArchivedUser", kFalse, "="), "OR")
+            ->filter("sDeleted", kFalse, "=");
 }
 
 String BOHandlerMessage::pack(DBObject* vDBObject)
@@ -137,24 +166,33 @@ String BOHandlerMessage::pack(DBObject* vDBObject)
     nuint i;
     String packed = "";
     String first = "";
-    String* aValue = vDBObject->get();
 
-    for ( i = 1 ; i < h->mDBTable->cField ; ++i ) {
-        packed += first + regex_replace(aValue[i], regex("(@|#)"), String("@$1"));
+    for ( i = 1 ; i < 11 ; ++i ) {
+        packed += first + regex_replace(vDBObject->maValue[i], regex("(@|#)"), String("@$1"));
         first = "1#";
     }
     return packed;
 }
 
-void BOHandlerMessage::setMessage(nuint id, const String& id_cat, const String& title, const String& text, const String& link)
+String BOHandlerMessage::packId(DBObject* vDBObject)
 {
-    DBObject* vDBObject = h->getInstance(to_string(id));
+    return vDBObject->maValue[1] + "1#" + vDBObject->maValue[2] + "1#" + vDBObject->maValue[3] + "1#" + vDBObject->maValue[4] + "1#" + vDBObject->maValue[5];
+}
+
+void BOHandlerMessage::setMessage(DBObject* vDBObject, const String& id_cat, const String& title, const String& text, const String& link)
+{
     vDBObject->set("sCategoryId", id_cat);
     vDBObject->set("sTitle", title);
     vDBObject->set("text", text);
     vDBObject->set("link", link);
-    vDBObject->commit();
-    delete vDBObject;
+}
+
+DBObject* BOHandlerMessage::setMessage(nuint vcDBObjectId, const String& id_cat, const String& title, const String& text, const String& link)
+{
+    DBObject* vDBObject = h->getInstance(vcDBObjectId);
+    setMessage(vDBObject, id_cat, title, text, link);
+    vDBObject->set("sRevSource", vDBObject->count("sRevSource") + 1);
+    return vDBObject;
 }
 
 } // End namespace

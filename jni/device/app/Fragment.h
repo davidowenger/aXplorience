@@ -53,11 +53,6 @@ public:
         NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNDelta01, (NParam)this, (NParam)vBundle);
     }
 
-    virtual void onViewStateRestored(Bundle* vBundle)
-    {
-        NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNEpsilon01, (NParam)this, (NParam)vBundle);
-    }
-
     virtual void onStart()
     {
         NWrapper::w->mNVisitorAppFragment->tRun(NWrapper::w->mNDzeta01, (NParam)this);

@@ -24,7 +24,7 @@ int BluetoothServerSocket::getChannel()
 
 void BluetoothServerSocket::close()
 {
-	NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNGamma02, (NParam)this);
+    NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNGamma02, (NParam)this);
 }
 
 } // End namespace

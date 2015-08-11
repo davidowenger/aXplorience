@@ -7,14 +7,14 @@ namespace NSNATIVE
 class NVisitorBluetooth : public NVisitor
 {
 public:
-	NVisitorBluetooth(NWrapper* w)
-		: NVisitor(w)
-	{
-	}
+    NVisitorBluetooth(NWrapper* w)
+        : NVisitor(w)
+    {
+    }
 
    ~NVisitorBluetooth()
-	{
-	}
+    {
+    }
 };
 
 } // END namespace

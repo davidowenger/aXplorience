@@ -10,7 +10,7 @@ public:
     FragmentViewEdit(Wrapper* w);
     virtual ~FragmentViewEdit() override;
 
-    virtual void init(nuint vcView, Menu* vMenu, nuint vcDBObjectId) override;
+    virtual void init(nuint vcView, DBObject* vDBObject) override;
     virtual bool onMenuItemSelected(nint id) override;
 
     // GestureDetector::OnGestureListener

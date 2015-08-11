@@ -7,14 +7,14 @@ namespace NSDEVICE
 class WidgetAbout : public Widget, public View::OnTouchListener
 {
 public:
-	WidgetAbout(Wrapper* w);
-	virtual ~WidgetAbout() override;
-
-    virtual void init(nuint vcView, nuint vcDBObjectId) override;
+    WidgetAbout(Wrapper* w);
+    virtual ~WidgetAbout() override;
 
     // View::OnTouchListener
     virtual bool onTouch(View* v, MotionEvent* event) override;
 
+    LinearLayout* mTop;
+    ImageButton* mIcon;
     TextView* mTextView;
     GestureDetector* mGestureDetector;
 

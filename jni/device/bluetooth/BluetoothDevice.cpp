@@ -26,46 +26,46 @@ const String BluetoothDevice::EXTRA_PREVIOUS_BOND_STATE = "android.bluetooth.dev
 
 bool BluetoothDevice::equals(BluetoothDevice* dBluetoothDevice)
 {
-	return (bool)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNAlpha01, (NParam)this, (NParam)dBluetoothDevice);
+    return (bool)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNAlpha01, (NParam)this, (NParam)dBluetoothDevice);
 }
 
 int BluetoothDevice::hashCode()
 {
-	return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNBeta01, (NParam)this);
+    return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNBeta01, (NParam)this);
 }
 
 String BluetoothDevice::toString()
 {
-	NReturn index = NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNGamma01, (NParam)this);
-	return NWrapper::w->nFrame->tGetString(NWrapper::w->nFrame->tRunObject((NParam)index));
+    NReturn index = NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNGamma01, (NParam)this);
+    return NWrapper::w->nFrame->tGetString(NWrapper::w->nFrame->tRunObject((NParam)index));
 }
 
 int BluetoothDevice::describeContents()
 {
-	return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNDelta01, (NParam)this);
+    return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNDelta01, (NParam)this);
 }
 
 void BluetoothDevice::writeToParcel(void* out, int flags)
 {
-	//TODO: implement
-	//NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNepsilon01, (NParam)this, (NParam)out, (NParam)flags);
+    //TODO: implement
+    //NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNepsilon01, (NParam)this, (NParam)out, (NParam)flags);
 }
 
 String BluetoothDevice::getAddress()
 {
-	NReturn index = NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNDzeta01, (NParam)this);
-	return NWrapper::w->nFrame->tGetString(NWrapper::w->nFrame->tRunObject((NParam)index));
+    NReturn index = NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNDzeta01, (NParam)this);
+    return NWrapper::w->nFrame->tGetString(NWrapper::w->nFrame->tRunObject((NParam)index));
 }
 
 String BluetoothDevice::getName()
 {
-	NReturn index = NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNEta01, (NParam)this);
-	return NWrapper::w->nFrame->tGetString(NWrapper::w->nFrame->tRunObject((NParam)index));
+    NReturn index = NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNEta01, (NParam)this);
+    return NWrapper::w->nFrame->tGetString(NWrapper::w->nFrame->tRunObject((NParam)index));
 }
 
 int BluetoothDevice::getBondState()
 {
-	return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNTheta01, (NParam)this);
+    return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNTheta01, (NParam)this);
 }
 
 BluetoothClass* BluetoothDevice::getBluetoothClass()

@@ -7,23 +7,17 @@ namespace NSDEVICE
 class Widget : public LinearLayout
 {
 public:
-	Widget(Wrapper* w)
-        : LinearLayout(w->mApplication), w(w), mcView(0), mcDBObjectId(1)
+    Widget(Wrapper* w)
+        : LinearLayout(w->mApplication), w(w), mcDBObjectId(1)
     {
-	    setLayoutParams(new LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT, 1));
+        setLayoutParams(new LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT, 1));
     }
 
-	virtual ~Widget()
-    {
-    }
-
-    virtual void init(nuint vcView, nuint vcDBObjectId)
+    virtual ~Widget()
     {
     }
 
     Wrapper* w;
-
-    nuint mcView;
     nuint mcDBObjectId;
 };
 
