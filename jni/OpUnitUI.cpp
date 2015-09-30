@@ -25,7 +25,6 @@ void OpUnitUI::handleOp()
     Op* op;
     DBObject* vMessage;
     nint i;
-    mWrapper->maMessageAlive->add(new String("#2#3"));
 
     while (mAlive) {
         mcTimeStampNow = system_clock::now().time_since_epoch().count();

@@ -153,6 +153,10 @@ void NActivity::onCreate(Bundle* savedInstanceState)
     mWrapper->opSquad->add(mWrapper->opUnitCore);
     mWrapper->mOpUnitCoreId = mWrapper->opUnitCore->mId;
 
+    mWrapper->mOpUnitNetwork = new OpUnitNetwork(mWrapper);
+    mWrapper->opSquad->add(mWrapper->mOpUnitNetwork);
+    mWrapper->mOpUnitNetworkId = mWrapper->mOpUnitNetwork->mId;
+
     mWrapper->opUnitUI = new OpUnitUI(mWrapper);
     mWrapper->opSquad->add(mWrapper->opUnitUI);
     mWrapper->mOpUnitUIId = mWrapper->opUnitUI->mId;
@@ -164,6 +168,17 @@ void NActivity::onCreate(Bundle* savedInstanceState)
     mWrapper->mOpUnitAnim = new OpUnitAnim(mWrapper);
     mWrapper->opSquad->add(mWrapper->mOpUnitAnim);
     mWrapper->mOpUnitAnimId = mWrapper->mOpUnitAnim->mId;
+
+    mWrapper->mServiceGenericAccessId = "00001800-0000-1000-8000-00805f9b34fb";
+    mWrapper->mServiceGattId = "00001801-0000-1000-8000-00805f9b34fb";
+    mWrapper->mServiceApplicationId = "0110f9b3-0220-0330-0440-000000000000";
+    mWrapper->mCharacteristicServiceChangedId = "00002a05-0000-1000-8000-00805f9b34fb";
+    mWrapper->mCharacteristicDeviceNameId = "00002a00-0000-1000-8000-00805f9b34fb";
+    mWrapper->mCharacteristicAppearanceId = "00002a01-0000-1000-8000-00805f9b34fb";
+
+    mWrapper->mDescriptorCCCDId = "00002902-0000-1000-8000-00805f9b34fb";
+    mWrapper->dBluetoothAdapter = BluetoothAdapter::getDefaultAdapter();
+    mWrapper->mBluetoothManager = (BluetoothManager*)getSystemService(Context::BLUETOOTH_SERVICE);
 
     mWrapper->opUnitCore->start();
 }
@@ -256,12 +271,12 @@ void NActivity::handleMessage(long long int m)
 
 void NActivity::onReceiveDiscoveryFinished()
 {
-    sendOp(mWrapper->mOpUnitCoreId, mWrapper->w->mNAlpha00, new OpParam());
+    ++mWrapper->mcDiscoveryDone;
 }
 
 void NActivity::onReceiveFoundDevice(BluetoothDevice* dBluetoothDevice)
 {
-    sendOp(mWrapper->mOpUnitCoreId, mWrapper->w->mNBeta00, new OpParam((NParam)dBluetoothDevice));
+    sendOp(mWrapper->mOpUnitNetworkId, mWrapper->w->mNBeta00, new OpParam((NParam)dBluetoothDevice));
 }
 
 void NActivity::removeWidget(nuint vcDBObjectId)

@@ -34,10 +34,8 @@ public:
     nuint mcInterruptDone;
     nuint mcRunningInitializations;
     nuint mcDiscovery;
-    nuint mcDiscoveryDone;
     unordered_set<String> maMacInitializing;
     unordered_set<String> maMacConnected;
-    unordered_set<BluetoothDevice*> maBluetoothDevice;
     nuint mcState;
 };
 

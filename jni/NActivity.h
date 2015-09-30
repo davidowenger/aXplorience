@@ -17,6 +17,7 @@ public:
     void addWidget();
     void renderHeader();
     void removeWidget(nuint vcDBObjectId);
+    void scan();
     void setView(nint vcView, DBObject* vDBObject = nullptr);
     void sort(DBCollection* vDBCollection);
     void tilt(nuint color);

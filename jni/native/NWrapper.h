@@ -120,6 +120,8 @@ public:
     NVisitor* mNVisitorAppActivity;
     NVisitor* mNVisitorAppFragment;
     NVisitor* mNVisitorBluetooth;
+    NVisitor* mNVisitorBluetoothGatt;
+    NVisitor* mNVisitorBluetoothLe;
     NVisitor* mNVisitorContent;
     NVisitor* mNVisitorContentRes;
     NVisitor* mNVisitorGraphics;

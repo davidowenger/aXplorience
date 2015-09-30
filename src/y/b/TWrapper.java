@@ -6,7 +6,7 @@ import android.content.Context;
 
 public class TWrapper
 {
-    public static final boolean kDoDebug = false;
+    public static final boolean kDoDebug = true;
     static {
         System.loadLibrary("gnustl_shared");
         System.loadLibrary("TActivity");
@@ -132,6 +132,8 @@ public class TWrapper
     TVisitor mTVisitorAppActivity;
     TVisitor mTVisitorAppFragment;
     TVisitor mTVisitorBluetooth;
+    TVisitor mTVisitorBluetoothGatt;
+    TVisitor mTVisitorBluetoothLe;
     TVisitor mTVisitorContent;
     TVisitor mTVisitorContentRes;
     TVisitor mTVisitorGraphics;

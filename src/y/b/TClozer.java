@@ -9,6 +9,7 @@ import y.b.R;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.IntentFilter;
+import android.os.Build.VERSION;
 
 public class TClozer extends TFrame
 {
@@ -135,6 +136,8 @@ public class TClozer extends TFrame
             w.mTVisitorAppActivity = new TVisitorAppActivity(w),
             w.mTVisitorAppFragment = new TVisitorAppFragment(w),
             w.mTVisitorBluetooth = new TVisitorBluetooth(w),
+            w.mTVisitorBluetoothGatt = new TVisitorBluetoothGatt(w),
+            w.mTVisitorBluetoothLe = new TVisitorBluetoothLe(w),
             w.mTVisitorContent = new TVisitorContent(w),
             w.mTVisitorContentRes = new TVisitorContentRes(w),
             w.mTVisitorGraphics = new TVisitorGraphics(w),
@@ -178,7 +181,7 @@ public class TClozer extends TFrame
         w.mTAlpha00.n = nInit(GET_ELEMENT);
         w.sTElement.put(w.mTAlpha00.n, w.mTAlpha00);
 
-        w.tActivity.n = nRun(w.mTAlpha00);
+        w.tActivity.n = nRun(w.mTAlpha00, VERSION.SDK_INT);
         w.sObject.put(w.tActivity.n, w.tActivity);
 
         for ( i = 0 ; i < w.aAction.length && i < w.tActivityReceiver.length ; ++i ) {
@@ -209,7 +212,21 @@ public class TClozer extends TFrame
         Object ret = null;
 
         synchronized (w.aObject) {
-            ret = w.aObject.remove((int)a);
+            ret = w.aObject.get((int)a);
+        }
+        if (b >= 0 && ret instanceof LinkedList<?>) {
+            if (b == ((LinkedList<?>)ret).size() - 1) {
+                synchronized (w.aObject) {
+                    w.aObject.remove((int)a);
+                }
+            }
+            synchronized (w.aObject) {
+               ret = ((LinkedList<?>)ret).get((int)b);
+            }
+        } else {
+            synchronized (w.aObject) {
+                w.aObject.remove((int)a);
+            }
         }
         return ret;
     }
@@ -254,7 +271,7 @@ public class TClozer extends TFrame
                 ret = ((Number)((LinkedList<?>)o).get((int)b)).longValue();
             } else {
                 synchronized (w.sObject) {
-                    w.sObject.put(c, ((LinkedList<?>)o).get((int)b));
+                   ret = emplaceKey(c, ((LinkedList<?>)o).get((int)b));
                 }
             }
             if (b == ((LinkedList<?>)o).size() - 1) {

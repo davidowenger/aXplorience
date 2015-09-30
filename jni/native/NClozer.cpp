@@ -1,5 +1,12 @@
 #include "native/NCommon.h"
 
+namespace NSDEVICE
+{
+
+int Build::VERSION::SDK_INT = 0;
+
+} // END namespace
+
 namespace NSNATIVE
 {
 
@@ -108,13 +115,15 @@ NClozer::NClozer(NWrapper* w)
         (nlong)(w->mNPsi03 = new NPsi03()),
         (nlong)(w->mNOmega03 = new NOmega03())
     };
-    w->mcNVisitor = 17;
+    w->mcNVisitor = 19;
     w->maNVisitor = new nlong[w->mcNVisitor] {
         (nlong)(this),
         (nlong)(w->mNVisitorApp = new NVisitorApp(w)),
         (nlong)(w->mNVisitorAppActivity = new NVisitorAppActivity(w)),
         (nlong)(w->mNVisitorAppFragment = new NVisitorAppFragment(w)),
         (nlong)(w->mNVisitorBluetooth = new NVisitorBluetooth(w)),
+        (nlong)(w->mNVisitorBluetoothGatt = new NVisitorBluetoothGatt(w)),
+        (nlong)(w->mNVisitorBluetoothLe = new NVisitorBluetoothLe(w)),
         (nlong)(w->mNVisitorContent = new NVisitorContent(w)),
         (nlong)(w->mNVisitorContentRes = new NVisitorContentRes(w)),
         (nlong)(w->mNVisitorGraphics = new NVisitorGraphics(w)),
@@ -206,6 +215,7 @@ NReturn NClozer::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d
     for (index = 1 ; index < w->mcNVisitor; ++index) {
         tRun(w->mNBeta00, (NParam)w->maNVisitor[index], index);
     }
+    Build::VERSION::SDK_INT = a;
     Typeface::DEFAULT = Typeface::create("", Typeface::NORMAL);
     Typeface::DEFAULT_BOLD = Typeface::create("", Typeface::BOLD);
     Typeface::SANS_SERIF = Typeface::create("sans-serif", Typeface::NORMAL);

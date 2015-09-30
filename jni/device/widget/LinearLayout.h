@@ -49,9 +49,7 @@ public:
     LinearLayout(Context* context)
         : ViewGroup(NWrapper::w->mNNoObject->instance<ViewGroup>())
     {
-        NParam a = (NParam)this;
-        NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNGamma00, a, (NParam)context);
-        //NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)context);
+        NWrapper::w->mNVisitorWidgetLayout->tRun(NWrapper::w->mNGamma00, (NParam)this, (NParam)context);
     }
 
     virtual ~LinearLayout()

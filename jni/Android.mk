@@ -12,6 +12,7 @@ LOCAL_SRC_FILES := \
 	db/DBFile.cpp \
 	db/DBHandler.cpp \
 	device/graphics/Typeface.cpp \
+	device/content/Context.cpp \
 	device/bluetooth/BluetoothAdapter.cpp \
 	device/bluetooth/BluetoothDevice.cpp \
 	device/bluetooth/BluetoothSocket.cpp \
@@ -45,11 +46,13 @@ LOCAL_SRC_FILES := \
 	FragmentLevel0.cpp \
 	RootLayout.cpp \
 	OpUnitAnim.cpp \
+	OpUnitNetwork.cpp \
 	OpUnitListener.cpp \
 	OpUnitPeer.cpp \
 	OpUnitServer.cpp \
 	OpUnitUI.cpp \
 	OpUnitCore.cpp \
+	Peer.cpp \
 	NActivity.cpp
 
 LOCAL_LDLIBS := \

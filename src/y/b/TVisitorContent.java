@@ -18,6 +18,12 @@ public class TVisitorContent extends TVisitor
         return w.tFrame.emplaceKey(b, ((Context)w.sObject.get(a)).getApplicationContext());
     }
 
+    // Object* getSystemService(const String& name)
+    public long visit(TGamma00 element, long a, long b, long c, long d, long e)
+    {
+        return w.tFrame.emplaceKey(b, ((Context)w.sObject.get(a)).getSystemService((String)w.tFrame.nRunObject(c)));
+    }
+
     //*******************************************************************************
     //**************************** ContextWrapper ***********************************
     //*******************************************************************************

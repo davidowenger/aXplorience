@@ -6,7 +6,7 @@ namespace NSDEVICE
 
 OpUnitCore::OpUnitCore(Wrapper* const w)
     : OpUnit(w), mcProcessedDevice(0), mcTimeStampBTDiscovery(0), mcTimeStampBTState(0), mcInterruptDone(0), mcRunningInitializations(0),
-      mcDiscovery(0), mcDiscoveryDone(0), maMacInitializing(), maMacConnected(), maBluetoothDevice(), mcState(0)
+      mcDiscovery(0), maMacInitializing(), maMacConnected(), mcState(0)
 {
     mWrapper->dbh = new DBHandler(mWrapper);
     mWrapper->dbh->add<Table_Message>("Message");
@@ -34,11 +34,19 @@ void OpUnitCore::run()
     LOGD((String("System timestamp is : #") + to_string(system_clock::now().time_since_epoch().count())).c_str());
     mWrapper->mc1Seconde = chrono::duration_cast<system_clock::duration>(chrono::seconds(1)).count();
     mWrapper->mMili = chrono::milliseconds(1);
-    mWrapper->dBluetoothAdapter = BluetoothAdapter::getDefaultAdapter();
+    //mWrapper->dBluetoothAdapter = BluetoothAdapter::getDefaultAdapter();
+    mWrapper->sServiceName = "Proximity service";
+    mWrapper->sUuidService = "0000F9B3-0000-0000-0000-";
     mWrapper->mcBTState = 0;
+    mWrapper->mcConnected = 0;
+    mWrapper->mcRunningInitializations = 0;
     mWrapper->mcInterrupt = 0;
     mWrapper->mIsInterrupted = false;
 
+    if (mWrapper->dBluetoothAdapter) {
+        mWrapper->mac = parseMac(mWrapper->dBluetoothAdapter->getAddress());
+        LOGD(("System MAC address is : #" + mWrapper->mac).c_str());
+    }
     // Init database
     DBCollection* vaApplication = mWrapper->dbh->get("Application")->getCollection();
     DBCollection* vaMessage = mWrapper->dbh->get("Message")->getCollection();
@@ -68,20 +76,19 @@ void OpUnitCore::run()
     delete vaApplication;
     delete vaMessage;
 
-    mWrapper->mcConnected = 0;
-    mWrapper->mac = parseMac(mWrapper->dBluetoothAdapter->getAddress());
-    mWrapper->sServiceName = "Proximity service";
-    mWrapper->sUuidService = "0000F9B3-0000-0000-0000-";
-
     mWrapper->maSort.emplace_back(mWrapper->mDBObjectApplication->get("sSort0"), mWrapper->mDBObjectApplication->is("sAscending0"));
     mWrapper->maSort.emplace_back(mWrapper->mDBObjectApplication->get("sSort1"), mWrapper->mDBObjectApplication->is("sAscending1"));
     mWrapper->maSort.emplace_back(mWrapper->mDBObjectApplication->get("sSort2"), mWrapper->mDBObjectApplication->is("sAscending2"));
 
     // Start other threads
+    mWrapper->maMessageAlive->add(new String("#2#3"));
     mWrapper->opUnitUI->start();
-    mWrapper->opUnitServer->start();
+    //mWrapper->opUnitServer->start();
     mWrapper->mOpUnitAnim->start();
 
+    if (mWrapper->mBluetoothManager) {
+        mWrapper->mOpUnitNetwork->start();
+    }
     handleOp();
     cancel();
 }
@@ -96,7 +103,7 @@ void OpUnitCore::handleOp()
         vcTimeStampNow = system_clock::now().time_since_epoch().count();
 
         if (mWrapper->mcBTState && mcInterruptDone < mWrapper->mcInterrupt) {
-            mWrapper->dBluetoothAdapter->cancelDiscovery();
+            //mWrapper->dBluetoothAdapter->cancelDiscovery();
             mcTimeStampBTState = vcTimeStampNow;
             mcTimeStampBTDiscovery = vcTimeStampNow;
             mcState = 0;
@@ -113,26 +120,26 @@ void OpUnitCore::handleOp()
             mcState *= (bool)mWrapper->mcBTState;
             mcTimeStampBTState = vcTimeStampNow;
         }
-        if (
-            !mWrapper->mIsInterrupted && mcState == 0 && mWrapper->mcBTState &&
-            ((!maMacConnected.size() && mcRunningInitializations == 0) || vcTimeStampNow - mcTimeStampBTDiscovery > 120*mWrapper->mc1Seconde)
-        ) {
-            LOGD("startDiscovery");
-            mcDiscovery = mcDiscoveryDone + 1;
-            mWrapper->dBluetoothAdapter->startDiscovery();
-            mcState = 1;
-            mcTimeStampBTDiscovery = vcTimeStampNow;
-        }
-        if (
-            !mWrapper->mIsInterrupted && mcState == 1 && mWrapper->mcBTState &&
-            (mcDiscovery <= mcDiscoveryDone || vcTimeStampNow - mcTimeStampBTDiscovery > 20*mWrapper->mc1Seconde)
-        ) {
-            for (BluetoothDevice* vBluetoothDevice : maBluetoothDevice) {
-                requestAsClient(vBluetoothDevice);
-            }
-            maBluetoothDevice.clear();
-            mcState = 0;
-        }
+//        if (
+//            !mWrapper->mIsInterrupted && mcState == 0 && mWrapper->mcBTState &&
+//            ((!maMacConnected.size() && mcRunningInitializations == 0) || vcTimeStampNow - mcTimeStampBTDiscovery > 120*mWrapper->mc1Seconde)
+//        ) {
+//            LOGD("startDiscovery");
+//            mcDiscovery = mWrapper->mcDiscoveryDone + 1;
+//            mWrapper->dBluetoothAdapter->startDiscovery();
+//            mcState = 1;
+//            mcTimeStampBTDiscovery = vcTimeStampNow;
+//        }
+//        if (
+//            !mWrapper->mIsInterrupted && mcState == 1 && mWrapper->mcBTState &&
+//            (mcDiscovery <= mWrapper->mcDiscoveryDone || vcTimeStampNow - mcTimeStampBTDiscovery > 20*mWrapper->mc1Seconde)
+//        ) {
+//            for (BluetoothDevice* vBluetoothDevice : mWrapper->maBluetoothDevice) {
+//                requestAsClient(vBluetoothDevice);
+//            }
+//            mWrapper->maBluetoothDevice.clear();
+//            mcState = 0;
+//        }
         op = nextOp();
 
         if (op) {
@@ -161,11 +168,15 @@ OpCallback* OpUnitCore::sendOp(int vcOpUnitId, NElement* vNElement, Op* vOp)
 {
     OpCallback* ret = nullptr;
 
-    if (mAlive && mOpSquad->maOpUnitType[vcOpUnitId] == Wrapper::OPUNIT_TYPE_ACTIVITY) {
+    if (mAlive && vcOpUnitId == mWrapper->mOpUnitAppId) {
         vOp->mNElement = vNElement;
         mWrapper->mNActivity->sendMessage((NParam)vOp);
         ret = vOp->mOpCallback;
-    } else {
+    } else if (mAlive && vcOpUnitId == mWrapper->mOpUnitNetworkId) {
+        if (mWrapper->mBluetoothManager) {
+            ret = OpUnit::sendOp(vcOpUnitId, vNElement, vOp);
+        }
+    } else if (mAlive) {
         ret = OpUnit::sendOp(vcOpUnitId, vNElement, vOp);
     }
     return ret;
@@ -220,7 +231,7 @@ void OpUnitCore::requestAsClient(BluetoothDevice* vBluetoothDevice)
 
     if (vIsAlive) {
         vMac = parseMac(vBluetoothDevice->getAddress());
-        vIsAlive &= !maMacConnected.count(vMac);
+        //vIsAlive &= !maMacConnected.count(vMac);
 #ifdef DEBUG
         if (!vIsAlive) {
             String vDump;
@@ -233,7 +244,8 @@ void OpUnitCore::requestAsClient(BluetoothDevice* vBluetoothDevice)
 #endif
     }
     if (vIsAlive) {
-        vIsAlive &= !maMacInitializing.count(vMac);
+        //vIsAlive &= !maMacInitializing.count(vMac);
+        //vIsAlive &= maMacInitializing.emplace(vMac).second;
 #ifdef DEBUG
         if (!vIsAlive) {
             String vDump;
@@ -246,9 +258,15 @@ void OpUnitCore::requestAsClient(BluetoothDevice* vBluetoothDevice)
 #endif
     }
     if (vIsAlive) {
-        mWrapper->opSquad->add(new OpUnitPeer(mWrapper, vBluetoothDevice, vMac))->start();
-        LOGV(("Currently running initialization for MAC : #" + vMac).c_str());
-        ++mcRunningInitializations;
+        //mWrapper->opSquad->add(new OpUnitPeer(mWrapper, vBluetoothDevice, vMac))->start();
+        //LOGV(("Currently running initialization for MAC : #" + vMac).c_str());
+        //++mcRunningInitializations;
+        if (vMac == "E02A82CF0845" || vMac == "680571EDCCBE" || vMac == "E4B021A5443F" || vMac == "889B390B59E5") {
+            LOGD(("Initializing server with MAC : #" + vMac).c_str());
+            sendOp(mWrapper->mOpUnitNetworkId, w->mNAlpha00, new OpParam((NParam)vBluetoothDevice));
+        }
+        //maMacConnected.emplace(vMac);
+        //maMacInitializing.erase(vMac);
     }
     if (vBluetoothDevice && !vIsAlive) {
         delete vBluetoothDevice;
@@ -343,14 +361,14 @@ void OpUnitCore::unregisterConnection(const String& vsMac)
 // void onReceiveDiscoveryFinished()
 NReturn OpUnitCore::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    ++mcDiscoveryDone;
+    ++mWrapper->mcDiscoveryDone;
     return 0;
 }
 
 // void onReceiveFoundDevice(BluetoothDevice* dBluetoothDevice)
 NReturn OpUnitCore::visit(NBeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
 {
-    maBluetoothDevice.emplace((BluetoothDevice*)a);
+    mWrapper->maBluetoothDevice.emplace((BluetoothDevice*)a);
     return 0;
 }
 

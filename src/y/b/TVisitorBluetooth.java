@@ -10,6 +10,11 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattServerCallback;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
 import android.content.Intent;
 
 public class TVisitorBluetooth extends TVisitor
@@ -19,13 +24,41 @@ public class TVisitorBluetooth extends TVisitor
     }
 
     //*******************************************************************************
+    //********************** BluetoothAdapter::LeScanCallback ***********************
+    //*******************************************************************************
+
+    //BluetoothAdapter::LeScanCallback::LeScanCallback()
+    public long visit(TDzeta02 element, long a, long b, long c, long d, long e)
+    {
+        return w.tFrame.emplaceKey(a, new TLeScanCallback(w, a));
+    }
+
+    //*******************************************************************************
     //**************************** BluetoothAdapter *********************************
     //*******************************************************************************
+
+    //static bool checkBluetoothAddress(String address)
+    public long visit(TRho00 element, long a, long b, long c, long d, long e)
+    {
+        return ( BluetoothAdapter.checkBluetoothAddress((String)w.tFrame.nRunObject(a)) ? 1 : 0 );
+    }
 
     //static BluetoothAdapter* getDefaultAdapter()
     public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
     {
         return w.tFrame.emplaceKey(a, BluetoothAdapter.getDefaultAdapter());
+    }
+
+    //BluetoothLeAdvertiser* getBluetoothLeAdvertiser()
+    public long visit(TPsi00 element, long a, long b, long c, long d, long e)
+    {
+        return w.tFrame.emplaceKey(b, ((BluetoothAdapter)w.sObject.get(a)).getBluetoothLeAdvertiser());
+    }
+
+    //BluetoothLeScanner* getBluetoothLeScanner()
+    public long visit(TOmega00 element, long a, long b, long c, long d, long e)
+    {
+        return w.tFrame.emplaceKey(b, ((BluetoothAdapter)w.sObject.get(a)).getBluetoothLeScanner());
     }
 
     //BluetoothDevice* getRemoteDevice(String address)
@@ -38,6 +71,12 @@ public class TVisitorBluetooth extends TVisitor
     public long visit(TGamma00 element, long a, long b, long c, long d, long e)
     {
         return ( ((BluetoothAdapter)w.sObject.get(a)).isEnabled() ? 1 : 0 );
+    }
+
+    //bool isMultipleAdvertisementSupported()
+    public long visit(TRho01 element, long a, long b, long c, long d, long e)
+    {
+        return ( ((BluetoothAdapter)w.sObject.get(a)).isMultipleAdvertisementSupported() ? 1 : 0 );
     }
 
     //int getState()
@@ -86,6 +125,32 @@ public class TVisitorBluetooth extends TVisitor
     public long visit(TLambda00 element, long a, long b, long c, long d, long e)
     {
         return ( ((BluetoothAdapter)w.sObject.get(a)).startDiscovery() ? 1 : 0 );
+    }
+
+    //bool startLeScan(BluetoothAdapter::LeScanCallback* callback)
+    public long visit(TKhi00 element, long a, long b, long c, long d, long e)
+    {
+        return ( ((BluetoothAdapter)w.sObject.get(a)).startLeScan(w.tFrame.getValue(b, BluetoothAdapter.LeScanCallback.class)) ? 1 : 0 );
+    }
+
+    //bool startLeScan(NArray<String>* serviceUuids, BluetoothAdapter::LeScanCallback* callback)
+    public long visit(TUpsilon00 element, long a, long b, long c, long d, long e)
+    {
+        int vcIndex;
+        int vaUUIDString[] = (int[])w.aObject.remove((int)b);
+        UUID vaUUID[] = new UUID[vaUUIDString.length];
+
+        for (vcIndex = 0 ; vcIndex < vaUUIDString.length ; ++vcIndex) {
+            vaUUID[vcIndex] = UUID.fromString((String)w.tFrame.nRunObject(vaUUIDString[vcIndex]));
+        };
+        return ( ((BluetoothAdapter)w.sObject.get(a)).startLeScan(vaUUID, w.tFrame.getValue(c, BluetoothAdapter.LeScanCallback.class)) ? 1 : 0 );
+    }
+
+    //void stopLeScan(BluetoothAdapter::LeScanCallback* callback)
+    public long visit(TPhi00 element, long a, long b, long c, long d, long e)
+    {
+        ((BluetoothAdapter)w.sObject.get(a)).stopLeScan(w.tFrame.getValue(b, BluetoothAdapter.LeScanCallback.class));
+        return 0;
     }
 
     //bool cancelDiscovery()
@@ -157,12 +222,6 @@ public class TVisitorBluetooth extends TVisitor
         return w.tFrame.emplaceKey(b, vBluetoothServerSocket);
     }
 
-    //static bool checkBluetoothAddress(String address)
-    public long visit(TRho00 element, long a, long b, long c, long d, long e)
-    {
-        return ( BluetoothAdapter.checkBluetoothAddress((String)w.tFrame.nRunObject(a)) ? 1 : 0 );
-    }
-
     //void discoverable(int nTimeout)
     public long visit(TSigma00 element, long a, long b, long c, long d, long e)
     {
@@ -175,6 +234,40 @@ public class TVisitorBluetooth extends TVisitor
     //*******************************************************************************
     //***************************** BluetoothDevice *********************************
     //*******************************************************************************
+
+    //BluetoothGatt* connectGatt(Context* context, bool autoConnect, BluetoothGattCallback* callback)
+    public long visit(TXi01 element, long a, long b, long c, long d, long e)
+    {
+        return w.tFrame.emplaceKey(b, ((BluetoothDevice)w.sObject.get(a)).connectGatt(w.tFrame.getValue(c, Context.class), d != 0, w.tFrame.getValue(e, BluetoothGattCallback.class)));
+    }
+
+    //BluetoothGatt* connectGatt(Context* context, bool autoConnect, BluetoothGattCallback* callback, int transport)
+    public long visit(TOmicron01 element, long a, long b, long c, long d, long e)
+    {
+        BluetoothGatt vBluetoothGatt = null;
+        BluetoothDevice vBluetoothDevice = (BluetoothDevice)w.sObject.get(a);
+        Class<?> vClass;
+        Method vMethod;
+
+        try {
+            vClass = vBluetoothDevice.getClass();
+            vMethod = vClass.getDeclaredMethod("connectGatt", new Class[] { Context.class, Boolean.TYPE, BluetoothGattCallback.class, Integer.TYPE });
+            vMethod.setAccessible(true);
+            vBluetoothGatt = (BluetoothGatt)vMethod.invoke(vBluetoothDevice, new Object[] {
+                w.tFrame.getValue(c, Context.class),
+                (Boolean)((d&1) != 0),
+                w.tFrame.getValue(e, BluetoothGattCallback.class),
+                (Integer)((int)d>>32)
+            });
+        }
+        catch (Exception vException) {
+            vBluetoothGatt = null;
+        }
+        if (vBluetoothGatt == null) {
+            vBluetoothGatt = vBluetoothDevice.connectGatt(w.tFrame.getValue(c, Context.class), (d&1) != 0, w.tFrame.getValue(e, BluetoothGattCallback.class));
+        }
+        return w.tFrame.emplaceKey(b, vBluetoothGatt);
+    }
 
     //bool equals(BluetoothDevice* dBluetoothDevice);
     public long visit(TAlpha01 element, long a, long b, long c, long d, long e)
@@ -231,6 +324,12 @@ public class TVisitorBluetooth extends TVisitor
         return w.tFrame.emplaceKey(b, ((BluetoothDevice)w.sObject.get(a)).getBluetoothClass());
     }
 
+    //int getType()
+    public long visit(TPi01 element, long a, long b, long c, long d, long e)
+    {
+        return ((BluetoothDevice)w.sObject.get(a)).getType();
+    }
+
     //BluetoothSocket* createInsecureRfcommSocket(int port);
     public long visit(TNu01 element, long a, long b, long c, long d, long e)
     {
@@ -284,6 +383,15 @@ public class TVisitorBluetooth extends TVisitor
     public long visit(TMu01 element, long a, long b, long c, long d, long e)
     {
         return w.tFrame.putNext(((BluetoothDevice)w.sObject.get(a)).getUuids());
+    }
+
+    //*******************************************************************************
+    //********************************** BluetoothManager ***************************
+    //*******************************************************************************
+    //BluetoothGattServer* openGattServer(Context* context, BluetoothGattServerCallback* callback)
+    public long visit(TEpsilon02 element, long a, long b, long c, long d, long e)
+    {
+        return w.tFrame.emplaceKey(b, ((BluetoothManager)w.sObject.get(a)).openGattServer(w.tFrame.getValue(c, Context.class), w.tFrame.getValue(d, BluetoothGattServerCallback.class)));
     }
 
     //*******************************************************************************
