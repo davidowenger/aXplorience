@@ -19,7 +19,6 @@ class BluetoothDevice : public Object
 friend NSNATIVE::NNoObject;
 
 public:
-    static const int ERROR;
     static const String ACTION_FOUND;
     static const String ACTION_DISAPPEARED;
     static const String ACTION_CLASS_CHANGED;
@@ -34,10 +33,17 @@ public:
     static const String EXTRA_CLASS;
     static const String EXTRA_BOND_STATE;
     static const String EXTRA_PREVIOUS_BOND_STATE;
-    static const int BOND_NONE;
-    static const int BOND_BONDING;
-    static const int BOND_BONDED;
 
+    static const int BOND_BONDED = 0x0000000c;
+    static const int BOND_BONDING = 0x0000000b;
+    static const int BOND_NONE = 0x0000000a;
+    static const int ERROR = 0x80000000;
+    static const int TRANSPORT_AUTO = 0x00000000;
+    static const int TRANSPORT_BREDR = 0x00000001;
+    static const int TRANSPORT_LE = 0x00000002;
+
+    BluetoothGatt* connectGatt(Context* context, bool autoConnect, BluetoothGattCallback* callback);
+    BluetoothGatt* connectGatt(Context* context, bool autoConnect, BluetoothGattCallback* callback, int transport);
     bool equals(BluetoothDevice* dBluetoothDevice);
     int hashCode();
     String toString();
@@ -47,6 +53,7 @@ public:
     String getName();
     int getBondState();
     BluetoothClass* getBluetoothClass();
+    int getType();
     BluetoothSocket* createInsecureRfcommSocket(int port);
     BluetoothSocket* createInsecureRfcommSocketToServiceRecord(const String& uuid);
     BluetoothSocket* createRfcommSocketToServiceRecord(const String& uuid);

@@ -11,6 +11,7 @@ LOCAL_SRC_FILES := \
 	op/OpSquad.cpp \
 	db/DBFile.cpp \
 	db/DBHandler.cpp \
+	device/content/Context.cpp \
 	device/graphics/Typeface.cpp \
 	device/bluetooth/BluetoothAdapter.cpp \
 	device/bluetooth/BluetoothDevice.cpp \

@@ -3,11 +3,6 @@
 namespace NSDEVICE
 {
 
-const int BluetoothDevice::ERROR = -1 >> 1;
-const int BluetoothDevice::BOND_NONE = 10;
-const int BluetoothDevice::BOND_BONDING = 11;
-const int BluetoothDevice::BOND_BONDED = 12;
-
 const String BluetoothDevice::ACTION_FOUND = "android.bluetooth.device.action.FOUND";
 const String BluetoothDevice::ACTION_DISAPPEARED = "android.bluetooth.device.action.DISAPPEARED";
 const String BluetoothDevice::ACTION_CLASS_CHANGED = "android.bluetooth.device.action.CLASS_CHANGED";
@@ -23,6 +18,18 @@ const String BluetoothDevice::EXTRA_RSSI = "android.bluetooth.device.extra.RSSI"
 const String BluetoothDevice::EXTRA_CLASS = "android.bluetooth.device.extra.CLASS";
 const String BluetoothDevice::EXTRA_BOND_STATE = "android.bluetooth.device.extra.BOND_STATE";
 const String BluetoothDevice::EXTRA_PREVIOUS_BOND_STATE = "android.bluetooth.device.extra.PREVIOUS_BOND_STATE";
+
+BluetoothGatt* BluetoothDevice::connectGatt(Context* context, bool autoConnect, BluetoothGattCallback* callback)
+{
+    BluetoothGatt* b = NWrapper::w->mNNoObject->pointer<BluetoothGatt>();
+    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNXi01, (NParam)this, (NParam)b, (NParam)context, (NParam)autoConnect, (NParam)callback));
+}
+
+BluetoothGatt* BluetoothDevice::connectGatt(Context* context, bool autoConnect, BluetoothGattCallback* callback, int transport)
+{
+    BluetoothGatt* b = NWrapper::w->mNNoObject->pointer<BluetoothGatt>();
+    return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNOmicron01, (NParam)this, (NParam)b, (NParam)context, (((NParam)transport)<<32) + autoConnect, (NParam)callback));
+}
 
 bool BluetoothDevice::equals(BluetoothDevice* dBluetoothDevice)
 {
@@ -72,6 +79,11 @@ BluetoothClass* BluetoothDevice::getBluetoothClass()
 {
     BluetoothClass* b = NWrapper::w->mNNoObject->pointer<BluetoothClass>();
     return NWrapper::w->mNNoObject->emplaceKey(b, NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNIota01, (NParam)this, (NParam)b));
+}
+
+int BluetoothDevice::getType()
+{
+    return (nint)NWrapper::w->mNVisitorBluetooth->tRun(NWrapper::w->mNPi01, (NParam)this);
 }
 
 BluetoothSocket* BluetoothDevice::createInsecureRfcommSocket(int port)

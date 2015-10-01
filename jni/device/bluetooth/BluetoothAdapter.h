@@ -18,13 +18,25 @@ public:
     const int SCAN_MODE_CONNECTABLE = 21;
     const int SCAN_MODE_CONNECTABLE_DISCOVERABLE = 23;
 
-    static BluetoothAdapter* getDefaultAdapter();
+    class LeScanCallback
+    {
+    public:
+        virtual ~LeScanCallback();
+        virtual void onLeScan(BluetoothDevice* device, int rssi, NArray<nubyte> scanRecord) = 0;
+    protected:
+        LeScanCallback();
+    };
+
     static bool checkBluetoothAddress(const String& address);
+    static BluetoothAdapter* getDefaultAdapter();
 
     virtual ~BluetoothAdapter() override;
 
+    BluetoothLeAdvertiser* getBluetoothLeAdvertiser();
+    BluetoothLeScanner* getBluetoothLeScanner();
     BluetoothDevice* getRemoteDevice(const String& address);
     bool isEnabled();
+    bool isMultipleAdvertisementSupported();
     int getState();
     bool enable();
     bool disable();
@@ -33,6 +45,9 @@ public:
     bool setName(const String& name);
     int getScanMode();
     bool startDiscovery();
+    bool startLeScan(BluetoothAdapter::LeScanCallback* callback);
+    bool startLeScan(NArray<String> serviceUuids, BluetoothAdapter::LeScanCallback* callback);
+    void stopLeScan(BluetoothAdapter::LeScanCallback* callback);
     bool cancelDiscovery();
     bool isDiscovering();
     void* getBondedDevices(); //List...<BluetoothDevice>

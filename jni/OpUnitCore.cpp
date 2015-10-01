@@ -161,7 +161,7 @@ OpCallback* OpUnitCore::sendOp(int vcOpUnitId, NElement* vNElement, Op* vOp)
 {
     OpCallback* ret = nullptr;
 
-    if (mAlive && mOpSquad->maOpUnitType[vcOpUnitId] == Wrapper::OPUNIT_TYPE_ACTIVITY) {
+    if (mAlive && vcOpUnitId == mWrapper->mOpUnitAppId) {
         vOp->mNElement = vNElement;
         mWrapper->mNActivity->sendMessage((NParam)vOp);
         ret = vOp->mOpCallback;

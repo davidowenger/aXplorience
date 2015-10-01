@@ -15,7 +15,7 @@
 //*******************************************************************************
 
 #define TARGET_ANDROID
-//#define CONFIG_DEBUG
+#define CONFIG_DEBUG
 #define LOG_TAG "aXplorience"
 
 //*******************************************************************************
@@ -143,6 +143,7 @@ class View;
 class ViewGroup;
 class BluetoothAdapter;
 class BluetoothDevice;
+class BluetoothManager;
 
 } // END namespace
 
@@ -155,6 +156,7 @@ class NVisitorApp;
 class NVisitorAppActivity;
 class NVisitorAppFragment;
 class NVisitorBluetooth;
+class NVisitorBluetoothLe;
 class NVisitorContentRes;
 class NVisitorIO;
 class NVisitorView;
@@ -165,6 +167,7 @@ class NFrame;
 
 using namespace NSNATIVE;
 
+#include "native/NArray.h"
 #include "native/NNoObject.h"
 #include "native/NElement.h"
 #include "native/NWrapper.h"
@@ -184,6 +187,7 @@ using namespace NSNATIVE;
 #include "device/lang/Object.h"
 #include "device/R.h"
 #include "device/util/DisplayMetrics.h"
+#include "device/os/Build.h"
 #include "device/os/BaseBundle.h"
 #include "device/os/Bundle.h"
 #include "device/os/ParcelUuid.h"
@@ -212,6 +216,23 @@ using namespace NSNATIVE;
 #include "device/view/ViewGroup.h"
 #include "device/io/InputStream.h"
 #include "device/io/OutputStream.h"
+#include "device/bluetooth/le/ScanRecord.h"
+#include "device/bluetooth/le/ScanResult.h"
+#include "device/bluetooth/le/ScanCallback.h"
+#include "device/bluetooth/le/AdvertiseSettings.h"
+#include "device/bluetooth/le/AdvertiseCallback.h"
+#include "device/bluetooth/le/AdvertiseData.h"
+#include "device/bluetooth/le/BluetoothLeAdvertiser.h"
+#include "device/bluetooth/le/BluetoothLeScanner.h"
+#include "device/bluetooth/BluetoothProfile.h"
+#include "device/bluetooth/BluetoothGattDescriptor.h"
+#include "device/bluetooth/BluetoothGattCharacteristic.h"
+#include "device/bluetooth/BluetoothGattService.h"
+#include "device/bluetooth/BluetoothGatt.h"
+#include "device/bluetooth/BluetoothGattCallback.h"
+#include "device/bluetooth/BluetoothGattServerCallback.h"
+#include "device/bluetooth/BluetoothGattServer.h"
+#include "device/bluetooth/BluetoothManager.h"
 #include "device/bluetooth/BluetoothSocket.h"
 #include "device/bluetooth/BluetoothServerSocket.h"
 #include "device/bluetooth/BluetoothDevice.h"
@@ -245,6 +266,8 @@ using namespace NSNATIVE;
 #include "native/NVisitorAppActivity.h"
 #include "native/NVisitorAppFragment.h"
 #include "native/NVisitorBluetooth.h"
+#include "native/NVisitorBluetoothGatt.h"
+#include "native/NVisitorBluetoothLe.h"
 #include "native/NVisitorContent.h"
 #include "native/NVisitorContentRes.h"
 #include "native/NVisitorIO.h"
