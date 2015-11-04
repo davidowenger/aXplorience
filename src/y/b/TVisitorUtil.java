@@ -2,7 +2,7 @@ package y.b;
 
 import android.util.DisplayMetrics;
 
-public class TVisitorUtil extends TVisitor
+public class TVisitorUtil extends TKrossVisitor
 {
     public TVisitorUtil(TWrapper w) {
         super(w);

@@ -12,7 +12,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-public class TVisitorWidgetView extends TVisitor
+public class TVisitorWidgetView extends TKrossVisitor
 {
     public final ScaleType[] maScaleType = ScaleType.values();
 
@@ -121,7 +121,7 @@ public class TVisitorWidgetView extends TVisitor
     // void setHint(const String& hint)
     public long visit(TUpsilon00 element, long a, long b, long c, long d, long e)
     {
-        ((TextView)w.sObject.get(a)).setHint((String)w.tFrame.nRunObject(b));
+        ((TextView)w.sObject.get(a)).setHint((String)w.mTKrossSystem.nRunObject(b));
         return 0;
     }
 
@@ -162,7 +162,7 @@ public class TVisitorWidgetView extends TVisitor
     // void setText(const String& text)
     public long visit(TPi00 element, long a, long b, long c, long d, long e)
     {
-        ((TextView)w.sObject.get(a)).setText((String)w.tFrame.nRunObject(b));
+        ((TextView)w.sObject.get(a)).setText((String)w.mTKrossSystem.nRunObject(b));
         return 0;
     }
 

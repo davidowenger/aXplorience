@@ -3,7 +3,7 @@ package y.b;
 import android.content.Context;
 import android.content.ContextWrapper;
 
-public class TVisitorContent extends TVisitor
+public class TVisitorContent extends TKrossVisitor
 {
     public TVisitorContent(TWrapper w) {
         super(w);
@@ -15,13 +15,13 @@ public class TVisitorContent extends TVisitor
     //  Context* getApplicationContext()
     public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((Context)w.sObject.get(a)).getApplicationContext());
+        return w.mTKrossSystem.emplaceKey(b, ((Context)w.sObject.get(a)).getApplicationContext());
     }
 
     // Object* getSystemService(const String& name)
     public long visit(TGamma00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((Context)w.sObject.get(a)).getSystemService((String)w.tFrame.nRunObject(c)));
+        return w.mTKrossSystem.emplaceKey(b, ((Context)w.sObject.get(a)).getSystemService((String)w.mTKrossSystem.nRunObject(c)));
     }
 
     //*******************************************************************************
@@ -30,6 +30,6 @@ public class TVisitorContent extends TVisitor
     // Resources* getResources()
     public long visit(TBeta00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((ContextWrapper)w.sObject.get(a)).getResources());
+        return w.mTKrossSystem.emplaceKey(b, ((ContextWrapper)w.sObject.get(a)).getResources());
     }
 }

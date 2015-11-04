@@ -4,7 +4,7 @@ import android.content.Context;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-public class TVisitorWidgetLayout extends TVisitor
+public class TVisitorWidgetLayout extends TKrossVisitor
 {
     public TVisitorWidgetLayout(TWrapper w) {
         super(w);

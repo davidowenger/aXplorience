@@ -23,8 +23,8 @@ public class TBluetoothGattCallback extends BluetoothGattCallback
     {
         long vcKey;
         w.mTVisitorBluetoothGatt.nRun(w.mTAlpha01, n,
-            (vcKey = w.tFrame.getKey(gatt)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTAlpha01, n, -1, 2), gatt),
-            (vcKey = w.tFrame.getKey(characteristic)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTAlpha01, n, -1, 1), characteristic),
+            (vcKey = w.mTKrossSystem.getKey(gatt)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTAlpha01, n, -1, 2), gatt),
+            (vcKey = w.mTKrossSystem.getKey(characteristic)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTAlpha01, n, -1, 1), characteristic),
             status
         );
     }
@@ -34,7 +34,7 @@ public class TBluetoothGattCallback extends BluetoothGattCallback
     {
         long vcKey;
         w.mTVisitorBluetoothGatt.nRun(w.mTBeta01, n,
-            (vcKey = w.tFrame.getKey(gatt)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTBeta01, n, -1, 1), gatt),
+            (vcKey = w.mTKrossSystem.getKey(gatt)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTBeta01, n, -1, 1), gatt),
             status,
             newState
         );
@@ -45,7 +45,7 @@ public class TBluetoothGattCallback extends BluetoothGattCallback
     {
         long vcKey;
         w.mTVisitorBluetoothGatt.nRun(w.mTGamma01, n,
-            (vcKey = w.tFrame.getKey(gatt)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTGamma01, n, -1, 1), gatt),
+            (vcKey = w.mTKrossSystem.getKey(gatt)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTGamma01, n, -1, 1), gatt),
             status
         );
     }

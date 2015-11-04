@@ -29,7 +29,7 @@ public class TLinearLayout extends LinearLayout
     {
         long vcKey;
         return w.mTVisitorViewViewGroup.nRun(w.mTEta00, n,
-            (vcKey = w.tFrame.getKey(ev)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewViewGroup.nRun(w.mTEta00, n, -1, 1), ev)
+            (vcKey = w.mTKrossSystem.getKey(ev)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorViewViewGroup.nRun(w.mTEta00, n, -1, 1), ev)
         ) != 0;
     }
 }

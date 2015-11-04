@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TVisitorViewView extends TVisitor
+public class TVisitorViewView extends TKrossVisitor
 {
     public TVisitorViewView(TWrapper w) {
         super(w);
@@ -24,7 +24,7 @@ public class TVisitorViewView extends TVisitor
     // Drawable* getBackground()
     public long visit(TOmicron00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((View)w.sObject.get(a)).getBackground());
+        return w.mTKrossSystem.emplaceKey(b, ((View)w.sObject.get(a)).getBackground());
     }
 
     // int getId()
@@ -77,7 +77,7 @@ public class TVisitorViewView extends TVisitor
     // void setBackgroundDrawable(Drawable* background)
     public long visit(TDzeta00 element, long a, long b, long c, long d, long e)
     {
-        ((View)w.sObject.get(a)).setBackgroundDrawable(w.tFrame.getValue(b, Drawable.class));
+        ((View)w.sObject.get(a)).setBackgroundDrawable(w.mTKrossSystem.getValue(b, Drawable.class));
         return 0;
     }
 

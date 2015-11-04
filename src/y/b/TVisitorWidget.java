@@ -15,7 +15,7 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView.BufferType;
 import android.widget.ToggleButton;
 
-public class TVisitorWidget extends TVisitor
+public class TVisitorWidget extends TKrossVisitor
 {
     public final BufferType[] maBufferType = BufferType.values();
 
@@ -46,7 +46,7 @@ public class TVisitorWidget extends TVisitor
     // View* getDropDownView(int position, View* convertView, ViewGroup* parent)
     public long visit(TGamma00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putKey(b, ((TBaseAdapter)w.sObject.get(a)).getDropDownViewParent((int)c, (View)w.sObject.get(d), (ViewGroup)w.sObject.get(e)));
+        return w.mTKrossSystem.putKey(b, ((TBaseAdapter)w.sObject.get(a)).getDropDownViewParent((int)c, (View)w.sObject.get(d), (ViewGroup)w.sObject.get(e)));
     }
 
     //******************************************************************************************
@@ -68,7 +68,7 @@ public class TVisitorWidget extends TVisitor
     // void setButtonDrawable(Drawable* d)
     public long visit(TLambda00 element, long a, long b, long c, long d, long e)
     {
-        ((CompoundButton)w.sObject.get(a)).setButtonDrawable(w.tFrame.getValue(b, Drawable.class));
+        ((CompoundButton)w.sObject.get(a)).setButtonDrawable(w.mTKrossSystem.getValue(b, Drawable.class));
         return 0;
     }
 
@@ -100,13 +100,13 @@ public class TVisitorWidget extends TVisitor
             if (w.doDebug) vException.printStackTrace();
             vString = null;
         }
-        return w.tFrame.putNext(vString);
+        return w.mTKrossSystem.putNext(vString);
     }
 
     // void setText(const String& text, TextView::BufferType type)
     public long visit(TXi00 element, long a, long b, long c, long d, long e)
     {
-        ((EditText)w.sObject.get(a)).setText((String)w.tFrame.nRunObject(b), maBufferType[(int)c]);
+        ((EditText)w.sObject.get(a)).setText((String)w.mTKrossSystem.nRunObject(b), maBufferType[(int)c]);
         return 0;
     }
 
@@ -171,14 +171,14 @@ public class TVisitorWidget extends TVisitor
     // void setTextOn(const String& textOn)
     public long visit(TKhi00 element, long a, long b, long c, long d, long e)
     {
-        ((ToggleButton)w.sObject.get(a)).setTextOn((String)w.tFrame.nRunObject(b));
+        ((ToggleButton)w.sObject.get(a)).setTextOn((String)w.mTKrossSystem.nRunObject(b));
         return 0;
     }
 
     // void setTextOff(const String& textOff)
     public long visit(TPsi00 element, long a, long b, long c, long d, long e)
     {
-        ((ToggleButton)w.sObject.get(a)).setTextOff((String)w.tFrame.nRunObject(b));
+        ((ToggleButton)w.sObject.get(a)).setTextOff((String)w.mTKrossSystem.nRunObject(b));
         return 0;
     }
 }

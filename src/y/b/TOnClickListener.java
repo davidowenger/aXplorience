@@ -23,7 +23,7 @@ public class TOnClickListener implements View.OnClickListener
     {
         long vcKey;
         w.mTVisitorViewView.nRun(w.mTAlpha03, n,
-            (vcKey = w.tFrame.getKey(v)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTAlpha03, n, -1, 1), v)
+            (vcKey = w.mTKrossSystem.getKey(v)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorViewView.nRun(w.mTAlpha03, n, -1, 1), v)
         );
     }
 }
@@ -47,9 +47,9 @@ class TOnCreateContextMenuListener implements View.OnCreateContextMenuListener
     {
         long vcKey;
         w.mTVisitorViewView.nRun(w.mTBeta03, n,
-            (vcKey = w.tFrame.getKey(menu)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTBeta03, n, -1, 3), menu),
-            (vcKey = w.tFrame.getKey(v)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTBeta03, n, -1, 2), v),
-            (vcKey = w.tFrame.getKey(menuInfo)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTBeta03, n, -1, 1), menuInfo)
+            (vcKey = w.mTKrossSystem.getKey(menu)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorViewView.nRun(w.mTBeta03, n, -1, 3), menu),
+            (vcKey = w.mTKrossSystem.getKey(v)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorViewView.nRun(w.mTBeta03, n, -1, 2), v),
+            (vcKey = w.mTKrossSystem.getKey(menuInfo)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorViewView.nRun(w.mTBeta03, n, -1, 1), menuInfo)
         );
     }
 }
@@ -73,8 +73,8 @@ class TOnTouchListener implements View.OnTouchListener
     {
         long vcKey;
         return w.mTVisitorViewView.nRun(w.mTGamma03, n,
-            (vcKey = w.tFrame.getKey(v)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTGamma03, n, -1, 2), v),
-            w.tFrame.putKey(w.mTVisitorViewView.nRun(w.mTGamma03, n, -1, 1), event)
+            (vcKey = w.mTKrossSystem.getKey(v)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorViewView.nRun(w.mTGamma03, n, -1, 2), v),
+            w.mTKrossSystem.putKey(w.mTVisitorViewView.nRun(w.mTGamma03, n, -1, 1), event)
         ) != 0;
     }
 }

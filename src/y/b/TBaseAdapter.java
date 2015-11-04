@@ -30,8 +30,8 @@ public class TBaseAdapter extends BaseAdapter
         long vcKey;
         return (View)w.sObject.get(w.mTVisitorWidget.nRun(w.mTBeta01,n,
             position,
-            (vcKey = w.tFrame.getKey(convertView)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTBeta01, n, -1, 2), convertView),
-            (vcKey = w.tFrame.getKey(parent)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTBeta01, n, -1, 1), parent)
+            (vcKey = w.mTKrossSystem.getKey(convertView)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorWidget.nRun(w.mTBeta01, n, -1, 2), convertView),
+            (vcKey = w.mTKrossSystem.getKey(parent)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorWidget.nRun(w.mTBeta01, n, -1, 1), parent)
         ));
     }
 
@@ -57,8 +57,8 @@ public class TBaseAdapter extends BaseAdapter
         long vcKey;
         return (View)w.sObject.get(w.mTVisitorWidget.nRun(w.mTEpsilon01,n,
             position,
-            (vcKey = w.tFrame.getKey(convertView)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTEpsilon01, n, -1, 2), convertView),
-            (vcKey = w.tFrame.getKey(parent)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorWidget.nRun(w.mTEpsilon01, n, -1, 1), parent)
+            (vcKey = w.mTKrossSystem.getKey(convertView)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorWidget.nRun(w.mTEpsilon01, n, -1, 2), convertView),
+            (vcKey = w.mTKrossSystem.getKey(parent)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorWidget.nRun(w.mTEpsilon01, n, -1, 1), parent)
         ));
     }
 

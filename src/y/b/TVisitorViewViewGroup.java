@@ -3,7 +3,7 @@ package y.b;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TVisitorViewViewGroup extends TVisitor
+public class TVisitorViewViewGroup extends TKrossVisitor
 {
     public TVisitorViewViewGroup(TWrapper w) {
         super(w);
@@ -29,7 +29,7 @@ public class TVisitorViewViewGroup extends TVisitor
     // View* getChildAt(int index)
     public long visit(TBeta00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((ViewGroup)w.sObject.get(a)).getChildAt((int)c));
+        return w.mTKrossSystem.emplaceKey(b, ((ViewGroup)w.sObject.get(a)).getChildAt((int)c));
     }
 
     // int getChildCount()

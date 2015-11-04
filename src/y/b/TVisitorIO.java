@@ -3,7 +3,7 @@ package y.b;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class TVisitorIO extends TVisitor
+public class TVisitorIO extends TKrossVisitor
 {
     public TVisitorIO(TWrapper w) {
         super(w);
@@ -52,7 +52,7 @@ public class TVisitorIO extends TVisitor
             }
         }
         if (err >= 0) {
-            err = w.tFrame.putNext(vString);
+            err = w.mTKrossSystem.putNext(vString);
         }
         return err;
     }
@@ -80,10 +80,10 @@ public class TVisitorIO extends TVisitor
     {
         long err = 0;
         try {
-            //String vString = (String)w.tFrame.nRunObject(b);
+            //String vString = (String)w.mTKrossSystem.nRunObject(b);
             //byte[] vaByte = vString.getBytes();
             //((OutputStream)w.sObject.get(a)).write(vaByte);
-            ((OutputStream)w.sObject.get(a)).write(((String)w.tFrame.nRunObject(b)).getBytes());
+            ((OutputStream)w.sObject.get(a)).write(((String)w.mTKrossSystem.nRunObject(b)).getBytes());
         }
         catch (Exception vException) {
             if (w.doDebug) vException.printStackTrace();

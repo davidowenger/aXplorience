@@ -15,7 +15,7 @@ import android.bluetooth.le.ScanResult;
 
 import android.os.ParcelUuid;
 
-public class TVisitorBluetoothLe extends TVisitor
+public class TVisitorBluetoothLe extends TKrossVisitor
 {
     public TVisitorBluetoothLe(TWrapper w) {
         super(w);
@@ -43,7 +43,7 @@ public class TVisitorBluetoothLe extends TVisitor
         for (ParcelUuid vParcelUuid : vaParcelUuid) {
             vaString.add(vParcelUuid.toString());
         }
-        return w.tFrame.putNext(vaString);
+        return w.mTKrossSystem.putNext(vaString);
     }
 
     //*******************************************************************************
@@ -59,14 +59,14 @@ public class TVisitorBluetoothLe extends TVisitor
     //AdvertiseData::Builder* addServiceUuid(const String& serviceUuid)
     public long visit(TTau00 element, long a, long b, long c, long d, long e)
     {
-        ((AdvertiseData.Builder)w.sObject.get(a)).addServiceUuid(ParcelUuid.fromString((String)w.tFrame.nRunObject(b)));
+        ((AdvertiseData.Builder)w.sObject.get(a)).addServiceUuid(ParcelUuid.fromString((String)w.mTKrossSystem.nRunObject(b)));
         return 0;
     }
 
     //AdvertiseData* build()
     public long visit(TUpsilon00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((AdvertiseData.Builder)w.sObject.get(a)).build());
+        return w.mTKrossSystem.emplaceKey(b, ((AdvertiseData.Builder)w.sObject.get(a)).build());
     }
 
     //*******************************************************************************
@@ -104,7 +104,7 @@ public class TVisitorBluetoothLe extends TVisitor
     //AdvertiseSettings* build()
     public long visit(TAlpha01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((AdvertiseSettings.Builder)w.sObject.get(a)).build());
+        return w.mTKrossSystem.emplaceKey(b, ((AdvertiseSettings.Builder)w.sObject.get(a)).build());
     }
 
     //AdvertiseSettings::Builder* setConnectable(bool connectable)
@@ -136,9 +136,9 @@ public class TVisitorBluetoothLe extends TVisitor
     public long visit(TDzeta00 element, long a, long b, long c, long d, long e)
     {
         ((BluetoothLeAdvertiser)w.sObject.get(a)).startAdvertising(
-            w.tFrame.getValue(b, AdvertiseSettings.class),
-            w.tFrame.getValue(c, AdvertiseData.class),
-            w.tFrame.getValue(d, AdvertiseCallback.class)
+            w.mTKrossSystem.getValue(b, AdvertiseSettings.class),
+            w.mTKrossSystem.getValue(c, AdvertiseData.class),
+            w.mTKrossSystem.getValue(d, AdvertiseCallback.class)
         );
         return 0;
     }
@@ -147,10 +147,10 @@ public class TVisitorBluetoothLe extends TVisitor
     public long visit(TEta00 element, long a, long b, long c, long d, long e)
     {
         ((BluetoothLeAdvertiser)w.sObject.get(a)).startAdvertising(
-            w.tFrame.getValue(b, AdvertiseSettings.class),
-            w.tFrame.getValue(c, AdvertiseData.class),
-            w.tFrame.getValue(d, AdvertiseData.class),
-            w.tFrame.getValue(e, AdvertiseCallback.class)
+            w.mTKrossSystem.getValue(b, AdvertiseSettings.class),
+            w.mTKrossSystem.getValue(c, AdvertiseData.class),
+            w.mTKrossSystem.getValue(d, AdvertiseData.class),
+            w.mTKrossSystem.getValue(e, AdvertiseCallback.class)
         );
         return 0;
     }
@@ -158,7 +158,7 @@ public class TVisitorBluetoothLe extends TVisitor
     //void stopAdvertising(AdvertiseCallback* callback)
     public long visit(TTheta00 element, long a, long b, long c, long d, long e)
     {
-        ((BluetoothLeAdvertiser)w.sObject.get(a)).stopAdvertising(w.tFrame.getValue(b, AdvertiseCallback.class));
+        ((BluetoothLeAdvertiser)w.sObject.get(a)).stopAdvertising(w.mTKrossSystem.getValue(b, AdvertiseCallback.class));
         return 0;
     }
 
@@ -169,21 +169,21 @@ public class TVisitorBluetoothLe extends TVisitor
     //void flushPendingScanResults(ScanCallback* callback)
     public long visit(TIota00 element, long a, long b, long c, long d, long e)
     {
-        ((BluetoothLeScanner)w.sObject.get(a)).flushPendingScanResults(w.tFrame.getValue(b, ScanCallback.class));
+        ((BluetoothLeScanner)w.sObject.get(a)).flushPendingScanResults(w.mTKrossSystem.getValue(b, ScanCallback.class));
         return 0;
     }
 
     //void startScan(ScanCallback* callback)
     public long visit(TKappa00 element, long a, long b, long c, long d, long e)
     {
-        ((BluetoothLeScanner)w.sObject.get(a)).startScan(w.tFrame.getValue(b, ScanCallback.class));
+        ((BluetoothLeScanner)w.sObject.get(a)).startScan(w.mTKrossSystem.getValue(b, ScanCallback.class));
         return 0;
     }
 
     //void stopScan(ScanCallback* callback)
     public long visit(TLambda00 element, long a, long b, long c, long d, long e)
     {
-        ((BluetoothLeScanner)w.sObject.get(a)).stopScan(w.tFrame.getValue(b, ScanCallback.class));
+        ((BluetoothLeScanner)w.sObject.get(a)).stopScan(w.mTKrossSystem.getValue(b, ScanCallback.class));
         return 0;
     }
 
@@ -215,7 +215,7 @@ public class TVisitorBluetoothLe extends TVisitor
         for (ParcelUuid vParcelUuid : vaParcelUuid) {
             vaString.add(vParcelUuid.toString());
         }
-        return w.tFrame.putNext(vaString);
+        return w.mTKrossSystem.putNext(vaString);
     }
 
     //*******************************************************************************
@@ -225,8 +225,8 @@ public class TVisitorBluetoothLe extends TVisitor
     public long visit(TOmicron00 element, long a, long b, long c, long d, long e)
     {
         w.sObject.put(a, new ScanResult(
-            w.tFrame.getValue(b, BluetoothDevice.class),
-            w.tFrame.getValue(c, ScanRecord.class),
+            w.mTKrossSystem.getValue(b, BluetoothDevice.class),
+            w.mTKrossSystem.getValue(c, ScanRecord.class),
             (int)d,
             e
         ));
@@ -236,12 +236,12 @@ public class TVisitorBluetoothLe extends TVisitor
     //BluetoothDevice* getDevice()
     public long visit(TPi00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((ScanResult)w.sObject.get(a)).getDevice());
+        return w.mTKrossSystem.emplaceKey(b, ((ScanResult)w.sObject.get(a)).getDevice());
     }
 
     //ScanRecord* getScanRecord()
     public long visit(TRho00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((ScanResult)w.sObject.get(a)).getScanRecord());
+        return w.mTKrossSystem.emplaceKey(b, ((ScanResult)w.sObject.get(a)).getScanRecord());
     }
 }

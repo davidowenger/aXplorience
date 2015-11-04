@@ -42,7 +42,7 @@ public class TFragment extends Fragment
         long vcKey;
         if (n != 0) {
             w.mTVisitorAppFragment.nRun(w.mTAlpha01, n,
-                (vcKey = w.tFrame.getKey(vActivity)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTAlpha01, n, -1, 1), vActivity)
+                (vcKey = w.mTKrossSystem.getKey(vActivity)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTAlpha01, n, -1, 1), vActivity)
             );
         } else {
             super.onAttach(vActivity);
@@ -59,7 +59,7 @@ public class TFragment extends Fragment
 //        }
         if (n != 0) {
             w.mTVisitorAppFragment.nRun(w.mTBeta01, n,
-                (vcKey = w.tFrame.getKey(vBundle)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTBeta01, n, -1, 1), vBundle)
+                (vcKey = w.mTKrossSystem.getKey(vBundle)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTBeta01, n, -1, 1), vBundle)
             );
         } else {
             super.onCreate(vBundle);
@@ -71,9 +71,9 @@ public class TFragment extends Fragment
     {
         long vcKey;
         if (n != 0) { return (View)w.sObject.get(w.mTVisitorAppFragment.nRun(w.mTGamma01,n,
-            (vcKey = w.tFrame.getKey(vLayoutInflater)) != -1 ? vcKey :  w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 3), vLayoutInflater),
-            (vcKey = w.tFrame.getKey(vViewGroup)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 2), vViewGroup),
-            (vcKey = w.tFrame.getKey(vBundle)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 1), vBundle)
+            (vcKey = w.mTKrossSystem.getKey(vLayoutInflater)) != -1 ? vcKey :  w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 3), vLayoutInflater),
+            (vcKey = w.mTKrossSystem.getKey(vViewGroup)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 2), vViewGroup),
+            (vcKey = w.mTKrossSystem.getKey(vBundle)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTGamma01, n, -1, 1), vBundle)
         )); } else { return super.onCreateView(vLayoutInflater, vViewGroup, vBundle); }
     }
 
@@ -82,7 +82,7 @@ public class TFragment extends Fragment
     {
         long vcKey;
         if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTDelta01, n,
-                (vcKey = w.tFrame.getKey(vBundle)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTDelta01, n, -1, 1), vBundle)
+                (vcKey = w.mTKrossSystem.getKey(vBundle)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTDelta01, n, -1, 1), vBundle)
         ); } else { super.onActivityCreated(vBundle); }
     }
 
@@ -113,7 +113,7 @@ public class TFragment extends Fragment
         long vcKey;
         if (n != 0) {
             w.mTVisitorAppFragment.nRun(w.mTIota01, n,
-                (vcKey = w.tFrame.getKey(vBundle)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTIota01, n, -1, 1), vBundle)
+                (vcKey = w.mTKrossSystem.getKey(vBundle)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTIota01, n, -1, 1), vBundle)
             );
 //            vBundle.putLong("z.a.TFragment.n", n);
         } else {
@@ -154,8 +154,8 @@ public class TFragment extends Fragment
     {
         long vcKey;
         if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTXi01, n,
-                (vcKey = w.tFrame.getKey(vMenu)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTXi01, n, -1, 2), vMenu),
-                (vcKey = w.tFrame.getKey(vMenuInflater)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTXi01, n, -1, 1), vMenuInflater)
+                (vcKey = w.mTKrossSystem.getKey(vMenu)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTXi01, n, -1, 2), vMenu),
+                (vcKey = w.mTKrossSystem.getKey(vMenuInflater)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTXi01, n, -1, 1), vMenuInflater)
         ); } else { super.onCreateOptionsMenu(vMenu, vMenuInflater); }
     }
 
@@ -164,7 +164,7 @@ public class TFragment extends Fragment
     {
         long vcKey;
         if (n != 0) { w.mTVisitorAppFragment.nRun(w.mTOmicron01, n,
-            (vcKey = w.tFrame.getKey(vMenu)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTOmicron01, n, -1, 1), vMenu)
+            (vcKey = w.mTKrossSystem.getKey(vMenu)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTOmicron01, n, -1, 1), vMenu)
         ); } else { super.onPrepareOptionsMenu(vMenu); }
     }
 
@@ -173,7 +173,7 @@ public class TFragment extends Fragment
     {
         long vcKey;
         if (n != 0) { return w.mTVisitorAppFragment.nRun(w.mTPi01, n,
-            (vcKey = w.tFrame.getKey(vMenuItem)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppFragment.nRun(w.mTPi01, n, -1, 1), vMenuItem)
+            (vcKey = w.mTKrossSystem.getKey(vMenuItem)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppFragment.nRun(w.mTPi01, n, -1, 1), vMenuItem)
         ) != 0; } else { return super.onOptionsItemSelected(vMenuItem); }
     }
 

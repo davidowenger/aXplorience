@@ -31,9 +31,9 @@ public class TBluetoothGattServerCallback extends BluetoothGattServerCallback
     ) {
         long vcKey;
         w.mTVisitorBluetoothGatt.nRun(w.mTDelta01, n,
-            ( vcKey = w.tFrame.getKey(device)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTDelta01, n, -1, 2), device ),
-            ( vcKey = w.tFrame.getKey(characteristic)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTDelta01, n, -1, 1), characteristic ),
-            w.tFrame.putNext(value),
+            ( vcKey = w.mTKrossSystem.getKey(device)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTDelta01, n, -1, 2), device ),
+            ( vcKey = w.mTKrossSystem.getKey(characteristic)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTDelta01, n, -1, 1), characteristic ),
+            w.mTKrossSystem.putNext(value),
             requestId << 32 + offset << 2 + ( preparedWrite ? 2 : 0 ) + ( responseNeeded ? 1 : 0 )
         );
     }
@@ -43,7 +43,7 @@ public class TBluetoothGattServerCallback extends BluetoothGattServerCallback
     {
         long vcKey;
         w.mTVisitorBluetoothGatt.nRun(w.mTEpsilon01, n,
-            (vcKey = w.tFrame.getKey(device)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTEpsilon01, n, -1, 1), device),
+            (vcKey = w.mTKrossSystem.getKey(device)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTEpsilon01, n, -1, 1), device),
             status,
             newState
         );
@@ -54,7 +54,7 @@ public class TBluetoothGattServerCallback extends BluetoothGattServerCallback
     {
         long vcKey;
         w.mTVisitorBluetoothGatt.nRun(w.mTDzeta01, n,
-            (vcKey = w.tFrame.getKey(device)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTDzeta01, n, -1, 1), device),
+            (vcKey = w.mTKrossSystem.getKey(device)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTDzeta01, n, -1, 1), device),
             status
         );
     }
@@ -65,7 +65,7 @@ public class TBluetoothGattServerCallback extends BluetoothGattServerCallback
         long vcKey;
         w.mTVisitorBluetoothGatt.nRun(w.mTEta01, n,
             status,
-            (vcKey = w.tFrame.getKey(service)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTEta01, n, -1, 1), service)
+            (vcKey = w.mTKrossSystem.getKey(service)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothGatt.nRun(w.mTEta01, n, -1, 1), service)
         );
     }
 }

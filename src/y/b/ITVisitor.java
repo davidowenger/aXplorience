@@ -3,7 +3,6 @@ package y.b;
 public interface ITVisitor
 {
     public long tRun(long tVisitorN, long tElementN, long a, long b, long c, long d, long e);
-    public Object tRunObject(long a, long b);
 
     public long visit(TAlpha00 element, long a, long b, long c, long d, long e);
     public long visit(TBeta00 element, long a, long b, long c, long d, long e);

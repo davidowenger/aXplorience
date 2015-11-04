@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
-public class TVisitorAppActivity extends TVisitor
+public class TVisitorAppActivity extends TKrossVisitor
 {
     public TVisitorAppActivity(TWrapper w) {
         super(w);
@@ -17,7 +17,11 @@ public class TVisitorAppActivity extends TVisitor
     // Activity()
     public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
     {
-        if (a != w.tActivity.n) w.sObject.put(a, new Activity());
+        if (w.tActivity.n == 0) {
+            w.sObject.put(a, w.tActivity);
+        } else {
+            w.sObject.put(a, new Activity());
+        }
         return 0;
     }
 
@@ -31,25 +35,31 @@ public class TVisitorAppActivity extends TVisitor
     // ActionBar* getActionBar()
     public long visit(TBeta00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((Activity)w.sObject.get(a)).getActionBar());
+        return w.mTKrossSystem.emplaceKey(b, ((Activity)w.sObject.get(a)).getActionBar());
     }
 
     // Application* getApplication()
     public long visit(TGamma00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((Activity)w.sObject.get(a)).getApplication());
+        return w.mTKrossSystem.emplaceKey(b, ((Activity)w.sObject.get(a)).getApplication());
     }
 
     // FragmentManager* getFragmentManager()
     public long visit(TDelta00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((Activity)w.sObject.get(a)).getFragmentManager());
+        return w.mTKrossSystem.emplaceKey(b, ((Activity)w.sObject.get(a)).getFragmentManager());
+    }
+
+    // WindowManager* getWindowManager()
+    public long visit(TTheta00 element, long a, long b, long c, long d, long e)
+    {
+        return w.mTKrossSystem.emplaceKey(b, ((Activity)w.sObject.get(a)).getWindowManager());
     }
 
     // void setContentView(View* view)
     public long visit(TEpsilon00 element, long a, long b, long c, long d, long e)
     {
-        ((Activity)w.sObject.get(a)).setContentView(w.tFrame.getValue(b, View.class));
+        ((Activity)w.sObject.get(a)).setContentView(w.mTKrossSystem.getValue(b, View.class));
         return 0;
     }
 
@@ -68,7 +78,7 @@ public class TVisitorAppActivity extends TVisitor
     // super.onCreate(Bundle* savedInstanceState)
     public long visit(TAlpha03 element, long a, long b, long c, long d, long e)
     {
-        ((TActivity)w.sObject.get(a)).onCreateParent(w.tFrame.getValue(b, Bundle.class));
+        ((TActivity)w.sObject.get(a)).onCreateParent(w.mTKrossSystem.getValue(b, Bundle.class));
         return 0;
     }
 

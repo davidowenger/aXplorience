@@ -22,7 +22,7 @@ public class TAdvertiseCallback extends AdvertiseCallback
     {
         long vcKey;
         w.mTVisitorBluetoothLe.nRun(w.mTAlpha02, n,
-            (vcKey = w.tFrame.getKey(settingsInEffect)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothLe.nRun(w.mTAlpha02, n, -1, 1), settingsInEffect)
+            (vcKey = w.mTKrossSystem.getKey(settingsInEffect)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothLe.nRun(w.mTAlpha02, n, -1, 1), settingsInEffect)
         );
     }
 

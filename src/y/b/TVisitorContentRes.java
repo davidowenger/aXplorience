@@ -4,7 +4,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 
-public class TVisitorContentRes extends TVisitor
+public class TVisitorContentRes extends TKrossVisitor
 {
     public TVisitorContentRes(TWrapper w) {
         super(w);
@@ -25,6 +25,12 @@ public class TVisitorContentRes extends TVisitor
         return ((Configuration)w.sObject.get(a)).screenWidthDp;
     }
 
+    // int getOrientation()
+    public long visit(TDelta00 element, long a, long b, long c, long d, long e)
+    {
+        return ((Configuration)w.sObject.get(a)).orientation;
+    }
+
     // int getSmallestScreenWidthDp()
     public long visit(TGamma00 element, long a, long b, long c, long d, long e)
     {
@@ -37,13 +43,13 @@ public class TVisitorContentRes extends TVisitor
     // DisplayMetrics* getDisplayMetrics()
     public long visit(TAlpha01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putKey(b, ((Resources)w.sObject.get(a)).getDisplayMetrics());
+        return w.mTKrossSystem.putKey(b, ((Resources)w.sObject.get(a)).getDisplayMetrics());
     }
 
     // Configuration* getConfiguration()
     public long visit(TBeta01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putKey(b, ((Resources)w.sObject.get(a)).getConfiguration());
+        return w.mTKrossSystem.putKey(b, ((Resources)w.sObject.get(a)).getConfiguration());
     }
 
     // Drawable* getDrawable(const String& vString)
@@ -52,12 +58,12 @@ public class TVisitorContentRes extends TVisitor
         Drawable ret = null;
 
         try {
-            ret = ((Resources)w.sObject.get(a)).getDrawable(w.tFrame.getDrawableId((String)w.tFrame.nRunObject(c)));
+            ret = ((Resources)w.sObject.get(a)).getDrawable(w.mTKrossSystem.getDrawableId((String)w.mTKrossSystem.nRunObject(c)));
         }
         catch (Resources.NotFoundException vException) {
             if (w.doDebug) vException.printStackTrace();
             ret = null;
         }
-        return w.tFrame.putKey(b, ret);
+        return w.mTKrossSystem.putKey(b, ret);
     }
 }

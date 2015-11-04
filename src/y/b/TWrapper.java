@@ -126,26 +126,30 @@ public class TWrapper
     TPsi03     mTPsi03;
     TOmega03   mTOmega03;
 
-    TVisitor[] aTVisitor;
-    TClozer tFrame;
-    TVisitor mTVisitorApp;
-    TVisitor mTVisitorAppActivity;
-    TVisitor mTVisitorAppFragment;
-    TVisitor mTVisitorBluetooth;
-    TVisitor mTVisitorBluetoothGatt;
-    TVisitor mTVisitorBluetoothLe;
-    TVisitor mTVisitorContent;
-    TVisitor mTVisitorContentRes;
-    TVisitor mTVisitorGraphics;
-    TVisitor mTVisitorIO;
-    TVisitor mTVisitorOS;
-    TVisitor mTVisitorUtil;
-    TVisitor mTVisitorView;
-    TVisitor mTVisitorViewView;
-    TVisitor mTVisitorViewViewGroup;
-    TVisitor mTVisitorWidget;
-    TVisitor mTVisitorWidgetLayout;
-    TVisitor mTVisitorWidgetView;
+    TKrossVisitor[] aTVisitor;
+    TKrossSystem mTKrossSystem;
+    TKrossVisitor mTVisitorApp;
+    TKrossVisitor mTVisitorAppActivity;
+    TKrossVisitor mTVisitorAppFragment;
+    TKrossVisitor mTVisitorBluetooth;
+    TKrossVisitor mTVisitorBluetoothGatt;
+    TKrossVisitor mTVisitorBluetoothLe;
+    TKrossVisitor mTVisitorContent;
+    TKrossVisitor mTVisitorContentRes;
+    TKrossVisitor mTVisitorGraphics;
+    TKrossVisitor mTVisitorHardware;
+    TKrossVisitor mTVisitorIO;
+    TKrossVisitor mTVisitorLocation;
+    TKrossVisitor mTVisitorMicroedition;
+    TKrossVisitor mTVisitorOpengl;
+    TKrossVisitor mTVisitorOS;
+    TKrossVisitor mTVisitorUtil;
+    TKrossVisitor mTVisitorView;
+    TKrossVisitor mTVisitorViewView;
+    TKrossVisitor mTVisitorViewViewGroup;
+    TKrossVisitor mTVisitorWidget;
+    TKrossVisitor mTVisitorWidgetLayout;
+    TKrossVisitor mTVisitorWidgetView;
 
     Hashtable<Long,TElement> sTElement;
     Hashtable<Long,TVisitor> sTVisitor;
@@ -162,5 +166,6 @@ public class TWrapper
     int cAPI00;
     boolean doDebug;
     boolean isStrict;
+    boolean isAlive;
     TAndroid tAndroid;
 }

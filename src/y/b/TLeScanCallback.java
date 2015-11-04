@@ -22,9 +22,9 @@ public class TLeScanCallback implements BluetoothAdapter.LeScanCallback
     {
         long vcKey;
         w.mTVisitorBluetooth.nRun(w.mTAlpha01, n,
-            (vcKey = w.tFrame.getKey(device)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetooth.nRun(w.mTAlpha01, n, -1, 1), device),
+            (vcKey = w.mTKrossSystem.getKey(device)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetooth.nRun(w.mTAlpha01, n, -1, 1), device),
             rssi,
-            w.tFrame.putNext(scanRecord)
+            w.mTKrossSystem.putNext(scanRecord)
         );
     }
 }

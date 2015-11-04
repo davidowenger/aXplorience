@@ -1,11 +1,10 @@
 package y.b;
 
-public abstract class TVisitor implements INVisitor, ITVisitor
+public abstract class TVisitor implements ITVisitor
 {
     public static int counter = 0;
 
     public TWrapper w;
-    public long n;
     public int i;
 
     public TVisitor(TWrapper w)
@@ -32,11 +31,6 @@ public abstract class TVisitor implements INVisitor, ITVisitor
             ret = (-1 >>> 1) + 1;
         }
         return ret;
-    }
-
-    public Object tRunObject(long a, long b)
-    {
-        return null;
     }
 
     public long visit(TAlpha00 element, long a, long b, long c, long d, long e){return defaultVisit(element);}
@@ -139,46 +133,4 @@ public abstract class TVisitor implements INVisitor, ITVisitor
     public long visit(TPsi03 element, long a, long b, long c, long d, long e){return defaultVisit(element);}
     public long visit(TOmega03 element, long a, long b, long c, long d, long e){return defaultVisit(element);}
 
-    public long nRun(TElement tElement)
-    {
-        return nRun(tElement, 0);
-    }
-
-    public long nRun(TElement tElement, Number a)
-    {
-        return nRun(tElement, a.longValue(), 0);
-    }
-
-    public long nRun(TElement tElement, Number a, Number b)
-    {
-        return nRun(tElement, a.longValue(), b.longValue(), 0);
-    }
-
-    public long nRun(TElement tElement, Number a, Number b, Number c)
-    {
-        return nRun(tElement, a.longValue(), b.longValue(), c.longValue(), 0);
-    }
-
-    public long nRun(TElement tElement, Number a, Number b, Number c, Number d)
-    {
-        return nRun(tElement, a.longValue(), b.longValue(), c.longValue(), d.longValue(), 0);
-    }
-
-    public long nRun(TElement tElement, Number a, Number b, Number c, Number d, Number e)
-    {
-        return nRun(this.n, tElement.n, a.longValue(), b.longValue(), c.longValue(), d.longValue(), e.longValue());
-    }
-
-    public Object nRunObject(Number a)
-    {
-        return nRunObject(a.longValue(), -1);
-    }
-
-    public Object nRunObject(Number a, Number b)
-    {
-        return nRunObject(a.longValue(), b.longValue());
-    }
-
-    public native long nRun(long tVisitorN, long tElementN, long a, long b, long c, long d, long e);
-    public native Object nRunObject(long a, long b);
 }

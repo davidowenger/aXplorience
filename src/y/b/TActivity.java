@@ -24,6 +24,7 @@ public class TActivity extends Activity
         TElement.counter = 0;
         TWrapper.w = new TWrapper();;
 
+        n = 0;
         w = TWrapper.w;
         w.doDebug = TWrapper.kDoDebug;
         w.isStrict = false;
@@ -46,13 +47,14 @@ public class TActivity extends Activity
         w.context = getApplication();
         w.tActivity = this;
         w.tActivityHandler = new TActivityHandler(w);
-        w.tFrame = new TClozer(w);
-        w.tFrame.tInit();
+        w.mTKrossSystem = new TKrossSystem(w);
+        w.mTKrossSystem.tInit();
 
         // Call user onCreate event
         long vcKey;
+        w.isAlive = true;
         w.mTVisitorAppActivity.nRun(w.mTAlpha00, n,
-            (vcKey = w.tFrame.getKey(vBundle)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorAppActivity.nRun(w.mTAlpha00, n, -1, 1), vBundle)
+            (vcKey = w.mTKrossSystem.getKey(vBundle)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppActivity.nRun(w.mTAlpha00, n, -1, 1), vBundle)
         );
     }
 
@@ -84,9 +86,10 @@ public class TActivity extends Activity
     protected void onDestroy()
     {
         w.mTVisitorAppActivity.nRun(w.mTEta00, n);
-        w.tFrame.nCancel();
-        w.tFrame.tCancel();
-        w.tFrame = null;
+        w.isAlive = false;
+        w.mTKrossSystem.nCancel(w.mTKrossSystem.n);
+        w.mTKrossSystem.tCancel();
+        w.mTKrossSystem = null;
         w.tActivityHandler.cancel();
         w.tActivityHandler = null;
         w.context = null;
@@ -303,11 +306,11 @@ class TActivityReceiver extends BroadcastReceiver
             } else if (action.equals(BluetoothDevice.ACTION_FOUND)) {
                 Object vObject = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 w.mTVisitorAppActivity.nRun(w.mTRho00, w.tActivity.n,
-                    w.tFrame.putKey(w.mTVisitorAppActivity.nRun(w.mTRho00, w.tActivity.n, -1, 1), vObject)
+                    w.mTKrossSystem.putKey(w.mTVisitorAppActivity.nRun(w.mTRho00, w.tActivity.n, -1, 1), vObject)
                 );
             } else if (action.equals(BluetoothAdapter.ACTION_LOCAL_NAME_CHANGED)) {
                 String string = intent.getStringExtra(BluetoothAdapter.EXTRA_LOCAL_NAME);
-                w.mTVisitorAppActivity.nRun(w.mTSigma00, w.tActivity.n, w.tFrame.putNext(string));
+                w.mTVisitorAppActivity.nRun(w.mTSigma00, w.tActivity.n, w.mTKrossSystem.putNext(string));
             } else if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
                 w.mTVisitorAppActivity.nRun(w.mTTau00, w.tActivity.n,
                     intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, -1),

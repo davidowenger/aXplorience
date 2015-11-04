@@ -9,7 +9,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothGattService;
 
-public class TVisitorBluetoothGatt extends TVisitor
+public class TVisitorBluetoothGatt extends TKrossVisitor
 {
     public TVisitorBluetoothGatt(TWrapper w) {
         super(w);
@@ -47,25 +47,25 @@ public class TVisitorBluetoothGatt extends TVisitor
     //BluetoothGattService* getService(const String& uuid)
     public long visit(TPi00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((BluetoothGatt)w.sObject.get(a)).getService(UUID.fromString((String)w.tFrame.nRunObject(c))));
+        return w.mTKrossSystem.emplaceKey(b, ((BluetoothGatt)w.sObject.get(a)).getService(UUID.fromString((String)w.mTKrossSystem.nRunObject(c))));
     }
 
-    //BluetoothGattService* getServices()
+    //NArray<BluetoothGattService*> getServices()
     public long visit(TBeta01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGatt)w.sObject.get(a)).getServices());
+        return w.mTKrossSystem.putNext(((BluetoothGatt)w.sObject.get(a)).getServices());
     }
 
     //bool setCharacteristicNotification(BluetoothGattCharacteristic* characteristic, bool enable)
     public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
     {
-        return ( ((BluetoothGatt)w.sObject.get(a)).setCharacteristicNotification(w.tFrame.getValue(b, BluetoothGattCharacteristic.class), c != 0) ? 1 : 0 );
+        return ( ((BluetoothGatt)w.sObject.get(a)).setCharacteristicNotification(w.mTKrossSystem.getValue(b, BluetoothGattCharacteristic.class), c != 0) ? 1 : 0 );
     }
 
     //bool writeCharacteristic(BluetoothGattCharacteristic* characteristic)
     public long visit(TBeta00 element, long a, long b, long c, long d, long e)
     {
-        return ( ((BluetoothGatt)w.sObject.get(a)).writeCharacteristic(w.tFrame.getValue(b, BluetoothGattCharacteristic.class)) ? 1 : 0 );
+        return ( ((BluetoothGatt)w.sObject.get(a)).writeCharacteristic(w.mTKrossSystem.getValue(b, BluetoothGattCharacteristic.class)) ? 1 : 0 );
     }
 
     //*******************************************************************************
@@ -84,26 +84,26 @@ public class TVisitorBluetoothGatt extends TVisitor
     //BluetoothGattCharacteristic(const String& uuid, int properties, int permissions)
     public long visit(TDelta00 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put(a, new BluetoothGattCharacteristic(UUID.fromString((String)w.tFrame.nRunObject(b)), (int)c, (int)d));
+        w.sObject.put(a, new BluetoothGattCharacteristic(UUID.fromString((String)w.mTKrossSystem.nRunObject(b)), (int)c, (int)d));
         return 0;
     }
 
     //bool addDescriptor(BluetoothGattDescriptor* descriptor)
     public long visit(TUpsilon01 element, long a, long b, long c, long d, long e)
     {
-        return ( ((BluetoothGattCharacteristic)w.sObject.get(a)).addDescriptor(w.tFrame.getValue(b, BluetoothGattDescriptor.class)) ? 1 : 0 );
+        return ( ((BluetoothGattCharacteristic)w.sObject.get(a)).addDescriptor(w.mTKrossSystem.getValue(b, BluetoothGattDescriptor.class)) ? 1 : 0 );
     }
 
     //BluetoothGattDescriptor* getDescriptor(const String& uuid)
     public long visit(TGamma01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((BluetoothGattCharacteristic)w.sObject.get(a)).getDescriptor(UUID.fromString((String)w.tFrame.nRunObject(c))));
+        return w.mTKrossSystem.emplaceKey(b, ((BluetoothGattCharacteristic)w.sObject.get(a)).getDescriptor(UUID.fromString((String)w.mTKrossSystem.nRunObject(c))));
     }
 
     //NArray<BluetoothGattDescriptor*> getDescriptors()
     public long visit(TDelta01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGattCharacteristic)w.sObject.get(a)).getDescriptors());
+        return w.mTKrossSystem.putNext(((BluetoothGattCharacteristic)w.sObject.get(a)).getDescriptors());
     }
 
     //int getProperties()
@@ -115,19 +115,19 @@ public class TVisitorBluetoothGatt extends TVisitor
     //String getUuid()
     public long visit(TDzeta01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGattCharacteristic)w.sObject.get(a)).getUuid().toString());
+        return w.mTKrossSystem.putNext(((BluetoothGattCharacteristic)w.sObject.get(a)).getUuid().toString());
     }
 
     //NArray<nubyte>* getValue()
     public long visit(TEpsilon00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGattCharacteristic)w.sObject.get(a)).getValue());
+        return w.mTKrossSystem.putNext(((BluetoothGattCharacteristic)w.sObject.get(a)).getValue());
     }
 
     //String getStringValue(int offset)
     public long visit(TDzeta00 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGattCharacteristic)w.sObject.get(a)).getStringValue((int)b));
+        return w.mTKrossSystem.putNext(((BluetoothGattCharacteristic)w.sObject.get(a)).getStringValue((int)b));
     }
 
     //bool setValue(NArray<nubyte>* value)
@@ -146,7 +146,7 @@ public class TVisitorBluetoothGatt extends TVisitor
     //bool setValue(const String& value)
     public long visit(TTheta00 element, long a, long b, long c, long d, long e)
     {
-        return ( ((BluetoothGattCharacteristic)w.sObject.get(a)).setValue((String)w.tFrame.nRunObject(b)) ? 1 : 0 );
+        return ( ((BluetoothGattCharacteristic)w.sObject.get(a)).setValue((String)w.mTKrossSystem.nRunObject(b)) ? 1 : 0 );
     }
 
     //void setWriteType (int writeType)
@@ -162,7 +162,7 @@ public class TVisitorBluetoothGatt extends TVisitor
     //BluetoothGattDescriptor(const String& uuid, int permissions)
     public long visit(TEta01 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put(a, new BluetoothGattDescriptor(UUID.fromString((String)w.tFrame.nRunObject(b)), (int)c));
+        w.sObject.put(a, new BluetoothGattDescriptor(UUID.fromString((String)w.mTKrossSystem.nRunObject(b)), (int)c));
         return 0;
     }
 
@@ -175,13 +175,13 @@ public class TVisitorBluetoothGatt extends TVisitor
     //String getUuid()
     public long visit(TIota01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGattDescriptor)w.sObject.get(a)).getUuid().toString());
+        return w.mTKrossSystem.putNext(((BluetoothGattDescriptor)w.sObject.get(a)).getUuid().toString());
     }
 
     //NArray<nubyte>* getValue()
     public long visit(TKappa01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGattDescriptor)w.sObject.get(a)).getValue());
+        return w.mTKrossSystem.putNext(((BluetoothGattDescriptor)w.sObject.get(a)).getValue());
     }
 
     //bool setValue(NArray<nubyte>* value)
@@ -203,13 +203,13 @@ public class TVisitorBluetoothGatt extends TVisitor
     //bool addService(BluetoothGattService* service)
     public long visit(TKappa00 element, long a, long b, long c, long d, long e)
     {
-        return ( ((BluetoothGattServer)w.sObject.get(a)).addService(w.tFrame.getValue(b, BluetoothGattService.class)) ? 1 : 0 );
+        return ( ((BluetoothGattServer)w.sObject.get(a)).addService(w.mTKrossSystem.getValue(b, BluetoothGattService.class)) ? 1 : 0 );
     }
 
     //void cancelConnection(BluetoothDevice* device)
     public long visit(TKhi00 element, long a, long b, long c, long d, long e)
     {
-        ((BluetoothGattServer)w.sObject.get(a)).cancelConnection(w.tFrame.getValue(b, BluetoothDevice.class));
+        ((BluetoothGattServer)w.sObject.get(a)).cancelConnection(w.mTKrossSystem.getValue(b, BluetoothDevice.class));
         return 0;
     }
 
@@ -230,21 +230,21 @@ public class TVisitorBluetoothGatt extends TVisitor
     //BluetoothGattService* getService(const String& uuid)
     public long visit(TMu01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((BluetoothGattServer)w.sObject.get(a)).getService(UUID.fromString((String)w.tFrame.nRunObject(c))));
+        return w.mTKrossSystem.emplaceKey(b, ((BluetoothGattServer)w.sObject.get(a)).getService(UUID.fromString((String)w.mTKrossSystem.nRunObject(c))));
     }
 
     //NArray<BluetoothGattService*> getServices()
     public long visit(TNu01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGattServer)w.sObject.get(a)).getServices());
+        return w.mTKrossSystem.putNext(((BluetoothGattServer)w.sObject.get(a)).getServices());
     }
 
     //bool notifyCharacteristicChanged(BluetoothDevice* device, BluetoothGattCharacteristic* characteristic, bool confirm)
     public long visit(TLambda00 element, long a, long b, long c, long d, long e)
     {
         return ( ((BluetoothGattServer)w.sObject.get(a)).notifyCharacteristicChanged(
-            w.tFrame.getValue(b, BluetoothDevice.class),
-            w.tFrame.getValue(c, BluetoothGattCharacteristic.class),
+            w.mTKrossSystem.getValue(b, BluetoothDevice.class),
+            w.mTKrossSystem.getValue(c, BluetoothGattCharacteristic.class),
             d != 0
         ) ? 1 : 0 );
     }
@@ -260,7 +260,7 @@ public class TVisitorBluetoothGatt extends TVisitor
             vaValue[vcIndex] = (byte)vaValueInt[vcIndex];
         };
         return ( ((BluetoothGattServer)w.sObject.get(a)).sendResponse(
-            w.tFrame.getValue(b, BluetoothDevice.class),
+            w.mTKrossSystem.getValue(b, BluetoothDevice.class),
             (int)c,
             (int)d,
             0,
@@ -284,38 +284,38 @@ public class TVisitorBluetoothGatt extends TVisitor
     //BluetoothGattService(const String& uuid, int serviceType)
     public long visit(TXi00 element, long a, long b, long c, long d, long e)
     {
-        w.sObject.put(a, new BluetoothGattService(UUID.fromString((String)w.tFrame.nRunObject(b)), (int)c));
+        w.sObject.put(a, new BluetoothGattService(UUID.fromString((String)w.mTKrossSystem.nRunObject(b)), (int)c));
         return 0;
     }
 
     //bool addCharacteristic(BluetoothGattCharacteristic* characteristic)
     public long visit(TOmicron00 element, long a, long b, long c, long d, long e)
     {
-        return ( ((BluetoothGattService)w.sObject.get(a)).addCharacteristic(w.tFrame.getValue(b, BluetoothGattCharacteristic.class)) ? 1 : 0 );
+        return ( ((BluetoothGattService)w.sObject.get(a)).addCharacteristic(w.mTKrossSystem.getValue(b, BluetoothGattCharacteristic.class)) ? 1 : 0 );
     }
 
     //bool addService(BluetoothGattService* service)
     public long visit(TXi01 element, long a, long b, long c, long d, long e)
     {
-        return ( ((BluetoothGattService)w.sObject.get(a)).addService(w.tFrame.getValue(b, BluetoothGattService.class)) ? 1 : 0 );
+        return ( ((BluetoothGattService)w.sObject.get(a)).addService(w.mTKrossSystem.getValue(b, BluetoothGattService.class)) ? 1 : 0 );
     }
 
     //BluetoothGattCharacteristic* getCharacteristic(const String& uuid)
     public long visit(TOmicron01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.emplaceKey(b, ((BluetoothGattService)w.sObject.get(a)).getCharacteristic(UUID.fromString((String)w.tFrame.nRunObject(c))));
+        return w.mTKrossSystem.emplaceKey(b, ((BluetoothGattService)w.sObject.get(a)).getCharacteristic(UUID.fromString((String)w.mTKrossSystem.nRunObject(c))));
     }
 
     //NArray<BluetoothGattCharacteristic*> getCharacteristics()
     public long visit(TPi01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGattService)w.sObject.get(a)).getCharacteristics());
+        return w.mTKrossSystem.putNext(((BluetoothGattService)w.sObject.get(a)).getCharacteristics());
     }
 
     //NArray<BluetoothGattService*> getIncludedServices()
     public long visit(TRho01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGattService)w.sObject.get(a)).getIncludedServices());
+        return w.mTKrossSystem.putNext(((BluetoothGattService)w.sObject.get(a)).getIncludedServices());
     }
 
     //int getInstanceId()
@@ -333,7 +333,7 @@ public class TVisitorBluetoothGatt extends TVisitor
     //String getUuid ()
     public long visit(TAlpha01 element, long a, long b, long c, long d, long e)
     {
-        return w.tFrame.putNext(((BluetoothGattService)w.sObject.get(a)).getUuid().toString());
+        return w.mTKrossSystem.putNext(((BluetoothGattService)w.sObject.get(a)).getUuid().toString());
     }
 
 }

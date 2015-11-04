@@ -23,7 +23,7 @@ public class TScanCallback extends ScanCallback
     public void onBatchScanResults(List<ScanResult> results)
     {
         w.mTVisitorBluetoothGatt.nRun(w.mTGamma02, n,
-            w.tFrame.putNext(results)
+            w.mTKrossSystem.putNext(results)
         );
     }
 
@@ -41,7 +41,7 @@ public class TScanCallback extends ScanCallback
         long vcKey;
         w.mTVisitorBluetoothGatt.nRun(w.mTEpsilon02, n,
             callbackType,
-            (vcKey = w.tFrame.getKey(result)) != -1 ? vcKey : w.tFrame.putKey(w.mTVisitorBluetoothLe.nRun(w.mTEpsilon02, n, -1, 1), result)
+            (vcKey = w.mTKrossSystem.getKey(result)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorBluetoothLe.nRun(w.mTEpsilon02, n, -1, 1), result)
         );
     }
 }
