@@ -4,177 +4,137 @@ namespace NSDEVICE
 {
 
 AREngine::AREngine(Wrapper* vWrapper) :
-    SurfaceTexture::OnFrameAvailableListener(), w(vWrapper), mEnv(nullptr), mEGLDisplay(nullptr), mEGLConfig(nullptr), mEGLContext(nullptr), mEGLSurface(nullptr),
-    maVertexPreview(new GLfloat[24] {
-        +1.0f, -1.0f, +1.0f, +1.0f,
-        -1.0f, +1.0f, +1.0f, +1.0f,
-        -1.0f, -1.0f, +1.0f, +1.0f,
-        +1.0f, +1.0f, +1.0f, +1.0f,
-        -1.0f, +1.0f, +1.0f, +1.0f,
-        +1.0f, -1.0f, +1.0f, +1.0f,
+    SurfaceTexture::OnFrameAvailableListener(),
+    mUpdate(false), mGrey(0), mARState(1), mARSurface(1), mWidth(0), mHeight(0), mSpacingWidth(0), mSpacingHeight(0),
+    w(vWrapper), mEnv(nullptr), mGraphicsBuffer(nullptr),
+    mNorthAxis({0, 1, 0}), mUpAxis({0, 0, 1}), mChangeMatrix(9), mDeviceEarthCoord(3), mDeviceRotation(4),
+    mNorthEarthCoord(3), mNorthCoord(3), mPOICoord(3), mPOIAzimuthRotation(4), mClassCoord(16), mClassRotation(4),
+    mcPreviewIndice(6),
+    mPreviewTexture(nullptr), mPreviewProgram(nullptr),
+    mPreviewVertex(nullptr), mPreviewFragment(nullptr), mPreviewRotation(nullptr), mPreviewTextureUnit(nullptr),
+    mcPOIIndice(12),
+    mPOIProgram(nullptr),
+    mPOIVertex(nullptr), mPOIFragment(nullptr), mPOIRotation(nullptr), mPOITranslation(nullptr), mPOIProjection(nullptr),
+    mcLabelIndice(6),
+    mLabelTexture(nullptr), mLabelProgram(nullptr),
+    mLabelVertex(nullptr), mLabelFragment(nullptr), mLabelRotation(nullptr), mLabelTranslation(nullptr), mLabelProjection(nullptr),
+    mLabelTextureUnit(nullptr), mLabelPosition(nullptr), mLabelBox(nullptr), mLabelColor(nullptr),
+    mcDebugIndice(6),
+    mDebugTexture(nullptr), mDebugProgram(nullptr),
+    mDebugVertex(nullptr), mDebugFragment(nullptr), mDebugPosition(nullptr), mDebugBox(nullptr), mDebugTextureUnit(nullptr),
+    mDebugParamNameArray({
+        "vaVertex",
+        "vaFragment",
+        "vcRotation"
     }),
-    maCoordPreview(new GLfloat[12] {
-        1.0f, 1.0f,
-        0.0f, 0.0f,
-        0.0f, 1.0f,
-        1.0f, 0.0f,
-        0.0f, 0.0f,
-        1.0f, 1.0f
-    }),
-    mProjection(new GLfloat[4] {0, 0, 0, 1}),
-    mModel(new GLfloat[4] {0, 0, 0, 1}),
-    mcARState(1), mcARSurface(1),  mWidth(0), mHeight(0), mModelIndex(0.0), mGrey(1.0),
-    mhProgramCameraPreview(0), mhProgramOverlayText(0), mhVertexPreview(0), mhCoordPreview(0), mhSamplerPreview(0),
-    mhTransformation(0), mhVertexPOI(0), mhProgramPOI(0), mhModel(0), mhProjection(0), mhVertexBuffer(0),
-    mhIndiceBuffer(0), mhTexturePreview(0), mUpdate(false),
-    maVertexPOI({
-        +0.0f, +0.0f, +1.0f, +0.85f,
-        -1.0f, -1.0f, +2.0f, +0.65f,
-        +1.0f, -1.0f, +2.0f, +0.00f,
-        +0.0f, +1.0f, +2.0f, +0.45f
-    }),
-    maIndicesPOI({
-        0, 1, 2,
-        0, 2, 3,
-        0, 3, 1
-    })
+    mDebugParamArray(mDebugParamNameArray.mcData)
 {
+    // Geomagnetic North Pole based on the WMM2015 coefficients for 2015.0
+    nfloat vLat = 80.31*M_PI_180;
+    nfloat vLong = -72.62*M_PI_180;
+
+    mNorthEarthCoord.is(
+        cos(vLat)*cos(vLong),
+        cos(vLat)*sin(vLong),
+        sin(vLat)
+    );
 }
 
 AREngine::~AREngine()
 {
-    maVertexPOI.discard();
-    maIndicesPOI.discard();
-
-    delete maVertexPreview;
-    delete maCoordPreview;
-    delete mProjection;
-    delete mModel;
+    mNorthAxis.discard();
+    mUpAxis.discard();
+    mChangeMatrix.discard();
+    mDeviceEarthCoord.discard();
+    mDeviceRotation.discard();
+    mNorthEarthCoord.discard();
+    mNorthCoord.discard();
+    mPOICoord.discard();
+    mPOIAzimuthRotation.discard();
+    mClassCoord.discard();
+    mClassRotation.discard();
 }
 
 void AREngine::engineCreate()
 {
     LOGI("AREngine engineCreate");
-
-    //*******************************************************************************
-    //********************************* EGL *****************************************
-    //*******************************************************************************
-#ifdef EGL_VERSION_1_3
-    LOGI("EGL Version 1.3");
-    nuint vState = 0;
-    EGLint vSize = 0;
-    NArray<EGLint> vaConfigAttrib({
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-        EGL_NONE
-    });
-    NArray<EGLint> vaContextAttrib({
-         EGL_CONTEXT_CLIENT_VERSION, 2,
-         EGL_NONE
-    });
+    w->mGraphicsHandler->createDisplayConfig();
     mEnv = (JNIEnv*)w->mNWrapper->mNKrossWrapper->mNKrossSystem->tAttachCurrentThread();
-    mEGLDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    vState = (mEGLDisplay != nullptr);
-
-    if (vState) {
-        vState &= eglInitialize(mEGLDisplay, NULL, NULL);
-    } else {
-        LOGE("Could not get default display");
-    }
-    if (vState) {
-        vState = eglChooseConfig(mEGLDisplay, vaConfigAttrib.maData, &mEGLConfig, 1, &vSize);
-        vState &= (vSize > 0);
-    } else {
-        LOGE("Could not initialize display");
-    }
-    if (vState) {
-        mEGLContext = eglCreateContext(mEGLDisplay, mEGLConfig, nullptr, vaContextAttrib.maData);
-        vState &= (mEGLContext != nullptr);
-    } else {
-        LOGE("Could not find configuration");
-    }
-    if (vState) {
-        LOGI("EGL context created");
-    } else {
-        LOGE("Could not create context");
-    }
-    vaConfigAttrib.discard();
-    vaContextAttrib.discard();
-#else
-    LOGE("EGL version 1.3 not found");
-#endif //EGL_VERSION_1_3
 }
 
-void AREngine::engineDestroy()
+void AREngine::engineEnable(Surface* vSurface, nint vWidth, nint vHeight)
 {
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glUseProgram(0);
+    SLOGI("AREngine engineReset w: #" + to_string(vWidth) + " h: #" + to_string(vHeight));
 
-    if (w->mTexturePreview) {
-        w->mTexturePreview->release();
-        delete w->mTexturePreview;
-        w->mTexturePreview = nullptr;
-    }
-    if (w->mCamera) {
-        w->mCamera->release();
-        delete w->mCamera;
-        w->mCamera = nullptr;
-    }
-}
-
-void AREngine::engineInit(Surface* vSurface, int width, int height)
-{
-    LOGI(("AREngine engineReset w: #" + to_string(width) + " h: #" + to_string(height)).c_str());
-    mWidth = width;
-    mHeight = height;
-
-    //*******************************************************************************
-    //********************************* EGL *****************************************
-    //*******************************************************************************
     NReturnObject vSurfaceObject = w->mNWrapper->mNKrossWrapper->mNKrossSystem->tRunObject((NParam)vSurface, -2);
     EGLNativeWindowType vEGLNativeWindow = ANativeWindow_fromSurface(mEnv, vSurfaceObject);
-    nuint vState = (vEGLNativeWindow != nullptr);
 
-    if (vState) {
-        mEGLSurface = eglCreateWindowSurface(mEGLDisplay, mEGLConfig, vEGLNativeWindow, nullptr);
-        vState &= (mEGLSurface != nullptr);
-    } else {
-        LOGE("Could not get Native Window");
-    }
-    if (vState) {
-        vState = eglMakeCurrent(mEGLDisplay, mEGLSurface, mEGLSurface, mEGLContext);
-    } else {
-        LOGE("Could not create surface");
-    }
-    if (vState) {
-        LOGI("Current EGL context set");
-    } else {
-        LOGE("Could not set current context");
-    }
+    w->mGraphicsHandler->createDisplaySurface(vEGLNativeWindow);
+    w->mGraphicsHandler->enableRendering3D(vWidth, vHeight, true, true);
+    w->mGraphicsHandler->enableRenderingFont(36);
+
+    mWidth = vWidth;
+    mHeight = vHeight;
+    mSpacingWidth = 1.5*w->mNWrapper->mGraphicsWrapper->mGlyphWidth/mWidth;
+    mSpacingHeight = 1.5*w->mNWrapper->mGraphicsWrapper->mGlyphHeight/mHeight;
+    mClassCoord.is(
+        0.9*mSpacingWidth,   0.6*mSpacingWidth,  0.3*mSpacingWidth,  0*mSpacingWidth,
+       -5.3*mSpacingHeight, -2.8*mSpacingHeight, 2.2*mSpacingHeight, 4.7*mSpacingHeight,
+       -4.3*mSpacingHeight, -1.8*mSpacingHeight, 1.2*mSpacingHeight, 3.7*mSpacingHeight,
+        5,                   4,                  1,                  0
+    );
+    mGraphicsBuffer = w->mGraphicsHandler->factoryBuffer(
+        NArray<nfloat>({
+            // Preview Data
+            +1.00f, -1.00f, +1.00f, 1.00f, 1.00f,
+            -1.00f, +1.00f, +1.00f, 0.00f, 0.00f,
+            -1.00f, -1.00f, +1.00f, 0.00f, 1.00f,
+            +1.00f, +1.00f, +1.00f, 1.00f, 0.00f,
+            // POI Data
+            +0.00f, +0.00f, +0.01f, 1.00f, 0.00f,
+            -0.05f, -0.05f, -0.01f, 0.00f, 0.00f,
+            +0.05f, -0.05f, -0.01f, 0.00f, 0.00f,
+            +0.00f, +0.05f, -0.01f, 0.00f, 1.00f,
+            // Label Data
+            +1.00f, +1.00f, +0.01f, 1.00f, 1.00f,
+            +0.00f, +0.00f, +0.01f, 0.00f, 0.00f,
+            +0.00f, +1.00f, +0.01f, 0.00f, 1.00f,
+            +1.00f, +0.00f, +0.01f, 1.00f, 0.00f,
+            // Debug Data
+            +1.00f, +0.00f, +1.00f, 1.00f, 0.00f,
+            +0.00f, +1.00f, +1.00f, 0.00f, 1.00f,
+            +0.00f, +0.00f, +1.00f, 0.00f, 0.00f,
+            +1.00f, +1.00f, +1.00f, 1.00f, 1.00f
+        }),
+        5,
+        NArray<nushort>({
+            // Preview Indices
+            0, 1, 2,
+            3, 1, 0,
+            // POI Indices
+            4, 5, 6,
+            4, 7, 5,
+            4, 6, 7,
+            7, 6, 5,
+            // Label Indices
+            8, 9, 10,
+            11, 9, 8,
+            // Debug Indices
+            12, 13, 14,
+            15, 13, 12
+        })
+    );
+    mGrey = 1.0f;
+    mPreviewTexture = w->mGraphicsHandler->factoryTexture(GL_TEXTURE_EXTERNAL_OES, 0, 0, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
+    mLabelTexture = w->mGraphicsHandler->factoryTexture(GL_TEXTURE_2D, GL_ALPHA, GL_UNSIGNED_BYTE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
+    mDebugTexture = w->mGraphicsHandler->factoryTexture(GL_TEXTURE_2D, GL_RGB, GL_UNSIGNED_BYTE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
 
     //*******************************************************************************
-    //*************************** CAMERA ********************************************
+    //*************************** PREVIEW *******************************************
     //*******************************************************************************
-    LOGI(("GL Vendor " + to_string(GL_VENDOR)).c_str());
-    LOGI(("GL Renderer " + to_string(GL_RENDERER)).c_str());
-    LOGI(("GL Extensions " + to_string(GL_EXTENSIONS)).c_str());
+    nfloat vTanAlphaH = 1;
 
-    glViewport(0, 0, mWidth, mHeight);
-
-    mhProgramCameraPreview = w->mGraphicsHandler->loadProgramAsset("CameraPreview.vert", "CameraPreview.frag");
-    mhVertexPreview = glGetAttribLocation(mhProgramCameraPreview, "mVertexPreview");
-    mhCoordPreview = glGetAttribLocation(mhProgramCameraPreview, "mCoordPreview");
-    mhSamplerPreview = glGetUniformLocation(mhProgramCameraPreview, "mcSamplerPreview");
-    mhTransformation = glGetUniformLocation(mhProgramCameraPreview, "mcTransformation");
-
-    glGenTextures(1, &mhTexturePreview);
-    glBindTexture(GL_TEXTURE_EXTERNAL_OES, mhTexturePreview);
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    w->mTexturePreview = new SurfaceTexture(mhTexturePreview);
+    w->mTexturePreview = new SurfaceTexture(mPreviewTexture->mID);
     w->mTexturePreview->setOnFrameAvailableListener(this);
 
     if (w->maCameraId.mcData) {
@@ -187,8 +147,9 @@ void AREngine::engineInit(Surface* vSurface, int width, int height)
         Camera::Parameters* vParameters = w->mCamera->getParameters();
         vector<Camera::Size> vSupportedPreviewSizes = vParameters->getSupportedPreviewSizes();
         w->mcCameraFocalLength = vParameters->getFocalLength()/1000;
-        w->mcCameraHorizontalAngle = vParameters->getHorizontalViewAngle()*w->mcPi/180.0;
-        w->mcCameraVerticalAngle = vParameters->getVerticalViewAngle()*w->mcPi/180.0;
+        w->mcCameraHorizontalAngle = vParameters->getHorizontalViewAngle()*M_PI_180;
+        w->mcCameraVerticalAngle = vParameters->getVerticalViewAngle()*M_PI_180;
+        vTanAlphaH = 1/tan(w->mcCameraHorizontalAngle/2);
 
         while (
             i + 1 < vSupportedPreviewSizes.size() &&
@@ -202,23 +163,153 @@ void AREngine::engineInit(Surface* vSurface, int width, int height)
     } else {
         LOGE("Camera cannot be opened");
     }
-    nfloat vTanAlphaH = 1/tan(w->mcCameraHorizontalAngle/2);
-    mProjection[0] = ( mWidth > mHeight ? vTanAlphaH : vTanAlphaH );
-    mProjection[1] = ( mWidth > mHeight ? vTanAlphaH*mWidth/mHeight : vTanAlphaH*mWidth/mHeight );
-    mProjection[2] = 1;
-    mProjection[3] = 110000;
-    mModelIndex = getPreviewRotation(w->mcCameraMountOrientation, w->mcDisplayRotation);
+    mPreviewProgram = w->mGraphicsHandler->factoryProgram(NArray<String>({"Preview.vert", "Preview.frag"}), mcPreviewIndice);
+    mPreviewVertex = mPreviewProgram->createParam("vaVertex", mGraphicsBuffer, 3);
+    mPreviewFragment = mPreviewProgram->createParam("vaFragment", mGraphicsBuffer, 2);
+    mPreviewRotation = mPreviewProgram->createParam("vcRotation", NArray<nfloat>({
+        getPreviewRotation(w->mcCameraMountOrientation, w->mcDisplayRotation)
+    }));
+    mPreviewTextureUnit = mPreviewProgram->createParam("vTextureUnit", mPreviewTexture);
 
     //*******************************************************************************
-    //*************************** POI ***********************************************
+    //********************* POINT OF INTEREST ***************************************
     //*******************************************************************************
-    glGenBuffers(1, &mhVertexBuffer);
-    glGenBuffers(1, &mhIndiceBuffer);
+    mPOIProgram = w->mGraphicsHandler->factoryProgram(NArray<String>({"POI.vert", "POI.frag"}), mcPOIIndice);
+    mPOIVertex = mPOIProgram->createParam("vaVertex", mGraphicsBuffer, 3);
+    mPOIFragment = mPOIProgram->createParam("vaFragment", mGraphicsBuffer, 2);
+    mPOIRotation = mPOIProgram->createParam("vaRotation", NArray<nfloat>(4));
+    mPOITranslation = mPOIProgram->createParam("vaTranslation", NArray<nfloat>(3));
+    mPOIProjection = mPOIProgram->createParam("vaProjection", NArray<nfloat>({
+        ( mWidth > mHeight ? vTanAlphaH : vTanAlphaH ),
+        ( mWidth > mHeight ? vTanAlphaH*mWidth/mHeight : vTanAlphaH*mWidth/mHeight ),
+        3,
+        110000
+    }));
 
-    mhProgramPOI = w->mGraphicsHandler->loadProgramAsset("POI.vert", "POI.frag");
-    mhModel = glGetUniformLocation(mhProgramPOI, "mModel");
-    mhProjection = glGetUniformLocation(mhProgramPOI, "mProjection");
-    mhVertexPOI = glGetAttribLocation(mhProgramPOI, "maVertexPOI");
+    //*******************************************************************************
+    //*************************** LABEL *********************************************
+    //*******************************************************************************
+    mLabelProgram = w->mGraphicsHandler->factoryProgram(NArray<String>({"Label.vert", "Label.frag"}), mcLabelIndice);
+    mLabelVertex = mLabelProgram->createParam("vaVertex", mGraphicsBuffer, 3);
+    mLabelFragment = mLabelProgram->createParam("vaFragment", mGraphicsBuffer, 2);
+    mLabelRotation = mLabelProgram->createParam("vaRotation", NArray<nfloat>(4));
+    mLabelTranslation = mLabelProgram->createParam("vaTranslation", NArray<nfloat>(3));
+    mLabelProjection = mLabelProgram->createParam("vaProjection", NArray<nfloat>(4));
+    mLabelTextureUnit = mLabelProgram->createParam("vTextureUnit", mLabelTexture);
+    mLabelPosition = mLabelProgram->createParam("vaLabelPosition", NArray<nfloat>(2));
+    mLabelBox = mLabelProgram->createParam("vaLabelBox", NArray<nfloat>(4));
+    mLabelColor = mLabelProgram->createParam("vaLabelColor", NArray<nfloat>({0.5, 0.14, 0.5, 1.0}));
+    mLabelProjection->is(mPOIProjection);
+
+#ifdef DEBUG
+    //*******************************************************************************
+    //*************************** DEBUG *********************************************
+    //*******************************************************************************
+    nuint i;
+    NArray<nbyte> vAtlasMonoNum = w->mGraphicsHandler->loadAsset("AtlasMonoNum.rtx");
+
+    mDebugProgram = w->mGraphicsHandler->factoryProgram(NArray<String>({"Debug.vert", "Debug.frag"}), mcDebugIndice);
+    mDebugVertex = mDebugProgram->createParam("vaDebugVertex", mGraphicsBuffer, 3);
+    mDebugFragment = mDebugProgram->createParam("vaDebugFragment", mGraphicsBuffer, 2);
+    mDebugPosition = mDebugProgram->createParam("vaDebugPosition", NArray<nfloat>(3));
+    mDebugBox = mDebugProgram->createParam("vaDebugBox", NArray<nfloat>({(nfloat)mWidth, (nfloat)mHeight}));
+    mDebugTextureUnit = mDebugProgram->createParam("vDebugTextureUnit", mDebugTexture);
+    mDebugParamArray.maData[0] = mDebugProgram->createParam(mDebugParamNameArray.maData[0].c_str(), NArray<nfloat>(3));
+    mDebugParamArray.maData[1] = mDebugProgram->createParam(mDebugParamNameArray.maData[1].c_str(), NArray<nfloat>(2));
+
+    for (i = 2 ; i < mDebugParamArray.mcData ; ++i) {
+        mDebugParamArray.maData[i] = mDebugProgram->createParam(mDebugParamNameArray.maData[i].c_str(), NArray<nfloat>(1));
+    }
+    mDebugTexture->setBitmap((nubyte*)vAtlasMonoNum.maData, 104, 10);
+#endif //DEBUG
+}
+
+void AREngine::engineEnd()
+{
+    w->mGraphicsHandler->endRendering3D();
+
+    if (w->mTexturePreview) {
+        w->mTexturePreview->release();
+        delete w->mTexturePreview;
+        w->mTexturePreview = nullptr;
+    }
+    if (w->mCamera) {
+        w->mCamera->release();
+        delete w->mCamera;
+        w->mCamera = nullptr;
+    }
+}
+
+void AREngine::enginePlay()
+{
+    bool vStarted = true;
+    mARState = 2;
+
+    while (vStarted) {
+        switch (mARState) {
+        case 0: // destroy
+            LOGI("AR Engine state 0 -> 1");
+            engineEnd();
+            mARState = 1;
+            this_thread::sleep_for(chrono::milliseconds(40));
+            break;
+        case 1: // off
+            vStarted = false;
+            this_thread::sleep_for(chrono::milliseconds(40));
+            break;
+        case 2: // create
+            if (w->mARState != 2 && w->mARSurface == 2) {
+                LOGI("AR Engine state 2 -> 3");
+                engineEnable(w->mSurface, w->mSurfaceWidth, w->mSurfaceHeight);
+                mARSurface = w->mARSurface;
+                mARState = 3;
+            }
+            if (w->mARState == 0) {
+                LOGI("AR Engine state 2 -> 0");
+                mARState = 0;
+            }
+            this_thread::sleep_for(chrono::milliseconds(40));
+            break;
+        case 3: // resume
+            LOGI("AR Engine state 3 -> 4");
+            engineResume();
+            mARState = 4;
+
+            if (w->mARState != 3) {
+                LOGI("AR Engine state 3 -> 5");
+                mARState = 5;
+            }
+            this_thread::sleep_for(chrono::milliseconds(40));
+            break;
+        case 4: // run
+            engineRun();
+
+            if (w->mARState != 3) {
+                LOGI("AR Engine state 4 -> 5");
+                mARState = 5;
+            }
+            break;
+        case 5: // pause
+            engineSleep();
+
+            if (w->mARState < 3) {
+                LOGI("AR Engine state 5 -> 0");
+                mARState = 0;
+            }
+            if (w->mARState == 3) {
+                LOGI("AR Engine state 5 -> 3");
+                mARState = 3;
+            }
+            this_thread::sleep_for(chrono::milliseconds(40));
+            break;
+        default: // bad state
+            LOGE("AR Engine BAD state");
+            mARState = 0;
+            this_thread::sleep_for(chrono::milliseconds(40));
+            break;
+        }
+        this_thread::sleep_for(chrono::milliseconds(10));
+    }
 }
 
 void AREngine::engineResume()
@@ -234,87 +325,125 @@ void AREngine::engineResume()
 
 void AREngine::engineRun()
 {
-    //*******************************************************************************
-    //*************************** CAMERA ********************************************
-    //*******************************************************************************
-    glClear(GL_COLOR_BUFFER_BIT);
+    // Earth centered coordinate system
+    //  X-axis intersects the sphere of the Earth at 0° latitude (Equator) and 0° longitude (Greenwich)
+    //  Y is the cross-product X x Z
+    //  Z-axis points toward the North Pole
+    // North aligned coordinate system (device centered)
+    //  X is the cross-product Y x Z, it is tangential to the ground and points east
+    //  Y-axis is tangential to the ground, and points toward the North Pole
+    //  Z-axis points toward the sky and is perpendicular to the ground plane
+    // Geomagnetic north aligned coordinate system (device centered)
+    //  X is the cross-product Y x Z, it is tangential to the ground and points approximately east
+    //  Y-axis is tangential to the ground, and points toward the North Geomagnetic Pole
+    //  Z-axis points toward the sky and is perpendicular to the ground plane
+    nfloat vSinAlpha;
+    nfloat vNorthDeclination;
+    BOPOI* vPOI;
+    nfloat vPOIAzimuth;
+    nint vPOIDistance;
+    nfloat vPreviousValue;
+    nint vClass = 0;
 
-    if (mUpdate) {
-        mUpdate = false;
-        w->mTexturePreview->updateTexImage();
-    }
-    glActiveTexture(GL_TEXTURE0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindTexture(GL_TEXTURE_EXTERNAL_OES, mhTexturePreview);
-    glEnableVertexAttribArray(mhVertexPreview);
-    glEnableVertexAttribArray(mhCoordPreview);
-    glUseProgram(mhProgramCameraPreview);
-
-    glUniform1i(mhSamplerPreview, 0);
-    glUniform1f(mhTransformation, mModelIndex);
-    glVertexAttribPointer(mhVertexPreview, 4, GL_FLOAT, GL_FALSE, 0, maVertexPreview);
-    glVertexAttribPointer(mhCoordPreview, 2, GL_FLOAT, GL_FALSE, 0, maCoordPreview);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     //*******************************************************************************
-    //*************************** POI ***********************************************
+    //*************************** CAMERA PREVIEW ************************************
     //*******************************************************************************
-    //   Rotation Vector coordinate system
-    // X is defined as the vector product Y x Z. It is tangential to the ground at the device's current location and points approximately East.
-    // Y is tangential to the ground at the device's current location and points toward the geomagnetic North Pole.
-    // Z points toward the sky and is perpendicular to the ground plane.
-    // The magnitude of the rotation vector is equal to sin(θ/2)
-    //   N-Vector coordinate system
-    // x-axis intersects the sphere of the Earth at 0° latitude (Equator) and 0° longitude (Greenwich).
-    // Y is the cross-product of x/z
-    // z-axis is pointing towards the north
-    nuint i = 0;
-    nfloat m[3][3];
-    nfloat n[3][3];
-    GLfloat p[4] = {0, 0, 0, 1};
-    GLfloat v[4] = {0, 0, 0, 1};
+    mPreviewProgram->use();
+    updatePreview();
+    mPreviewProgram->draw();
 
-    glUseProgram(mhProgramPOI);
-    glBindBuffer(GL_ARRAY_BUFFER, mhVertexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mhIndiceBuffer);
+    while ((vPOI = w->mPOISortList->updateHead())) {
+        //*******************************************************************************
+        //************************** POINT OF INTEREST **********************************
+        //*******************************************************************************
+        // Earth centered coordinate system
+        mDeviceEarthCoord.is3(w->mCoordBuffer->getHead());
+        mPOICoord.is3(vPOI->maEarthCoord).sub3(mDeviceEarthCoord).scale3(6371000);
+        vPOIDistance = mPOICoord.magnitude3();
+        vPOIAzimuth = 100000;
+        vPreviousValue = 100000;
 
-    glUniform4fv(mhProjection, 1, mProjection);
-    glBufferData(GL_ARRAY_BUFFER, maVertexPOI.mcData*sizeof(GLfloat), maVertexPOI.maData, GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, maIndicesPOI.mcData*sizeof(GLushort), maIndicesPOI.maData, GL_STATIC_DRAW);
+        if (vPOIDistance >= 100000) {
+            vPreviousValue = w->mPOISortList->updateValue(vPOIDistance);
+        }
+        if (vPOIDistance < 100000 || vPreviousValue < 100000) {
+            // North aligned coordinate system
+            vSinAlpha = sqrt(mDeviceEarthCoord[0]*mDeviceEarthCoord[0] + mDeviceEarthCoord[1]*mDeviceEarthCoord[1]);
+            mChangeMatrix.is(
+               -mDeviceEarthCoord[1]/vSinAlpha, -mDeviceEarthCoord[2]*mDeviceEarthCoord[0]/vSinAlpha, mDeviceEarthCoord[0],
+                mDeviceEarthCoord[0]/vSinAlpha, -mDeviceEarthCoord[2]*mDeviceEarthCoord[1]/vSinAlpha, mDeviceEarthCoord[1],
+                0.0f,                            vSinAlpha,                                           mDeviceEarthCoord[2]
+            ).inv9();
+            mPOICoord.mul3AtLeft(mChangeMatrix);
 
-    for (i = 0 ; i < w->maPOICoord.mcData/4; ++i) {
-        nfloat* vDeviceCoord = w->maDeviceCoord->maBuffer + w->maDeviceCoord->mWriteIndex;
-        v[0] = (w->maPOICoordData[4*i + 0] - vDeviceCoord[0])*6371000;
-        v[1] = (w->maPOICoordData[4*i + 1] - vDeviceCoord[1])*6371000;
-        v[2] = (w->maPOICoordData[4*i + 2] - vDeviceCoord[2])*6371000;
+            // Geomagnetic north aligned coordinate system
+            mNorthCoord.is3(mNorthEarthCoord).sub3(mDeviceEarthCoord).mul3AtLeft(mChangeMatrix);
+            vPOIAzimuth = mNorthCoord.angle2(mPOICoord);
+        }
+        if (vPOIDistance < 100000) {
+            vPreviousValue = w->mPOISortList->updateValue(vPOIAzimuth);
+        }
+        if (vPreviousValue < 100000) {
+            vNorthDeclination = mNorthAxis.angle2(mNorthCoord);
+            mPOICoord.rot3ByAxisAngle(mUpAxis, -vNorthDeclination);
 
-        if (v[0]*v[0] + v[1]*v[1] + v[2]*v[2] < 100000.0*100000.0) {
-            // Matrix for change from n-Vector basis to sensor basis
-            nfloat vcLength = sqrt(vDeviceCoord[0]*vDeviceCoord[0] + vDeviceCoord[1]*vDeviceCoord[1]);
-            m[0][0] = -vDeviceCoord[1]/vcLength;
-            m[0][1] = vDeviceCoord[0]/vcLength;
-            m[0][2] = 0;
-            m[1][0] = -vDeviceCoord[2]*vDeviceCoord[0]/vcLength;
-            m[1][1] = -vDeviceCoord[2]*vDeviceCoord[1]/vcLength;
-            m[1][2] = sqrt(1 - vDeviceCoord[2]*vDeviceCoord[2]);
-            m[2][0] = sqrt(1 - vDeviceCoord[2]*vDeviceCoord[2])*vDeviceCoord[0]/vcLength;
-            m[2][1] = sqrt(1 - vDeviceCoord[2]*vDeviceCoord[2])*vDeviceCoord[1]/vcLength;
-            m[2][2] = vDeviceCoord[2];
-            matInv(n, m);
-            matMult(p, n, v); // POI coordinates in the sensor basis
-            quatRot(mModel, p, w->maRotation->maBuffer + w->maRotation->mWriteIndex); // POI coordinates in the device basis
+            // Device coordinate system
+            mDeviceRotation.is4(w->mRotationBuffer->getHead());
+            mPOIAzimuthRotation.is4(mDeviceRotation).mul4ByAxisAngle(mUpAxis, vPOIAzimuth);
+            mClassRotation.is4(mPOIAzimuthRotation).mul4ByAxisAngle(mNorthAxis, mClassCoord[vClass + 3]*M_PI/6.0f);
+            mPOICoord.rot3(mDeviceRotation);
 
-            glUniform4fv(mhModel, 1, mModel);
-            glVertexAttribPointer(mhVertexPOI, 4, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), (GLvoid*)nullptr);
+            // Draw
+            mPOIProgram->use();
+            mPOITranslation->is3(mPOICoord);
+            mPOIRotation->is4(mClassRotation);
+            mPOIProgram->draw();
 
-            glEnableVertexAttribArray(mhVertexPOI);
-            glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_SHORT, (GLvoid*)nullptr);
+            //*******************************************************************************
+            //*************************** LABEL *********************************************
+            //*******************************************************************************
+            mLabelProgram->use();
+            mLabelTranslation->is3(mPOICoord);
+            mLabelRotation->is4(mPOIAzimuthRotation);
+
+            mLabelPosition->is(mClassCoord[vClass], mClassCoord[vClass + 1]);
+            w->mGraphicsHandler->renderFontLine(vPOI->mLabel, mLabelProgram, mLabelPosition, mLabelBox, mLabelTextureUnit);
+            mLabelPosition->is(mClassCoord[vClass], mClassCoord[vClass + 2]);
+            w->mGraphicsHandler->renderFontLine(to_string(vPOIDistance) + "m", mLabelProgram, mLabelPosition, mLabelBox, mLabelTextureUnit);
+
+#ifdef DEBUG
+            //*******************************************************************************
+            //*************************** DEBUG *********************************************
+            //*******************************************************************************
+            nuint vcShowDebugLine = 4;
+            nuint i = 0;
+            nuint j;
+            nuint k;
+            nuint l;
+
+            mDebugProgram->use();
+            mDebugTexture->use();
+            mDebugParamArray[2]->is(getPreviewRotation(w->mcCameraMountOrientation, w->mcDisplayRotation));
+
+            for (l = 0; l < vcShowDebugLine; ++l) {
+                for (k = 0; k < 4; ++k) {
+                    for (j = 0; j < 8; ++j) {
+                        mDebugPosition->is(j, k, l);
+                        mDebugParamArray[0]->is3(mGraphicsBuffer->mDataArray.maData + i + k*5);
+                        mDebugParamArray[1]->is2(mGraphicsBuffer->mDataArray.maData + i + k*5 + 3);
+                        mDebugProgram->draw();
+                    }
+                }
+            }
+#endif //DEBUG
+
+            vClass = (vClass + 4)%16;
         }
     }
-    glFlush();
-    eglSwapBuffers(mEGLDisplay, mEGLSurface);
+    w->mGraphicsHandler->flush();
+    w->mPOISortList->swap();
 }
 
 void AREngine::engineSleep()
@@ -325,76 +454,9 @@ void AREngine::engineSleep()
     w->mOpUnitEvents->stopEventsProduction();
 }
 
-void AREngine::engineStart()
+nfloat AREngine::getPreviewRotation(nint vcCameraMountOrientation, nint vcDisplayRotation)
 {
-    bool vStarted = true;
-    mcARState = 2;
-
-    while (vStarted) {
-        switch (mcARState) {
-        case 0: // destroy
-            LOGI("AR Engine state 0 -> 1");
-            engineDestroy();
-            mcARState = 1;
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        case 1: // off
-            vStarted = false;
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        case 2: // create
-            if (w->mcARState != 2 && w->mcARSurface == 2) {
-                LOGI("AR Engine state 2 -> 3");
-                engineInit(w->mSurface, w->mSurfaceWidth, w->mSurfaceHeight);
-                mcARSurface = w->mcARSurface;
-                mcARState = 3;
-            }
-            if (w->mcARState == 0) {
-                LOGI("AR Engine state 2 -> 0");
-                mcARState = 0;
-            }
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        case 3: // resume
-            LOGI("AR Engine state 3 -> 4");
-            engineResume();
-            mcARState = 4;
-
-            if (w->mcARState != 3) {
-                LOGI("AR Engine state 3 -> 5");
-                mcARState = 5;
-            }
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        case 4: // run
-            engineRun();
-
-            if (w->mcARState != 3) {
-                LOGI("AR Engine state 4 -> 5");
-                mcARState = 5;
-            }
-            break;
-        case 5: // pause
-            engineSleep();
-
-            if (w->mcARState < 3) {
-                LOGI("AR Engine state 5 -> 0");
-                mcARState = 0;
-            }
-            if (w->mcARState == 3) {
-                LOGI("AR Engine state 5 -> 3");
-                mcARState = 3;
-            }
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        default: // bad state
-            LOGE("AR Engine BAD state");
-            mcARState = 0;
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        }
-        this_thread::sleep_for(chrono::milliseconds(10));
-    }
+    return (nfloat)((4 + vcCameraMountOrientation - vcDisplayRotation)%4)*M_PI_2;
 }
 
 bool AREngine::isSuitedPreviewOrientation(nint vTargetWidth, nint vTargetHeight, nint vSupportedWidth, nint vSupportedHeight)
@@ -412,85 +474,12 @@ bool AREngine::isSuitedPreviewOrientation(nint vTargetWidth, nint vTargetHeight,
     return vIsSuited;
 }
 
-nint AREngine::getPreviewRotation(nint vcCameraMountOrientation, nint vcDisplayRotation)
+void AREngine::updatePreview()
 {
-    return (4 + vcCameraMountOrientation - vcDisplayRotation)%4;
-}
-
-void AREngine::matMult(nfloat* v, nfloat(*m)[3], nfloat* u)
-{
-    v[0] = m[0][0]*u[0] + m[1][0]*u[1] + m[2][0]*u[2];
-    v[1] = m[0][1]*u[0] + m[1][1]*u[1] + m[2][1]*u[2];
-    v[2] = m[0][2]*u[0] + m[1][2]*u[1] + m[2][2]*u[2];
-}
-
-nfloat AREngine::matDet(nfloat(*m)[3])
-{
-    return m[0][0]*matMinor(0, 0, m) - m[1][0]*matMinor(0, 1, m) + m[2][0]*matMinor(0, 2, m);
-}
-
-void AREngine::matInv(nfloat(*n)[3], nfloat(*m)[3])
-{
-    nfloat det = matDet(m);
-
-    n[0][0] =  matMinor(0, 0, m)/det;
-    n[0][1] = -matMinor(0, 1, m)/det;
-    n[0][2] =  matMinor(0, 2, m)/det;
-    n[1][0] = -matMinor(1, 0, m)/det;
-    n[1][1] =  matMinor(1, 1, m)/det;
-    n[1][2] = -matMinor(1, 2, m)/det;
-    n[2][0] =  matMinor(2, 0, m)/det;
-    n[2][1] = -matMinor(2, 1, m)/det;
-    n[2][2] =  matMinor(2, 2, m)/det;
-}
-
-nfloat AREngine::matMinor(nint row, nint column, nfloat(*m)[3])
-{
-    nint r0 = 0;
-    nint r1 = 2;
-    nint c0 = 0;
-    nint c1 = 2;
-
-    if (row == 0) {
-        r0 = 1;
+    if (mUpdate) {
+        mUpdate = false;
+        w->mTexturePreview->updateTexImage();
     }
-    if (row == 2) {
-        r1 = 1;
-    }
-    if (column == 0) {
-        c0 = 1;
-    }
-    if (column == 2) {
-        c1 = 1;
-    }
-    return m[c0][r0]*m[c1][r1] - m[c1][r0]*m[c0][r1];
-}
-
-void AREngine::quatMult(nfloat* q, nfloat* q1, nfloat* q2)
-{
-    q[0] = q1[3]*q2[0] + q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1];
-    q[1] = q1[3]*q2[1] + q1[1]*q2[3] + q1[2]*q2[0] - q1[0]*q2[2];
-    q[2] = q1[3]*q2[2] + q1[2]*q2[3] + q1[0]*q2[1] - q1[1]*q2[0];
-    q[3] = q1[3]*q2[3] - q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2];
-}
-
-void AREngine::quatNormalize(nfloat* q)
-{
-    q[0] /= q[3];
-    q[1] /= q[3];
-    q[2] /= q[3];
-    q[3] = 1.0;
-}
-
-void AREngine::quatRot(nfloat* q, nfloat* q1, nfloat* r1)
-{
-    nfloat t1[4];
-    q[0] = -r1[0];
-    q[1] = -r1[1];
-    q[2] = -r1[2];
-    q[3] = r1[3];
-    quatMult(t1, q1, q);
-    quatMult(q, r1, t1);
 }
 
 void AREngine::onFrameAvailable(SurfaceTexture* surfaceTexture)

@@ -138,19 +138,18 @@ public:
     Surface* mSurface;
     nint mSurfaceWidth;
     nint mSurfaceHeight;
-    nuint mcARState;
-    nuint mcARSurface;
+    nuint mARState;
+    nuint mARSurface;
     AREngine* mAREngine;
 
     LocationManager* mLocationManager;
     NArray<String> maLocationProviderType;
     NArray<LocationProvider*> maLocationProvider;
     NArray<LocationListener*> maLocationListener;
-    NArray<nfloat> maPOICoord;
-    NArray<String> maPOILabel;
-    nfloat* maPOICoordData;
-    NConcurrentCircularScalarBuffer<nfloat>* maDeviceCoord;
-    NConcurrentCircularScalarBuffer<nfloat>* maRotation;
+    NArray<BOPOI*> maPOI;
+    NSortList<BOPOI,nfloat>* mPOISortList;
+    NConcurrentCircularBuffer<nfloat>* mCoordBuffer;
+    NConcurrentCircularBuffer<nfloat>* mRotationBuffer;
 
     SurfaceTexture* mTexturePreview;
     Camera* mCamera;
@@ -169,8 +168,6 @@ public:
     ASensorManager* mASensorManager;
     ASensorEventQueue* mASensorEventQueue;
     ASensorEvent maASensorEvent[8];
-
-    ndouble mcPi = 3.141592653589793;
 };
 
 } // End namespace

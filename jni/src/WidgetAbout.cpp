@@ -40,7 +40,7 @@ WidgetAbout::WidgetAbout(Wrapper* const w)
     mTextView->setTextColor(w->maColor[Theme::kColorMessageText]);
     mTextView->setTextSize(w->mcTextSize);
     mTextView->setTypeface(Typeface::DEFAULT);
-    mTextView->setText("aXplorience v0.2 BETA\nSwipe left and right to switch view\nUse + to add a message");
+    mTextView->setText("aXplorience v1.0.5 BETA\nSwipe left and right to switch view\nUse + to add a message");
     mTextView->setOnTouchListener(this);
 
     addView(mTop);

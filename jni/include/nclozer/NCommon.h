@@ -7,7 +7,6 @@
 
 #define TARGET_ANDROID
 #define LOG_TAG "nclozer"
-#define CONFIG_DEBUG
 
 //*******************************************************************************
 //********************************* C++ 11 **************************************
@@ -22,6 +21,7 @@
 
 #endif // TARGET_ANDROID
 
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <forward_list>
@@ -41,7 +41,7 @@
 //********************************** LOG ****************************************
 //*******************************************************************************
 
-#ifndef CONFIG_DEBUG
+#ifdef NDEBUG
 
 #define LOGPRINTV(...)
 #define LOGPRINTD(...)
@@ -53,17 +53,22 @@
 #define LOGI(...)
 #define LOGW(...)
 #define LOGE(...)
+#define SLOGV(...)
+#define SLOGI(...)
+#define SLOGD(...)
+#define SLOGW(...)
+#define SLOGE(...)
 
-#endif // CONFIG_DEBUG
+#endif // NDEBUG
 
 //*******************************************************************************
 //*************************** LOG ANDROID  **************************************
 //*******************************************************************************
 #ifdef TARGET_ANDROID
-#ifdef CONFIG_DEBUG
+#ifndef NDEBUG
 
 #include <android/log.h>
-#define DEBUG 1 // Set to 1 to enable debug log traces
+#define DEBUG 1
 #define LOGPRINTV(...)  __android_log_print(ANDROID_LOG_VERBOSE,  LOG_TAG, __VA_ARGS__)
 #define LOGPRINTD(...)  __android_log_print(ANDROID_LOG_DEBUG,  LOG_TAG, __VA_ARGS__)
 #define LOGPRINTI(...)  __android_log_print(ANDROID_LOG_INFO,  LOG_TAG, __VA_ARGS__)
@@ -74,8 +79,13 @@
 #define LOGD(...) __android_log_write(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define LOGW(...) __android_log_write(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_write(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#define SLOGV(...) LOGV((__VA_ARGS__).c_str())
+#define SLOGI(...) LOGI((__VA_ARGS__).c_str())
+#define SLOGD(...) LOGD((__VA_ARGS__).c_str())
+#define SLOGW(...) LOGW((__VA_ARGS__).c_str())
+#define SLOGE(...) LOGE((__VA_ARGS__).c_str())
 
-#endif // CONFIG_DEBUG
+#endif // NDEBUG
 #endif // TARGET_ANDROID
 
 //*******************************************************************************
@@ -93,10 +103,12 @@ namespace NSNATIVE
 using namespace std;
 
 typedef char nbyte;
+typedef short nshort;
 typedef int nint;
 typedef long long int nlong;
 
 typedef unsigned char nubyte;
+typedef unsigned short nushort;
 typedef unsigned int nuint;
 typedef unsigned long long int nulong;
 

@@ -10,6 +10,7 @@
 #include FT_IMAGE_H
 #include <NCommon.h>
 #include <NArray.h>
+#include <NVec.h>
 
 namespace NSNATIVE
 {
@@ -20,5 +21,6 @@ class GraphicsHandler;
 
 #include "GraphicsWrapper.h"
 #include "GraphicsHandler.h"
+#include "GraphicsProgram.h"
 
 #endif

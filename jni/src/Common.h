@@ -7,6 +7,17 @@
 #include <db/DBCommon.h>
 #include <graphics/GraphicsCommon.h>
 #include <NConcurrentCircularBuffer.h>
+#include <NSortList.h>
+
+#ifndef M_PIl
+#define M_PIl 3.141592653589793238462643383279502884L
+#endif
+#ifndef M_PI_180
+#define M_PI_180 M_PI/180.0f
+#endif
+#ifndef M_PI_180l
+#define M_PI_180l M_PIl/180.0L
+#endif
 
 //*******************************************************************************
 //************************************* ANDROID *********************************
@@ -99,6 +110,7 @@ void dump(const String& vHeader)
 
 #include "Tables.h"
 #include "BOMessage.h"
+#include "BOPOI.h"
 #include "RootLayout.h"
 #include "OpUnitEvents.h"
 #include "OpUnitAnim.h"

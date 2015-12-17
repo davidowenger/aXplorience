@@ -7,63 +7,89 @@ namespace NSDEVICE
 class AREngine : public SurfaceTexture::OnFrameAvailableListener
 {
 public:
+    static const nuint kTextureUnitBase = GL_TEXTURE0;
+
     AREngine(Wrapper* vWrapper);
     virtual ~AREngine();
 
     void engineCreate();
-    void engineDestroy();
-    void engineInit(Surface* vSurface, int width, int height);
+    void engineEnable(Surface* vSurface, int width, int height);
+    void engineEnd();
+    void enginePlay();
     void engineResume();
     void engineRun();
     void engineSleep();
-    void engineStart();
+    nfloat getPreviewRotation(nint vcCameraMountOrientation, nint vcDisplayRotation);
     bool isSuitedPreviewOrientation(nint vTargetWidth, nint vTargetHeight, nint vSupportedWidth, nint vSupportedHeight);
-    nint getPreviewRotation(nint vcCameraMountOrientation, nint vcDisplayRotation);
-    nfloat matDet(nfloat(*m)[3]);
-    void matInv(nfloat(*n)[3], nfloat(*m)[3]);
-    nfloat matMinor(nint row, nint column, nfloat(*m)[3]);
-    void matMult(nfloat* v, nfloat(*m)[3], nfloat* u);
-    void quatMult(nfloat* q, nfloat* q1, nfloat* q2);
-    void quatNormalize(nfloat* q);
-    void quatRot(nfloat* t, nfloat* p, nfloat* r);
+    void updatePreview();
 
     // SurfaceTexture::OnFrameAvailableListener
     virtual void onFrameAvailable(SurfaceTexture* surfaceTexture);
 
-    Wrapper* w;
-    JNIEnv* mEnv;
-    EGLDisplay mEGLDisplay;
-    EGLConfig mEGLConfig;
-    EGLContext mEGLContext;
-    EGLSurface mEGLSurface;
-    const GLfloat* maVertexPreview;
-    const GLfloat* maCoordPreview;
-    GLfloat* mProjection;
-    GLfloat* mModel;
-
-    nuint mcARState;
-    nuint mcARSurface;
+    bool mUpdate;
+    nfloat mGrey;
+    nuint mARState;
+    nuint mARSurface;
     nint mWidth;
     nint mHeight;
-    nfloat mModelIndex;
-    float mGrey;
-    GLint mhProgramCameraPreview;
-    GLint mhProgramOverlayText;
-    GLint mhVertexPreview;
-    GLint mhCoordPreview;
-    GLint mhSamplerPreview;
-    GLint mhTransformation;
-    GLint mhVertexPOI;
-    GLint mhProgramPOI;
-    GLint mhModel;
-    GLint mhProjection;
-    GLuint mhVertexBuffer;
-    GLuint mhIndiceBuffer;
-    GLuint mhTexturePreview;
-    bool mUpdate;
+    nfloat mSpacingWidth;
+    nfloat mSpacingHeight;
 
-    NArray<GLfloat> maVertexPOI;
-    NArray<GLushort> maIndicesPOI;
+    Wrapper* w;
+    JNIEnv* mEnv;
+    GraphicsBuffer* mGraphicsBuffer;
+
+    NVec<nfloat> mNorthAxis;
+    NVec<nfloat> mUpAxis;
+    NVec<nfloat> mChangeMatrix;
+    NVec<nfloat> mDeviceEarthCoord;
+    NVec<nfloat> mDeviceRotation;
+    NVec<nfloat> mNorthEarthCoord;
+    NVec<nfloat> mNorthCoord;
+    NVec<nfloat> mPOICoord;
+    NVec<nfloat> mPOIAzimuthRotation;
+    NVec<nfloat> mClassCoord;
+    NVec<nfloat> mClassRotation;
+
+    nuint mcPreviewIndice;
+    GraphicsTexture* mPreviewTexture;
+    GraphicsProgram* mPreviewProgram;
+    GraphicsParam* mPreviewVertex;
+    GraphicsParam* mPreviewFragment;
+    GraphicsParam* mPreviewRotation;
+    GraphicsParam* mPreviewTextureUnit;
+
+    nuint mcPOIIndice;
+    GraphicsProgram* mPOIProgram;
+    GraphicsParam* mPOIVertex;
+    GraphicsParam* mPOIFragment;
+    GraphicsParam* mPOIRotation;
+    GraphicsParam* mPOITranslation;
+    GraphicsParam* mPOIProjection;
+
+    nuint mcLabelIndice;
+    GraphicsTexture* mLabelTexture;
+    GraphicsProgram* mLabelProgram;
+    GraphicsParam* mLabelVertex;
+    GraphicsParam* mLabelFragment;
+    GraphicsParam* mLabelRotation;
+    GraphicsParam* mLabelTranslation;
+    GraphicsParam* mLabelProjection;
+    GraphicsParam* mLabelTextureUnit;
+    GraphicsParam* mLabelPosition;
+    GraphicsParam* mLabelBox;
+    GraphicsParam* mLabelColor;
+
+    nuint mcDebugIndice;
+    GraphicsTexture* mDebugTexture;
+    GraphicsProgram* mDebugProgram;
+    GraphicsParam* mDebugVertex;
+    GraphicsParam* mDebugFragment;
+    GraphicsParam* mDebugPosition;
+    GraphicsParam* mDebugBox;
+    GraphicsParam* mDebugTextureUnit;
+    NArray<String> mDebugParamNameArray;
+    NArray<GraphicsParam*> mDebugParamArray;
 };
 
 } // End namespace

@@ -29,7 +29,7 @@ WidgetSettings::WidgetSettings(Wrapper* const w)
     mTextView->setTextColor(w->maColor[Theme::kColorMessageText]);
     mTextView->setTextSize(w->mcTextSize);
     mTextView->setTypeface(Typeface::DEFAULT);
-    mTextView->setText("Be sure to have Bluetooth ENABLED and VISIBLE for your device to be seen. Only VISIBLE device can connect to not VISIBLE ones.");
+    mTextView->setText("Be sure to have Bluetooth ENABLED and VISIBLE for your device to be seen. Only VISIBLE device can connect to not VISIBLE ones.\n\nBe sure to have GPS Location ENABLED in your system settings when using Augmented Reality.");
     mTextView->setOnTouchListener(this);
 
     addView(mTextView);

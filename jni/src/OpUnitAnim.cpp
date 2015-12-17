@@ -15,13 +15,12 @@ OpUnitAnim::~OpUnitAnim()
     delete w->mAREngine;
 
     if (mIsARInitialized) {
-        w->maPOICoord.discard();
-        w->maPOILabel.discard();
+        w->maPOI.discard();
 
         delete w->mLocationManager;
         delete w->mGraphicsHandler;
-        delete w->maDeviceCoord;
-        delete w->maRotation;
+        delete w->mCoordBuffer;
+        delete w->mRotationBuffer;
     }
 }
 
@@ -116,55 +115,44 @@ NReturn OpUnitAnim::visit(NBeta00* element, NParam a, NParam b, NParam c, NParam
     Op* vOp = nextOp();
 
     if (!mIsARInitialized) {
-        nuint i = 0;
-        NArray<nfloat> vaPOILocation = NArray<nfloat>({
-            46.5183910, 6.6305800,
-            46.5271310, 6.6517860,
-            46.5223740, 6.6343880,
-            46.5071060, 6.6265730,
-            46.5252710, 6.6340880,
-            46.5228050, 6.5794420,
-            46.5082340, 6.6241910,
-            46.5165130, 6.6258520,
-            46.5481160, 6.5537010,
-            46.5195300, 6.6313710,
-            46.5195300, 6.6313710
-        });
-        nfloat* vaPOILocationData = vaPOILocation.maData;
+        nuint vPOIIndex;
 
         mIsARInitialized = true;
         w->mLocationManager = (LocationManager*)w->mNActivity->getSystemService(Context::LOCATION_SERVICE);
-        w->maDeviceCoord = new NConcurrentCircularScalarBuffer<nfloat>(24);
-        w->maRotation = new NConcurrentCircularScalarBuffer<nfloat>(32);
         w->mGraphicsHandler = new GraphicsHandler(w->mNWrapper);
-        w->mcDisplayRotation = (4 - w->mDisplay->getRotation())%4;
-        w->maPOICoord = NArray<nfloat>(vaPOILocation.mcData*2);
-        w->maPOICoordData = w->maPOICoord.maData;
-        w->maPOILabel = NArray<String>({
-            "Yatus - Lausanne", "",
-            "Brasserie de Chailly Lausanne", "",
-            "Giraf restaurant Vieux-Lausanne", "",
-            "La Riviera Lausanne-Ouchy", "",
-            "Lausanne-Moudon", "",
-            "Restaurant de Dorigny", "",
-            "Mövenpick-Ouchy", "",
-            "Restaurant Le Milan", "",
-            "Restaurant les Arcades", "",
-            "Brasserie du Grand-Chêne", "",
-            "La Table d'Edgard", ""
+        w->mCoordBuffer = new NConcurrentCircularBuffer<nfloat>(24);
+        w->mRotationBuffer = new NConcurrentCircularBuffer<nfloat>(32);
+        //TODO: link to a data source
+        w->maPOI = NArray<BOPOI*>({
+            new BOPOI(w, 46.521390, 6.628466, "Taco's Bar", ""),
+            new BOPOI(w, 46.519865, 6.639356, "Chorus", ""),
+            new BOPOI(w, 46.522417, 6.619248, "Les Docks", ""),
+            new BOPOI(w, 46.521222, 6.627045, "Xoxo Club", ""),
+            new BOPOI(w, 46.520137, 6.637671, "Bleu Lezard", ""),
+            new BOPOI(w, 46.519973, 6.636507, "Le Bourg", ""),
+            new BOPOI(w, 46.521796, 6.627189, "Mad Club", ""),
+            new BOPOI(w, 46.520579, 6.567823, "Satellite", ""),
+            new BOPOI(w, 46.526035, 6.580006, "Zelig", ""),
+            new BOPOI(w, 46.520995, 6.631114, "D! Club", ""),
+            new BOPOI(w, 46.522408, 6.634345, "La Giraf", ""),
+            new BOPOI(w, 46.520204, 6.637295, "Buzz Club", ""),
+            new BOPOI(w, 46.529604, 6.622984, "Beaulieu", ""),
+            new BOPOI(w, 46.519403, 6.578746, "Centre sportif de Dorigny", ""),
+            new BOPOI(w, 46.533306, 6.624165, "La Pontaise", "")
         });
-        for (i = 0 ; i < w->maPOICoord.mcData/4 ; ++i) {
-            w->maPOICoordData[4*i + 0] = cos((ndouble)vaPOILocationData[2*i + 0]/180*w->mcPi)*cos((ndouble)vaPOILocationData[2*i + 1]/180*w->mcPi);
-            w->maPOICoordData[4*i + 1] = cos((ndouble)vaPOILocationData[2*i + 0]/180*w->mcPi)*sin((ndouble)vaPOILocationData[2*i + 1]/180*w->mcPi);
-            w->maPOICoordData[4*i + 2] = sin((ndouble)vaPOILocationData[2*i + 0]/180*w->mcPi);
-            w->maPOICoordData[4*i + 3] = 1.0;
+        vPOIIndex = w->maPOI.mcData;
+        w->mPOISortList = new NSortList<BOPOI,nfloat>();
+        w->mPOISortList->resize(vPOIIndex);
+        w->mcDisplayRotation = (4 - w->mDisplay->getRotation())%4;
+
+        while (vPOIIndex--) {
+            w->mPOISortList->setValue(w->maPOI[vPOIIndex], 0);
         }
-        vaPOILocation.discard();
         w->mOpUnitEvents->start();
         w->mAREngine->engineCreate();
     }
     sendOp(w->mOpUnitEventsId, w->mNWrapper->mNKrossWrapper->mNAlpha00, new Op());
-    w->mAREngine->engineStart();
+    w->mAREngine->enginePlay();
 
     while (mAlive && vOp) {
         if (vOp->mNElement == w->mNWrapper->mNKrossWrapper->mNAlpha00) {

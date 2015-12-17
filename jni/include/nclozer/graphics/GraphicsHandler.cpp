@@ -3,23 +3,180 @@
 namespace NSNATIVE
 {
 
-GraphicsHandler::GraphicsHandler(NWrapper* vNWrapper)
-    : mNWrapper(vNWrapper)
+GraphicsBuffer::GraphicsBuffer(NArray<nfloat> vDataArray, nuint vRowSize, NArray<nushort> vIndiceArray)
+    : mRowSize(vRowSize), mDataArray(vDataArray), mIndiceArray(vIndiceArray)
 {
+    // TODO: enable multiple buffers
+    glGenBuffers(1, &mDataID);
+    glGenBuffers(1, &mIndiceID);
+    use();
+    glBufferData(GL_ARRAY_BUFFER, mDataArray.mcData*sizeof(GLfloat), mDataArray.maData, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndiceArray.mcData*sizeof(GLushort), mIndiceArray.maData, GL_STATIC_DRAW);
+}
+
+GraphicsBuffer::~GraphicsBuffer()
+{
+}
+
+void GraphicsBuffer::use()
+{
+    glBindBuffer(GL_ARRAY_BUFFER, mDataID);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndiceID);
+}
+
+GraphicsTexture::GraphicsTexture(nuint vTextureUnit, nuint vTarget, nint vFormat, nint vType, nint vWrapX, nint vWrapY, nint vMinFilter, nint vMagFilter)
+    : mID(0), mTextureUnit(vTextureUnit), mTarget(vTarget), mFormat(vFormat), mType(vType), mWrapX(vWrapX), mWrapY(vWrapY), mMinFilter(vMinFilter), mMagFilter(vMagFilter)
+{
+    glGenTextures(1, &mID);
+    use();
+    glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, mWrapX);
+    glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, mWrapY);
+    glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, mMinFilter);
+    glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, mMagFilter);
+}
+
+GraphicsTexture::~GraphicsTexture()
+{
+}
+
+void GraphicsTexture::setBitmap(nubyte* vaPixel, nuint vWidth, nuint vHeight)
+{
+    glActiveTexture(kTextureUnitBase + mTextureUnit);
+    glBindTexture(mTarget, mID);
+    glTexImage2D(mTarget, 0, mFormat, vWidth, vHeight, 0, mFormat, mType, vaPixel);
+}
+
+void GraphicsTexture::use()
+{
+    glActiveTexture(kTextureUnitBase + mTextureUnit);
+    glBindTexture(mTarget, mID);
+}
+
+GraphicsHandler::GraphicsHandler(NWrapper* vNWrapper) :
+    mTextureUnitCount(0), mFirstIndice(0), mWidth(0), mHeight(0),
+    mNWrapper(vNWrapper), mEGLDisplay(nullptr), mEGLConfig(nullptr), mEGLContext(nullptr), mEGLSurface(nullptr)
+{
+    mNWrapper->mGraphicsWrapper->mGraphicsHandler = this;
 }
 
 GraphicsHandler::~GraphicsHandler()
 {
 }
 
-nint GraphicsHandler::initFontRendering()
+nint GraphicsHandler::createDisplayConfig()
 {
-    FT_Error vError = 0;
+    //*******************************************************************************
+    //********************************* EGL CONFIG **********************************
+    //*******************************************************************************
+#ifdef EGL_VERSION_1_3
+    LOGI("EGL Version 1.3");
 
-    vError = FT_Init_FreeType(&mNWrapper->mGraphicsWrapper->mFontLib);
+    nuint vState = 0;
+    EGLint vSize = 0;
+    NArray<EGLint> vaConfigAttrib({
+        EGL_DEPTH_SIZE, 24,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_NONE
+    });
+    NArray<EGLint> vaContextAttrib({
+         EGL_CONTEXT_CLIENT_VERSION, 2,
+         EGL_NONE
+    });
+    mEGLDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    vState = (mEGLDisplay != nullptr);
+
+    if (vState) {
+        vState &= eglInitialize(mEGLDisplay, NULL, NULL);
+    } else {
+        LOGE("Could not get default display");
+    }
+    if (vState) {
+        vState = eglChooseConfig(mEGLDisplay, vaConfigAttrib.maData, &mEGLConfig, 1, &vSize);
+        vState &= (vSize > 0);
+    } else {
+        LOGE("Could not initialize display");
+    }
+    if (vState) {
+        mEGLContext = eglCreateContext(mEGLDisplay, mEGLConfig, nullptr, vaContextAttrib.maData);
+        vState &= (mEGLContext != nullptr);
+    } else {
+        LOGE("Could not find configuration");
+    }
+    if (vState) {
+        LOGI("EGL context created");
+    } else {
+        LOGE("Could not create context");
+    }
+    vaConfigAttrib.discard();
+    vaContextAttrib.discard();
+#else
+    LOGE("EGL version 1.3 not found");
+#endif //EGL_VERSION_1_3
+    return 0;
+}
+
+nint GraphicsHandler::createDisplaySurface(EGLNativeWindowType vEGLNativeWindow)
+{
+    //*******************************************************************************
+    //******************************* EGL Surface ***********************************
+    //*******************************************************************************
+    nuint vState = (vEGLNativeWindow != nullptr);
+
+    if (vState) {
+        mEGLSurface = eglCreateWindowSurface(mEGLDisplay, mEGLConfig, vEGLNativeWindow, nullptr);
+        vState &= (mEGLSurface != nullptr);
+    } else {
+        LOGE("Could not get Native Window");
+    }
+    if (vState) {
+        vState = eglMakeCurrent(mEGLDisplay, mEGLSurface, mEGLSurface, mEGLContext);
+    } else {
+        LOGE("Could not create surface");
+    }
+    if (vState) {
+        LOGI("Current EGL context set");
+    } else {
+        LOGE("Could not set current context");
+    }
+    return !vState;
+}
+
+nint GraphicsHandler::enableRendering3D(nint vWidth, nint vHeight, bool vDepthTest, bool vCullFace)
+{
+    //*******************************************************************************
+    //********************************* OPEN GL *************************************
+    //*******************************************************************************
+    LOGI(("GL Vendor " + to_string(GL_VENDOR)).c_str());
+    LOGI(("GL Renderer " + to_string(GL_RENDERER)).c_str());
+    LOGI(("GL Extensions " + to_string(GL_EXTENSIONS)).c_str());
+    mWidth = vWidth;
+    mHeight = vHeight;
+    mTextureUnitCount = 0;
+    mFirstIndice = 0;
+
+    if (vDepthTest) {
+        glEnable(GL_DEPTH_TEST);
+    }
+    if (vCullFace) {
+        glEnable(GL_CULL_FACE);
+    }
+    glViewport(0, 0, vWidth, vHeight);
+
+    return 0;
+}
+
+nint GraphicsHandler::enableRenderingFont(nuint vFontSize)
+{
+    //*******************************************************************************
+    //********************************* FreeType ************************************
+    //*******************************************************************************
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    nint vError = FT_Init_FreeType(&mNWrapper->mGraphicsWrapper->mFontLib);
 
     if (vError) {
-        LOGE(("Could not init freetype library : #" + to_string(vError)).c_str());
+        SLOGE("Could not init freetype library : #" + to_string(vError));
     }
     if (!vError) {
         vError = FT_New_Face(mNWrapper->mGraphicsWrapper->mFontLib, (mNWrapper->mFileDir + "FreeSans.ttf").c_str(), 0, &mNWrapper->mGraphicsWrapper->mFontFace);
@@ -28,26 +185,138 @@ nint GraphicsHandler::initFontRendering()
         vError = writeFile("FreeSans.ttf", loadAsset("FreeSans.ttf"));
 
         if (vError) {
-            LOGE(("Could not extract font : #" + to_string(vError)).c_str());
+            SLOGE("Could not extract font : #" + to_string(vError));
         }
         if (!vError) {
             vError = FT_New_Face(mNWrapper->mGraphicsWrapper->mFontLib, (mNWrapper->mFileDir + "FreeSans.ttf").c_str(), 0, &mNWrapper->mGraphicsWrapper->mFontFace);
         }
         if (vError) {
-            LOGE(("Could not load font : #" + to_string(vError)).c_str());
+            SLOGE("Could not load font : #" + to_string(vError));
         }
     }
     if (!vError) {
-        FT_Set_Pixel_Sizes(mNWrapper->mGraphicsWrapper->mFontFace, 0, 48);
+        vError = FT_Set_Pixel_Sizes(mNWrapper->mGraphicsWrapper->mFontFace, 0, vFontSize);
+    }
+    if (vError) {
+        SLOGE("Could not set font size : #" + to_string(vError));
+    }
+    if (!vError) {
         vError = FT_Load_Char(mNWrapper->mGraphicsWrapper->mFontFace, 'X', FT_LOAD_RENDER);
     }
     if (vError) {
-        LOGE(("Could not load character : #" + to_string(vError)).c_str());
+        SLOGE("Could not load character : #" + to_string(vError));
     }
     if (!vError) {
         mNWrapper->mGraphicsWrapper->mGlyphSlot = mNWrapper->mGraphicsWrapper->mFontFace->glyph;
+        mNWrapper->mGraphicsWrapper->mGlyphWidth = mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.width;
+        mNWrapper->mGraphicsWrapper->mGlyphHeight = mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.rows;
     }
     return vError;
+}
+
+void GraphicsHandler::endRendering3D()
+{
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glUseProgram(0);
+}
+
+GraphicsBuffer* GraphicsHandler::factoryBuffer(NArray<nfloat> vDataArray, nuint vRowSize, NArray<nushort> vIndiceArray)
+{
+    return new GraphicsBuffer(vDataArray, vRowSize, vIndiceArray);
+}
+
+GraphicsProgram* GraphicsHandler::factoryProgram(NArray<String> vaShader, nuint vIndiceCount)
+{
+    GraphicsProgram* vGraphicsProgram = new GraphicsProgram(mNWrapper, vaShader, vIndiceCount, mFirstIndice);
+    mFirstIndice += vIndiceCount;
+    return vGraphicsProgram;
+}
+
+GraphicsTexture* GraphicsHandler::factoryTexture(nuint vTarget, nint vFormat, nint vType, nint vWrapX, nint vWrapY, nint vMinFilter, nint vMagFilter)
+{
+    return new GraphicsTexture(mTextureUnitCount++, vTarget, vFormat, vType, vWrapX, vWrapY, vMinFilter, vMagFilter);
+}
+
+void GraphicsHandler::flush()
+{
+    glFlush();
+    eglSwapBuffers(mEGLDisplay, mEGLSurface);
+}
+
+NArray<nbyte> GraphicsHandler::loadAsset(const String& vFilePath)
+{
+    nint vState = -1;
+    const void* vBuffer = nullptr;
+    AAsset* vAAsset = AAssetManager_open(mNWrapper->mAAssetManager, (mNWrapper->mAssetDir + vFilePath).c_str(), AASSET_MODE_BUFFER);
+    NArray<nbyte> vFile;
+
+    if (!vAAsset) {
+        LOGE(("Error accessing asset : #" + mNWrapper->mAssetDir + vFilePath).c_str());
+    }
+    if (vAAsset) {
+        vState = AAsset_getLength(vAAsset);
+    }
+    if (vAAsset && vState == 0) {
+        LOGE(("Asset not found or empty : #" + mNWrapper->mAssetDir + vFilePath).c_str());
+    }
+    if (vState > 0) {
+        vBuffer = AAsset_getBuffer(vAAsset);
+    }
+    if (!vBuffer && vState > 0) {
+        LOGE(("Error reading asset : #" + mNWrapper->mAssetDir + vFilePath).c_str());
+    }
+    if (vBuffer) {
+        vFile.mcData = vState;
+        vFile.maData = new nbyte[vFile.mcData + 1];
+        vFile.maData[vFile.mcData] = 0;
+        memcpy(vFile.maData, vBuffer, vFile.mcData);
+    }
+    if (vAAsset) {
+        AAsset_close(vAAsset);
+    }
+    return vFile;
+}
+
+
+NArray<nbyte> GraphicsHandler::loadFile(const String& vFilePath)
+{
+    nint vState = -3;
+    NArray<nbyte> vFile;
+    fstream vFileStream;
+
+    vFileStream.open(mNWrapper->mFileDir + vFilePath, ios_base::binary | ios_base::out | ios_base::app );
+
+    if (!vFileStream.good()) {
+        LOGE(("Error accessing file : #" + mNWrapper->mFileDir + vFilePath).c_str());
+    }
+    if (vFileStream.good()) {
+        vFileStream.close();
+        vFileStream.open(mNWrapper->mFileDir + vFilePath, ios_base::binary| ios_base::in );
+        vState = -2;
+    }
+    if (!vFileStream.good() && vState == -2) {
+        LOGE(("Error reading file data : #" + mNWrapper->mFileDir + vFilePath).c_str());
+    }
+    if (vFileStream.good()) {
+        vFileStream.seekg(0, ios::end);
+        vState = vFileStream.tellg();
+        vFileStream.seekg(0, ios::beg);
+    }
+    if (vFileStream.good() && vState == -1) {
+        LOGE(("Error reading file size : #" + mNWrapper->mFileDir + vFilePath).c_str());
+    }
+    if (vFileStream.good() && vState == 0) {
+        LOGE(("File not found or empty : #" + mNWrapper->mFileDir + vFilePath).c_str());
+    }
+    if (vState > 0) {
+        vFile.mcData = vState;
+        vFile.maData = new nbyte[vFile.mcData + 1];
+        vFileStream.read(vFile.maData, vFile.mcData);
+    }
+    vFileStream.clear();
+    vFileStream.close();
+    return vFile;
 }
 
 GLuint GraphicsHandler::loadProgramAsset(const String& vVertexFile, const String& vFragmentFile)
@@ -126,79 +395,38 @@ GLuint GraphicsHandler::loadShaderText(GLenum vcType, const char* vsSource)
     return vhShader;
 }
 
-NArray<nbyte> GraphicsHandler::loadAsset(const String& vFilePath)
+nint GraphicsHandler::renderFontLine(const String& vLabel, GraphicsProgram* vProgram, GraphicsParam* vPosition, GraphicsParam* vBox, GraphicsParam* vTextureUnit)
 {
-    nint vState = -1;
-    const void* vBuffer = nullptr;
-    AAsset* vAAsset = AAssetManager_open(mNWrapper->mAAssetManager, (mNWrapper->mAssetDir + vFilePath).c_str(), AASSET_MODE_BUFFER);
-    NArray<nbyte> vFile;
+    const nbyte* vChar;
+    nint vError = 0;
+    GraphicsTexture* vTexture = ((GraphicsParamTex*)vTextureUnit)->mGraphicsTexture;
+    nfloat vCoord[2] {vPosition->mNVec[0], vPosition->mNVec[1]};
 
-    if (!vAAsset) {
-        LOGE(("Error accessing asset : #" + mNWrapper->mAssetDir + vFilePath).c_str());
-    }
-    if (vAAsset) {
-        vState = AAsset_getLength(vAAsset);
-    }
-    if (vAAsset && vState == 0) {
-        LOGE(("Asset not found or empty : #" + mNWrapper->mAssetDir + vFilePath).c_str());
-    }
-    if (vState > 0) {
-        vBuffer = AAsset_getBuffer(vAAsset);
-    }
-    if (!vBuffer && vState > 0) {
-        LOGE(("Error reading asset : #" + mNWrapper->mAssetDir + vFilePath).c_str());
-    }
-    if (vBuffer) {
-        vFile.mcData = vState;
-        vFile.maData = new nbyte[vFile.mcData + 1];
-        vFile.maData[vFile.mcData] = 0;
-        memcpy(vFile.maData, vBuffer, vFile.mcData);
-    }
-    if (vAAsset) {
-        AAsset_close(vAAsset);
-    }
-    return vFile;
-}
+    for (vChar = vLabel.c_str() ; *vChar ; ++vChar) {
+        vError = FT_Load_Char(mNWrapper->mGraphicsWrapper->mFontFace, *vChar, FT_LOAD_RENDER);
 
-
-NArray<nbyte> GraphicsHandler::loadFile(const String& vFilePath)
-{
-    nint vState = -3;
-    NArray<nbyte> vFile;
-    fstream vFileStream;
-
-    vFileStream.open(mNWrapper->mFileDir + vFilePath, ios_base::binary | ios_base::out | ios_base::app );
-
-    if (!vFileStream.good()) {
-        LOGE(("Error accessing file : #" + mNWrapper->mFileDir + vFilePath).c_str());
+        if (!vError) {
+            vTexture->setBitmap(
+                mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.buffer,
+                mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.width,
+                mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.rows
+            );
+            vBox->is(
+                (nfloat)mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap_left/mWidth,
+                (nfloat)mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap_top/mHeight,
+                (nfloat)mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.width/mWidth,
+                (nfloat)mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.rows/mHeight
+            );
+            vProgram->draw();
+            vPosition->is(
+                vCoord[0] += (nfloat)(mNWrapper->mGraphicsWrapper->mGlyphSlot->advance.x >> 6)/mWidth,
+                vCoord[1] += (nfloat)(mNWrapper->mGraphicsWrapper->mGlyphSlot->advance.y >> 6)/mHeight
+            );
+        } else {
+            LOGE("Unknown char :" + *vChar);
+        }
     }
-    if (vFileStream.good()) {
-        vFileStream.close();
-        vFileStream.open(mNWrapper->mFileDir + vFilePath, ios_base::binary| ios_base::in );
-        vState = -2;
-    }
-    if (!vFileStream.good() && vState == -2) {
-        LOGE(("Error reading file data : #" + mNWrapper->mFileDir + vFilePath).c_str());
-    }
-    if (vFileStream.good()) {
-        vFileStream.seekg(0, ios::end);
-        vState = vFileStream.tellg();
-        vFileStream.seekg(0, ios::beg);
-    }
-    if (vFileStream.good() && vState == -1) {
-        LOGE(("Error reading file size : #" + mNWrapper->mFileDir + vFilePath).c_str());
-    }
-    if (vFileStream.good() && vState == 0) {
-        LOGE(("File not found or empty : #" + mNWrapper->mFileDir + vFilePath).c_str());
-    }
-    if (vState > 0) {
-        vFile.mcData = vState;
-        vFile.maData = new nbyte[vFile.mcData + 1];
-        vFileStream.read(vFile.maData, vFile.mcData);
-    }
-    vFileStream.clear();
-    vFileStream.close();
-    return vFile;
+    return vError;
 }
 
 nint GraphicsHandler::writeFile(const String& vFilePath, NArray<nbyte> vFile)
@@ -216,45 +444,24 @@ nint GraphicsHandler::writeFile(const String& vFilePath, NArray<nbyte> vFile)
     return !vFileStream.good();
 }
 
-nint GraphicsHandler::renderFontLine(const char *text, float x, float y, float sx, float sy)
+nint GraphicsHandler::setFontSize(nuint vFontSize)
 {
-    const char *p;
+    FT_Error vError = FT_Set_Pixel_Sizes(mNWrapper->mGraphicsWrapper->mFontFace, 0, vFontSize);
 
-    for (p = text; *p; p++) {
-        if (FT_Load_Char(mNWrapper->mGraphicsWrapper->mFontFace, *p, FT_LOAD_RENDER))
-            continue;
-
-        glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_ALPHA,
-            mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.width,
-            mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.rows,
-            0,
-            GL_ALPHA,
-            GL_UNSIGNED_BYTE,
-            mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.buffer
-        );
-
-        float x2 = x + mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap_left * sx;
-        float y2 = -y - mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap_top * sy;
-        float w = mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.width * sx;
-        float h = mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.rows * sy;
-
-        GLfloat box[4][4] = {
-            {x2,     -y2    , 0, 0},
-            {x2 + w, -y2    , 1, 0},
-            {x2,     -y2 - h, 0, 1},
-            {x2 + w, -y2 - h, 1, 1},
-        };
-
-        glBufferData(GL_ARRAY_BUFFER, sizeof box, box, GL_DYNAMIC_DRAW);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        x += (mNWrapper->mGraphicsWrapper->mGlyphSlot->advance.x >> 6) * sx;
-        y += (mNWrapper->mGraphicsWrapper->mGlyphSlot->advance.y >> 6) * sy;
+    if (vError) {
+        LOGE(("Could not set font size : #" + to_string(vError)).c_str());
     }
-    return 0;
+    if (!vError) {
+        vError = FT_Load_Char(mNWrapper->mGraphicsWrapper->mFontFace, 'X', FT_LOAD_RENDER);
+    }
+    if (vError) {
+        LOGE(("Could not load character : #" + to_string(vError)).c_str());
+    }
+    if (!vError) {
+        mNWrapper->mGraphicsWrapper->mGlyphWidth = mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.width;
+        mNWrapper->mGraphicsWrapper->mGlyphHeight = mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.rows;
+    }
+    return vError;
 }
 
 } // End namespace

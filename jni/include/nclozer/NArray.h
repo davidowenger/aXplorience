@@ -21,11 +21,21 @@ public:
     NArray(initializer_list<T> vInit)
         : maData(new T[vInit.size()]()), mcData(vInit.size())
     {
-        memcpy(maData, vInit.begin(), mcData*sizeof(T));
+        //memcpy(maData, vInit.begin(), mcData*sizeof(T));
+        nuint i;
+
+        for (i = 0 ; i < mcData ; ++i) {
+            maData[i] = *(vInit.begin() + i);
+        }
     }
 
     ~NArray()
     {
+    }
+
+    T operator[](nuint vIndex)
+    {
+        return maData[vIndex];
     }
 
     void discard()

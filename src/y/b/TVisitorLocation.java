@@ -75,25 +75,57 @@ public class TVisitorLocation extends TKrossVisitor
     // Location* getLastKnownLocation(const String& provider)
     public long visit(TIota00 element, long a, long b, long c, long d, long e)
     {
-        return w.mTKrossSystem.emplaceKey(b, ((LocationManager)w.sObject.get(a)).getLastKnownLocation((String)w.mTKrossSystem.nRunObject(c)));
+        Location vLocation = null;
+
+        try {
+            vLocation = ((LocationManager)w.sObject.get(a)).getLastKnownLocation((String)w.mTKrossSystem.nRunObject(c));
+        }
+        catch (Exception vException) {
+            if (w.doDebug) vException.printStackTrace();
+            vLocation = null;
+        }
+        return w.mTKrossSystem.emplaceKey(b, vLocation);
     }
 
     // LocationProvider* getProvider(const String& name)
     public long visit(TTau00 element, long a, long b, long c, long d, long e)
     {
-        return w.mTKrossSystem.emplaceKey(b, ((LocationManager)w.sObject.get(a)).getProvider((String)w.mTKrossSystem.nRunObject(c)));
+        LocationProvider vLocationProvider = null;
+
+        try {
+            vLocationProvider = ((LocationManager)w.sObject.get(a)).getProvider((String)w.mTKrossSystem.nRunObject(c));
+        }
+        catch (Exception vException) {
+            if (w.doDebug) vException.printStackTrace();
+            vLocationProvider = null;
+        }
+        return w.mTKrossSystem.emplaceKey(b, vLocationProvider);
     }
 
     // bool isProviderEnabled(const String& provider)
     public long visit(TKappa00 element, long a, long b, long c, long d, long e)
     {
-        return ( ((LocationManager)w.sObject.get(a)).isProviderEnabled((String)w.mTKrossSystem.nRunObject(b)) ? 1 : 0 );
+        boolean vResult = false;
+
+        try {
+            vResult = ((LocationManager)w.sObject.get(a)).isProviderEnabled((String)w.mTKrossSystem.nRunObject(b));
+        }
+        catch (Exception vException) {
+            if (w.doDebug) vException.printStackTrace();
+            vResult = false;
+        }
+        return ( vResult ? 1 : 0 );
     }
 
     // void removeUpdates(LocationListener* listener)
     public long visit(TLambda00 element, long a, long b, long c, long d, long e)
     {
-        ((LocationManager)w.sObject.get(a)).removeUpdates(w.mTKrossSystem.getValue(b, LocationListener.class));
+        try {
+            ((LocationManager)w.sObject.get(a)).removeUpdates(w.mTKrossSystem.getValue(b, LocationListener.class));
+        }
+        catch (Exception vException) {
+            if (w.doDebug) vException.printStackTrace();
+        }
         return 0;
     }
 

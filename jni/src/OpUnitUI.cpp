@@ -373,7 +373,7 @@ NReturn OpUnitUI::visit(NRho00* element, NParam a, NParam b, NParam c, NParam d,
     while (--i >= 0) {
         *vString += "2#" + w->mBOHandlerMessage->pack(vDBCollection->get(i)) + "3#";
     }
-    sendOp(a, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam((NParam)vString, w->maMessageUpdate->mWriteIndex, w->maMessageBuzz->mWriteIndex, w->mcInterrupt));
+    sendOp(a, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam((NParam)vString, w->maMessageUpdate->mHeadIndex, w->maMessageBuzz->mHeadIndex, w->mcInterrupt));
     delete vDBCollection;
     return 0;
 }

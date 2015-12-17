@@ -118,8 +118,8 @@ void NActivity::onCreate(Bundle* savedInstanceState)
         "Bluetooth ENABLED",
         "Bluetooth OFF",
     };
-    w->mcARState = 1;
-    w->mcARSurface = 1;
+    w->mARState = 1;
+    w->mARSurface = 1;
     w->mActionBar = getActionBar();
     w->mActionBar->setIcon(w->maDrawable[11]);
     w->mSurfaceView = new SurfaceView(w->mApplication);

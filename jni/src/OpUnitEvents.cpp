@@ -19,15 +19,15 @@ LocationEventListener::~LocationEventListener()
 
 void LocationEventListener::onLocationChanged(Location* location)
 {
-    ndouble vLat = location->getLatitude()/180.0*w->mcPi;
-    ndouble vLong = location->getLongitude()/180.0*w->mcPi;
-    nint i = (w->maDeviceCoord->mWriteIndex + 3)%w->maDeviceCoord->mSize;
-    nfloat* b = w->maDeviceCoord->maBuffer + i;
-
-    b[0] = cos(vLat)*cos(vLong);
-    b[1] = cos(vLat)*sin(vLong);;
+    nfloat vLat = location->getLatitude()*M_PI_180;
+    nfloat vLong = location->getLongitude()*M_PI_180;
+    nint i = (w->mCoordBuffer->mHeadIndex + 3)%w->mCoordBuffer->mSize;
+    nfloat* b = w->mCoordBuffer->maBuffer + i;
     b[2] = sin(vLat);
-    w->maDeviceCoord->mWriteIndex = i;
+    vLat = cos(vLat);
+    b[1] = vLat*sin(vLong);
+    b[0] = vLat*cos(vLong);
+    w->mCoordBuffer->mHeadIndex = i;
 }
 
 void LocationEventListener::onProviderDisabled(const String& provider)
@@ -50,18 +50,18 @@ nint OpUnitEvents::onRotation(nint fd, nint events, void* data)
 {
     Wrapper* w = (Wrapper*)data;
     nint vcEvents = ASensorEventQueue_getEvents(w->mASensorEventQueue, w->maASensorEvent, 1) - 1;
-    nint i = (w->maRotation->mWriteIndex + 4)%w->maRotation->mSize;
-    nfloat* b = w->maRotation->maBuffer + i;
+    nint i = (w->mRotationBuffer->mHeadIndex + 4)%w->mRotationBuffer->mSize;
+    nfloat* b = w->mRotationBuffer->maBuffer + i;
     b[0] = -w->maASensorEvent[vcEvents].vector.v[0];
     b[1] = -w->maASensorEvent[vcEvents].vector.v[1];
     b[2] = -w->maASensorEvent[vcEvents].vector.v[2];
     b[3] = sqrt(1.0d - b[0]*b[0] - b[1]*b[1] - b[2]*b[2]);
-    w->maRotation->mWriteIndex = i;
+    w->mRotationBuffer->mHeadIndex = i;
     return 1;
 }
 
 OpUnitEvents::OpUnitEvents(Wrapper* const vWrapper)
-    : OpUnit(vWrapper->mNWrapper), mAliveAR(true), mOutEvents(0), mOutFd(0), mLooper(nullptr), mOutData(nullptr), w(vWrapper)
+    : OpUnit(vWrapper->mNWrapper), mAliveAR(false), mOutEvents(0), mOutFd(0), mLooper(nullptr), mOutData(nullptr), w(vWrapper)
 {
 }
 
@@ -82,9 +82,13 @@ void OpUnitEvents::run()
     mLooper = Looper::myLooper();
     initLocationProvider();
     initRotationProvider();
-    mLooper->loop();
-    killLocationProvider();
+    Looper::loop();
+
+    while (mAliveAR) {
+        this_thread::sleep_for(chrono::milliseconds(20));
+    }
     killRotationProvider();
+    killLocationProvider();
     delete mLooper;
     mLooper = nullptr;
 }
@@ -94,7 +98,7 @@ void OpUnitEvents::initLocationProvider()
     nuint i;
     nuint j;
     Location* vDeviceLocation = nullptr;
-    nfloat* vDeviceCoord = w->maDeviceCoord->maBuffer;
+    nfloat* vDeviceCoord = w->mCoordBuffer->maBuffer;
     vector<String> vaLocationProviderName = w->mLocationManager->getAllProviders();
 
     vDeviceCoord[0] = 0;
@@ -124,26 +128,26 @@ void OpUnitEvents::initLocationProvider()
             vDeviceLocation = w->mLocationManager->getLastKnownLocation(w->maLocationProviderType.maData[i]);
 
             if (vDeviceLocation) {
-                ndouble vLat = vDeviceLocation->getLatitude()/180.0*w->mcPi;
-                ndouble vLong = vDeviceLocation->getLongitude()/180.0*w->mcPi;
-
-                vDeviceCoord[0] = cos(vLat)*cos(vLong);
-                vDeviceCoord[1] = cos(vLat)*sin(vLong);
+                nfloat vLat = vDeviceLocation->getLatitude()*M_PI_180;
+                nfloat vLong = vDeviceLocation->getLongitude()*M_PI_180;
                 vDeviceCoord[2] = sin(vLat);
+                vLat = cos(vLat);
+                vDeviceCoord[1] = vLat*sin(vLong);
+                vDeviceCoord[0] = vLat*cos(vLong);
             }
         }
     }
     if (!vDeviceLocation) {
-        // Using North Pole
-        ndouble vLat = 89.89/180.0*w->mcPi;
-        ndouble vLong = 0.11/180.0*w->mcPi;
+        LOGI(("Using North Pole (Lat, Long) " + to_string(86.45) + " " + to_string(-136.98)).c_str());
+        ndouble vLat = 0.81200770380263454; //86.45/180.0*w->mcPi;
+        ndouble vLong = 0.11564977728398008; //-136.98/180.0*w->mcPi;
 
         vDeviceCoord[0] = cos(vLat)*cos(vLong);
         vDeviceCoord[1] = cos(vLat)*sin(vLong);
         vDeviceCoord[2] = sin(vLat);
     }
     if (vDeviceLocation) {
-        LOGI(("LastKnownLocation (Lat, Long, Alt)" + to_string(vDeviceLocation->getLatitude()) + to_string(vDeviceLocation->getLongitude())).c_str());
+        LOGI(("Using LastKnownLocation (Lat, Long) " + to_string(vDeviceLocation->getLatitude()) + " " + to_string(vDeviceLocation->getLongitude())).c_str());
         delete vDeviceLocation;
     }
     if (w->maLocationProvider.maData[2]) {
@@ -206,6 +210,7 @@ void OpUnitEvents::killRotationProvider()
 
 void OpUnitEvents::startEventsProduction()
 {
+    mAliveAR = true;
     registerLocationListener();
     registerRotationListener();
 }
@@ -214,6 +219,7 @@ void OpUnitEvents::stopEventsProduction()
 {
     releaseLocationListener();
     releaseRotationListener();
+    mAliveAR = false;
 }
 
 void OpUnitEvents::registerLocationListener()

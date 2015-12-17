@@ -149,18 +149,18 @@ void OpUnitPeer::handleOp()
     while (mAlive) {
         vcTimeStampNow = system_clock::now().time_since_epoch().count();
 
-        while (mBuzzIndex != maMessageBuzz->mWriteIndex) {
+        while (mBuzzIndex != maMessageBuzz->mHeadIndex) {
             mBuzzIndex = (mBuzzIndex + 1)%maMessageBuzz->mSize;
             write(*(maMessageBuzz->read(mBuzzIndex)));
             ++mcInterruptDone;
         }
-        if (!w->mIsInterrupted && mcInterruptDone == w->mcInterrupt && mUpdateIndex != maMessageUpdate->mWriteIndex) {
+        if (!w->mIsInterrupted && mcInterruptDone == w->mcInterrupt && mUpdateIndex != maMessageUpdate->mHeadIndex) {
             mUpdateIndex = (mUpdateIndex + 1)%maMessageUpdate->mSize;
             write(*(maMessageUpdate->read(mUpdateIndex)));
         }
         if (!w->mIsInterrupted && mcInterruptDone == w->mcInterrupt && vcTimeStampNow - mcTimeStampBroadcast > 15*w->mc1Seconde) {
             mcTimeStampBroadcast = vcTimeStampNow;
-            write(*(maMessageAlive->read()));
+            write(*(maMessageAlive->readHead()));
         }
         this_thread::sleep_for(200*w->mMili);
     }

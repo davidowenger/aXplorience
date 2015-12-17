@@ -25,6 +25,7 @@ LOCAL_SRC_FILES := \
 	include/nclozer/db/DBFile.cpp \
 	include/nclozer/db/DBHandler.cpp \
 	include/nclozer/graphics/GraphicsHandler.cpp \
+	include/nclozer/graphics/GraphicsProgram.cpp \
 	include/nclozer/nkross/device/bluetooth/BluetoothAdapter.cpp \
 	include/nclozer/nkross/device/bluetooth/BluetoothDevice.cpp \
 	include/nclozer/nkross/device/bluetooth/BluetoothSocket.cpp \
@@ -48,6 +49,7 @@ LOCAL_SRC_FILES := \
 	include/nclozer/NVisitor.cpp \
 	src/AREngine.cpp \
 	src/BOMessage.cpp \
+	src/BOPOI.cpp \
 	src/FragmentViewEdit.cpp \
 	src/FragmentViewDetails.cpp \
 	src/FragmentViewSettings.cpp \
