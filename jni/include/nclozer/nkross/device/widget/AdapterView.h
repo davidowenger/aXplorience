@@ -16,13 +16,13 @@ public:
     protected:
         OnItemSelectedListener()
         {
-            NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNAlpha03, (NParam)this);
+            NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNAlpha03, (NParam)this);
         }
 
     public:
         virtual ~OnItemSelectedListener()
         {
-            NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+            NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
         }
 
         virtual void onItemSelected(AdapterView* parent, View* view, int position, long id) = 0;
@@ -36,13 +36,13 @@ public:
     protected:
         OnItemClickListener()
         {
-            NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNBeta03, (NParam)this);
+            NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNBeta03, (NParam)this);
         }
 
     public:
         virtual ~OnItemClickListener()
         {
-            NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+            NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
         }
 
         virtual void onItemClick(AdapterView* parent, View* view, int position, long id) = 0;
@@ -54,17 +54,17 @@ public:
 
     virtual int getSelectedItemPosition()
     {
-        return (nint)NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNOmega00, (NParam)this);
+        return (nint)NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNOmega00, (NParam)this);
     }
 
     virtual void setOnItemSelectedListener(OnItemSelectedListener* listener)
     {
-        NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNBeta00, (NParam)this, (NParam)listener);
+        NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNBeta00, (NParam)this, (NParam)listener);
     }
 
 private:
     AdapterView(NKrossFriend* vNKrossFriend)
-        : ViewGroup(NSNKROSS::w->mNKrossFriend->instance<ViewGroup>())
+        : ViewGroup(NKrossWrapper::w->mNKrossFriend->instance<ViewGroup>())
     {
     }
 };

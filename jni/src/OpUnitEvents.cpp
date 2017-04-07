@@ -19,8 +19,8 @@ LocationEventListener::~LocationEventListener()
 
 void LocationEventListener::onLocationChanged(Location* location)
 {
-    nfloat vLat = location->getLatitude()*M_PI_180;
-    nfloat vLong = location->getLongitude()*M_PI_180;
+    nfloat vLat = location->getLatitude()*k::PiOn180;
+    nfloat vLong = location->getLongitude()*k::PiOn180;
     nint i = (w->mCoordBuffer->mHeadIndex + 3)%w->mCoordBuffer->mSize;
     nfloat* b = w->mCoordBuffer->maBuffer + i;
     b[2] = sin(vLat);
@@ -128,8 +128,8 @@ void OpUnitEvents::initLocationProvider()
             vDeviceLocation = w->mLocationManager->getLastKnownLocation(w->maLocationProviderType.maData[i]);
 
             if (vDeviceLocation) {
-                nfloat vLat = vDeviceLocation->getLatitude()*M_PI_180;
-                nfloat vLong = vDeviceLocation->getLongitude()*M_PI_180;
+                nfloat vLat = vDeviceLocation->getLatitude()*k::PiOn180;
+                nfloat vLong = vDeviceLocation->getLongitude()*k::PiOn180;
                 vDeviceCoord[2] = sin(vLat);
                 vLat = cos(vLat);
                 vDeviceCoord[1] = vLat*sin(vLong);
@@ -142,6 +142,10 @@ void OpUnitEvents::initLocationProvider()
         ndouble vLat = 0.81200770380263454; //86.45/180.0*w->mcPi;
         ndouble vLong = 0.11564977728398008; //-136.98/180.0*w->mcPi;
 
+        if (w->mac == "680571EDCCBE") {
+            vLat = 0.8120; //0.81200770380263454 //86.45/180.0*w->mcPi;
+            vLong = 0.1156; //0.11564977728398008 //-136.98/180.0*w->mcPi;
+        }
         vDeviceCoord[0] = cos(vLat)*cos(vLong);
         vDeviceCoord[1] = cos(vLat)*sin(vLong);
         vDeviceCoord[2] = sin(vLat);

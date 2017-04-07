@@ -14,7 +14,7 @@ public:
     public:
         virtual ~OnFrameAvailableListener()
         {
-            NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+            NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
         }
 
         virtual void onFrameAvailable(SurfaceTexture* surfaceTexture) = 0;
@@ -22,18 +22,18 @@ public:
     protected:
         OnFrameAvailableListener()
         {
-            NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNIota00, (NParam)this);
+            NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNIota00, (NParam)this);
         }
     };
 
     SurfaceTexture(int texName)
     {
-        NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNKappa00, (NParam)this, (NParam)texName);
+        NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNKappa00, (NParam)this, (NParam)texName);
     }
 
     SurfaceTexture(int texName, bool singleBufferMode)
     {
-        NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNLambda00, (NParam)this, (NParam)texName, (NParam)singleBufferMode);
+        NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNLambda00, (NParam)this, (NParam)texName, (NParam)singleBufferMode);
     }
 
     virtual ~SurfaceTexture()
@@ -43,39 +43,39 @@ public:
     // The mtx array must have exactly 16 elements
     virtual void getTransformMatrix(NArray<float> mtx)
     {
-        NReturn index = NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNMu00, (NParam)this);
-        NReturn size = NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNAlpha01, index, -1);
+        NReturn index = NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNMu00, (NParam)this);
+        NReturn size = NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNAlpha01, index, -1);
         nuint i;
 
         for (i = 0 ; i < size && i < mtx.mcData ; ++i) {
-            nlong vcValue = (nint)NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNAlpha01, index, (NParam)i);
+            nlong vcValue = (nint)NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNAlpha01, index, (NParam)i);
             mtx.maData[i] = (nfloat)*reinterpret_cast<ndouble*>(&vcValue);
         }
     }
 
     virtual void release()
     {
-        NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNNu00, (NParam)this);
+        NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNNu00, (NParam)this);
     }
 
     virtual void releaseTexImage()
     {
-        NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNXi00, (NParam)this);
+        NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNXi00, (NParam)this);
     }
 
     virtual void setDefaultBufferSize(int width, int height)
     {
-        NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNOmicron00, (NParam)this, (NParam)width, (NParam)height);
+        NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNOmicron00, (NParam)this, (NParam)width, (NParam)height);
     }
 
     virtual void setOnFrameAvailableListener(SurfaceTexture::OnFrameAvailableListener* listener)
     {
-        NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNPi00, (NParam)this, (NParam)listener);
+        NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNPi00, (NParam)this, (NParam)listener);
     }
 
     virtual void updateTexImage()
     {
-        NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNRho00, (NParam)this);
+        NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNRho00, (NParam)this);
     }
 
 private:

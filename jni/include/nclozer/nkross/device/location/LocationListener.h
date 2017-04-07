@@ -9,7 +9,7 @@ class LocationListener
 public:
     virtual ~LocationListener()
     {
-        NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
     virtual void onLocationChanged(Location* location) = 0;
@@ -20,7 +20,7 @@ public:
 protected:
     LocationListener()
     {
-        NSNKROSS::w->mNVisitorLocation->tRun(NSNKROSS::w->mNEta00, (NParam)this);
+        NKrossWrapper::w->mNVisitorLocation->tRun(NKrossWrapper::w->mNEta00, (NParam)this);
     }
 };
 

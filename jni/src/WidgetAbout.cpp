@@ -11,12 +11,13 @@ WidgetAbout::WidgetAbout(Wrapper* const w)
     mIcon = new ImageButton(w->mApplication);
     mTextView = new TextView(w->mApplication);
 
-    LinearLayout::LayoutParams vWidgetParams = LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT, 1);
+    LinearLayout::LayoutParams vWidgetParams = LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT);
     setLayoutParams(&vWidgetParams);
     setGravity(Gravity::BOTTOM);
     setOrientation(LinearLayout::VERTICAL);
     setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
     setOnTouchListener(this);
+    setBackgroundColor(w->maColor[Theme::kColorApplicationBackground]);
 
     LinearLayout::LayoutParams vTopParams = LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, 0, 1.0 - 1.0/1.6180339887);
     mTop->setLayoutParams(&vTopParams);
@@ -59,6 +60,24 @@ WidgetAbout::~WidgetAbout()
     if (mTop) {
         delete mTop;
     }
+}
+
+void WidgetAbout::init(nuint vcView, DBObject* vDBObject)
+{
+//    w->mMenu->setGroupVisible(k::ViewDelete, false);
+//    w->mMenu->setGroupVisible(k::ViewEdit, false);
+//    w->mMenu->setGroupVisible(k::ViewSave, false);
+//    w->mMenu->setGroupVisible(k::ViewList, true);
+//    w->mMenu->setGroupVisible(k::ViewAdd, true);
+
+    w->mMenu->setGroupVisible(k::ViewDelete, false);
+    w->mMenu->setGroupVisible(k::ViewEdit, false);
+    w->mMenu->setGroupVisible(k::ViewSave, false);
+    w->mMenu->setGroupVisible(k::ViewList, false);
+    w->mMenu->setGroupVisible(k::ViewAdd, false);
+
+    w->mActionBar->setDisplayHomeAsUpEnabled(true);
+    w->mActionBar->setHomeButtonEnabled(false);
 }
 
 //*******************************************************************************************//

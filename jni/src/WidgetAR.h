@@ -10,22 +10,26 @@ public:
     WidgetAR(Wrapper* w);
     virtual ~WidgetAR() override;
 
-    void init();
+    void init(nuint vcView, DBObject* vDBObject);
     void onCreate();
     void onResume();
     void onPause();
     void onDestroy();
+    void setState(nint vState);
 
     // SurfaceHolder::Callback
-    virtual void surfaceChanged(SurfaceHolder* holder, int format, int width, int height);
-    virtual void surfaceCreated(SurfaceHolder* holder);
-    virtual void surfaceDestroyed(SurfaceHolder* holder);
+    void surfaceChanged(SurfaceHolder* holder, int format, int width, int height);
+    void surfaceCreated(SurfaceHolder* holder);
+    void surfaceDestroyed(SurfaceHolder* holder);
 
     // View::OnTouchListener
-    virtual bool onTouch(View* v, MotionEvent* event) override;
+    bool onTouch(View* vView, MotionEvent* event);
 
-    SurfaceHolder* mSurfaceHolder;
     nint mcPadding;
+    nint mState;
+    SurfaceView* mSurfaceView;
+    SurfaceHolder* mSurfaceHolder;
+    EventManager* mEventManager;
 };
 
 } // End namespace

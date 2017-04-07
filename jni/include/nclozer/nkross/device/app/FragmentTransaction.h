@@ -15,31 +15,31 @@ public:
 
     virtual FragmentTransaction* add(int containerViewId, Fragment* fragment)
     {
-        NSNKROSS::w->mNVisitorAppFragment->tRun(NSNKROSS::w->mNAlpha03, (NParam)this, (NParam)containerViewId, (NParam)fragment);
+        NKrossWrapper::w->mNVisitorAppFragment->tRun(NKrossWrapper::w->mNAlpha03, (NParam)this, (NParam)containerViewId, (NParam)fragment);
         return this;
     }
 
     virtual FragmentTransaction* addToBackStack(const String& name = "")
     {
-        NSNKROSS::w->mNVisitorAppFragment->tRun(NSNKROSS::w->mNBeta03, (NParam)this, NKrossParam(name).n);
+        NKrossWrapper::w->mNVisitorAppFragment->tRun(NKrossWrapper::w->mNBeta03, (NParam)this, NKrossParam(name).n);
         return this;
     }
 
     virtual FragmentTransaction* remove(Fragment* fragment)
     {
-        NSNKROSS::w->mNVisitorAppFragment->tRun(NSNKROSS::w->mNGamma03, (NParam)this, (NParam)fragment);
+        NKrossWrapper::w->mNVisitorAppFragment->tRun(NKrossWrapper::w->mNGamma03, (NParam)this, (NParam)fragment);
         return this;
     }
 
     virtual FragmentTransaction* replace(int containerViewId, Fragment* fragment)
     {
-        NSNKROSS::w->mNVisitorAppFragment->tRun(NSNKROSS::w->mNDelta03, (NParam)this, (NParam)containerViewId, (NParam)fragment);
+        NKrossWrapper::w->mNVisitorAppFragment->tRun(NKrossWrapper::w->mNDelta03, (NParam)this, (NParam)containerViewId, (NParam)fragment);
         return this;
     }
 
     virtual int commit()
     {
-        return (int)NSNKROSS::w->mNVisitorAppFragment->tRun(NSNKROSS::w->mNEpsilon03, (NParam)this);
+        return (int)NKrossWrapper::w->mNVisitorAppFragment->tRun(NKrossWrapper::w->mNEpsilon03, (NParam)this);
     }
 
 private:

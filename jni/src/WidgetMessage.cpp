@@ -4,16 +4,15 @@
 namespace NSDEVICE
 {
 
-WidgetMessage::WidgetMessage(Wrapper* const w)
-    : Widget(w), mcPadding((nint)(10*w->mcDensity)), mcCategoryId(0), mIsInbound(true), mIsEnabled(false), mIsBuzzed(false),
-      mLeft(nullptr), mRight(nullptr), mCategory(nullptr), mText(nullptr), mCheck(nullptr), mBuzz(nullptr)
+WidgetMessage::WidgetMessage(Wrapper* const w) :
+    Widget(w), mcPadding((nint)(10*w->mcDensity)), mcCategoryId(0), mIsInbound(true), mIsEnabled(false), mIsBuzzed(false),
+    mLeft(nullptr), mRight(nullptr), mCategory(nullptr), mText(nullptr), mState(nullptr)
 {
     mLeft = new LinearLayout(w->mApplication);
     mRight = new LinearLayout(w->mApplication);
     mCategory = new ImageButton(w->mApplication);
     mText = new Button(w->mApplication);
-    mCheck = new ImageButton(w->mApplication);
-    mBuzz = new ImageButton(w->mApplication);
+    mState = new ImageButton(w->mApplication);
 
     LinearLayout::LayoutParams vLayoutParams = LinearLayout::LayoutParams(ViewGroup::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::WRAP_CONTENT);
     vLayoutParams.setMargins(5, 5, 5, 5);
@@ -30,11 +29,8 @@ WidgetMessage::WidgetMessage(Wrapper* const w)
 
 WidgetMessage::~WidgetMessage()
 {
-    if (mBuzz) {
-        delete mBuzz;
-    }
-    if (mCheck) {
-        delete mCheck;
+    if (mState) {
+        delete mState;
     }
     if (mText) {
         delete mText;
@@ -67,24 +63,19 @@ void WidgetMessage::render()
     mText->setPadding(5,5,5,5);
     mText->setMinimumHeight(w->maDrawable[3]->getIntrinsicHeight());
     mText->setLines(1);
+    mText->setAllCaps(false);
     mText->setBackgroundDrawable(nullptr);
+    mText->setTypeface(Typeface::DEFAULT);
     mText->setTextColor(w->maColor[Theme::kColorMessageText]);
     mText->setTextSize(w->mcTextSize);
     mText->setOnTouchListener(this);
 
-    ViewGroup::LayoutParams vCheckParams = ViewGroup::LayoutParams(w->maDrawable[3]->getIntrinsicWidth(), w->maDrawable[3]->getIntrinsicHeight());
-    mCheck->setLayoutParams(&vCheckParams);
-    mCheck->setPadding(0,0,0,0);
-    mCheck->setBackgroundDrawable(nullptr);
-    mCheck->setScaleType(ImageView::ScaleType::FIT_XY);
-    mCheck->setOnTouchListener(this);
-
-    ViewGroup::LayoutParams vBuzzParams = ViewGroup::LayoutParams(w->maDrawable[3]->getIntrinsicWidth(), w->maDrawable[3]->getIntrinsicHeight());
-    mBuzz->setLayoutParams(&vBuzzParams);
-    mBuzz->setPadding(0,0,0,0);
-    mBuzz->setBackgroundDrawable(nullptr);
-    mCheck->setScaleType(ImageView::ScaleType::FIT_XY);
-    mBuzz->setOnTouchListener(this);
+    ViewGroup::LayoutParams vCheckParams = ViewGroup::LayoutParams(w->maDrawable[0]->getIntrinsicWidth(), w->maDrawable[0]->getIntrinsicHeight());
+    mState->setLayoutParams(&vCheckParams);
+    mState->setPadding(0,0,0,0);
+    mState->setBackgroundDrawable(nullptr);
+    mState->setScaleType(ImageView::ScaleType::FIT_XY);
+    mState->setOnTouchListener(this);
 
     LinearLayout::LayoutParams vLeftParams = LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::WRAP_CONTENT, 1);
     mLeft->setLayoutParams(&vLeftParams);
@@ -102,8 +93,7 @@ void WidgetMessage::render()
 
     mLeft->addView(mCategory);
     mLeft->addView(mText);
-    mRight->addView(mCheck);
-    mRight->addView(mBuzz);
+    mRight->addView(mState);
 
     addView(mLeft);
     addView(mRight);
@@ -112,46 +102,33 @@ void WidgetMessage::render()
 void WidgetMessage::update(DBObject* vDBObject)
 {
     mcDBObjectId = vDBObject->mId;
-    mIsInbound = vDBObject->is("sIn");
-    mIsEnabled = vDBObject->is("sEnabled");
-    mIsBuzzed = vDBObject->is("sBuzzed");
-    mcCategoryId = vDBObject->count("sCategoryId");
+    mIsInbound = (vDBObject->get("Type") == "0");
+    mIsEnabled = vDBObject->is("Enabled");
+    mIsBuzzed = vDBObject->is("Buzzed");
+    mcCategoryId = vDBObject->count("CategoryId");
 
     ColorDrawable vColorDrawable = ColorDrawable(w->maColor[Theme::kColorCategoryBackground + mcCategoryId*3]);
     mCategory->setImageDrawable(&vColorDrawable);
-    mText->setText(vDBObject->get("sTitle"));
-    mCheck->setImageDrawable(w->maDrawable[ mIsInbound ? 3 + mIsEnabled : 5 + mIsEnabled ]);
-    mBuzz->setImageDrawable(w->maDrawable[ mIsInbound ? ( mIsEnabled ? 2 - mIsBuzzed : 0 ) : 0 + mIsBuzzed ]);
+    mText->setText(vDBObject->get("Title"));
+    mState->setImageDrawable(w->maDrawable[ mIsEnabled ? 2 - mIsBuzzed : 0 ]);
 }
 
 //*******************************************************************************************
 //**************************************  OnTouchListener  **********************************
 //*******************************************************************************************
-bool WidgetMessage::onTouch(View* vView, MotionEvent* event)
+bool WidgetMessage::onTouch(View* vView, MotionEvent* vEvent)
 {
-    w->mEventLong0 = mcDBObjectId;
-    w->mEventLong1 = mIsInbound;
-
-    if (w->mTouchState == 1 && vView == mText) {
-        w->mTouchState = 2;
-        w->mEventAction = [](Wrapper* w)->void{
-            w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewDetails, w->mEventLong0));
-        };
-    }
-    if (w->mTouchState == 1 && vView == mCheck) {
-        w->mTouchState = 2;
-        w->mEventAction = [](Wrapper* w)->void{
-            w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNXi00, new OpParam(w->mEventLong0, true));
-        };
-    }
-    if (w->mTouchState == 1 && vView == mBuzz) {
-        w->mTouchState = 2;
-        w->mEventAction = [](Wrapper* w)->void{
-            w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNDzeta00, new OpParam(w->mEventLong0, w->mEventLong1));
-        };
-    }
-    if (w->mTouchState == 3) {
-        w->mTouchState = 0;
+    if (vEvent->getActionMasked() == MotionEvent::ACTION_UP) {
+        if (vView == mCategory) {
+            w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam(k::ViewDetails, mcDBObjectId));
+        }
+        if (vView == mText) {
+            w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam(k::ViewDetails, mcDBObjectId));
+        }
+        if (vView == mState) {
+            mIsEnabled = !mIsEnabled;
+            w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNKappa00, new OpParam(mcDBObjectId, mIsEnabled));
+        }
     }
     return true;
 }

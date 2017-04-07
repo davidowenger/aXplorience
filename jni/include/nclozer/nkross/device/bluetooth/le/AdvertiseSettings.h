@@ -22,30 +22,30 @@ public:
     public:
         Builder()
         {
-            NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNPhi00, (NParam)this);
+            NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNPhi00, (NParam)this);
         }
 
         AdvertiseSettings* build()
         {
-            AdvertiseSettings* b = NSNKROSS::w->mNKrossFriend->pointer<AdvertiseSettings>();
-            return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNAlpha01, (NParam)this, (NParam)b));
+            AdvertiseSettings* b = NKrossWrapper::w->mNKrossFriend->pointer<AdvertiseSettings>();
+            return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNAlpha01, (NParam)this, (NParam)b));
         }
 
         AdvertiseSettings::Builder* setConnectable(bool connectable)
         {
-            NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNKhi00, (NParam)this, (NParam)connectable);
+            NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNKhi00, (NParam)this, (NParam)connectable);
             return this;
         }
 
         AdvertiseSettings::Builder* setTimeout(int timeoutMillis)
         {
-            NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNPsi00, (NParam)this, (NParam)timeoutMillis);
+            NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNPsi00, (NParam)this, (NParam)timeoutMillis);
             return this;
         }
 
         AdvertiseSettings::Builder* setTxPowerLevel(int txPowerLevel)
         {
-            NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNOmega00, (NParam)this, (NParam)txPowerLevel);
+            NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNOmega00, (NParam)this, (NParam)txPowerLevel);
             return this;
         }
     };
@@ -56,17 +56,17 @@ public:
 
     int getMode()
     {
-        return NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNGamma00, (NParam)this);
+        return NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNGamma00, (NParam)this);
     }
 
     int getTimeout()
     {
-        return NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        return NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
     bool isConnectable()
     {
-        return (bool)NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNEpsilon00, (NParam)this);
+        return (bool)NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNEpsilon00, (NParam)this);
     }
 
 private:

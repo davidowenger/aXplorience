@@ -3,6 +3,8 @@ package y.b;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class TVisitorAppActivity extends TKrossVisitor
 {
@@ -122,5 +124,30 @@ public class TVisitorAppActivity extends TKrossVisitor
     {
         ((TActivity)w.sObject.get(a)).onDestroyParent();
         return 0;
+    }
+
+    // super.onBackPressed()
+    public long visit(TMu03 element, long a, long b, long c, long d, long e)
+    {
+        ((TActivity)w.sObject.get(a)).onBackPressedParent();
+        return 0;
+    }
+
+    // super.onCreateOptionsMenu()
+    public long visit(TIota03 element, long a, long b, long c, long d, long e)
+    {
+        return ( ((TActivity)w.sObject.get(a)).onCreateOptionsMenuParent(w.mTKrossSystem.getValue(b, Menu.class)) ? 1 : 0 );
+    }
+
+    // super.onOptionsItemSelected()
+    public long visit(TLambda03 element, long a, long b, long c, long d, long e)
+    {
+        return ( ((TActivity)w.sObject.get(a)).onOptionsItemSelectedParent(w.mTKrossSystem.getValue(b, MenuItem.class)) ? 1 : 0 );
+    }
+
+    // super.onPrepareOptionsMenu()
+    public long visit(TKappa03 element, long a, long b, long c, long d, long e)
+    {
+        return ( ((TActivity)w.sObject.get(a)).onPrepareOptionsMenuParent(w.mTKrossSystem.getValue(b, Menu.class)) ? 1 : 0 );
     }
 }

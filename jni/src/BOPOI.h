@@ -7,15 +7,32 @@ namespace NSDEVICE
 class BOPOI
 {
 public:
-    BOPOI(Wrapper* vWrapper, nfloat vLatitude, nfloat vLongitude, const String& vLabel, const String& vDescription);
+    BOPOI(Wrapper* w);
     virtual ~BOPOI();
 
-    Wrapper* w;
-    nfloat* maEarthLocation;
-    nfloat* maEarthCoord;
+    void setDistance(nfloat vDistance);
+    void setAzimuth(nfloat vPrevious, nfloat vCurrent);
+    void update(DBObject* vDBObject);
+    void update(BOPOI* vBOPOI);
+    void position(DBObject* vDBObject);
 
-    String mLabel;
-    String mDescription;
+    Wrapper* w;
+    String mMac;
+    nuint mId;
+    nint mType;
+    nint mCategoryId;
+    nfloat mDistance;
+    String mTitle;
+    String mText;
+
+    bool mIsBuzzed;
+    bool mIsEnabled;
+    bool mIsActive;
+    bool mIsVisible;
+    nfloat mAzimuth;
+    nfloat* maEarthCoord;
+    nint mLine;
+    nfloat* maColor;
 };
 
 } // End namespace

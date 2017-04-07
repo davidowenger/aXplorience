@@ -15,27 +15,27 @@ public:
 
     void setAttributes(WindowManager::LayoutParams* a)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNAlpha00, (NParam)this, (NParam)a);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this, (NParam)a);
     }
 
     void addFlags(int flags)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNAlpha00, (NParam)this, (NParam)flags);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this, (NParam)flags);
     }
 
     void setFlags(int flags, int mask)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNAlpha00, (NParam)this, (NParam)flags, (NParam)mask);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this, (NParam)flags, (NParam)mask);
     }
 
     void setFormat(int format)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNAlpha00, (NParam)this, (NParam)format);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this, (NParam)format);
     }
 
     void takeSurface(SurfaceHolder::Callback2* callback)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNAlpha00, (NParam)this, (NParam)callback);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this, (NParam)callback);
     }
 
 private:

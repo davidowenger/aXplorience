@@ -15,29 +15,46 @@ public:
     void engineCreate();
     void engineEnable(Surface* vSurface, int width, int height);
     void engineEnd();
-    void enginePlay();
     void engineResume();
+    void engineRunEvent(nlong vT, nuint vX, nuint vY, nuint vState);
     void engineRun();
     void engineSleep();
     nfloat getPreviewRotation(nint vcCameraMountOrientation, nint vcDisplayRotation);
     bool isSuitedPreviewOrientation(nint vTargetWidth, nint vTargetHeight, nint vSupportedWidth, nint vSupportedHeight);
+    void showDebug();
     void updatePreview();
 
     // SurfaceTexture::OnFrameAvailableListener
     virtual void onFrameAvailable(SurfaceTexture* surfaceTexture);
 
     bool mUpdate;
+    bool mHasEvent;
+    bool mIsEventDone;
     nfloat mGrey;
     nuint mARState;
-    nuint mARSurface;
+    nlong mEventT0;
+    nuint mEventX0;
+    nuint mEventY0;
+    nuint mEventState;
     nint mWidth;
     nint mHeight;
     nfloat mSpacingWidth;
     nfloat mSpacingHeight;
 
+    map<nuint,BOPOI*>::iterator mPOIIt;
+    nfloat mMaxDistance;
+    BOPOI* mMaxStatic;
+    BOPOI* mMaxSorted;
+    nfloat* maColumnOffset;
+    nint* maItemCount;
+    bool* maHasGap;
+    nint mItemTotal;
+    BOPOI* mItemLast;
+
     Wrapper* w;
     JNIEnv* mEnv;
     GraphicsBuffer* mGraphicsBuffer;
+    NArray<nfloat> mPerspectiveProjection;
 
     NVec<nfloat> mNorthAxis;
     NVec<nfloat> mUpAxis;
@@ -45,11 +62,18 @@ public:
     NVec<nfloat> mDeviceEarthCoord;
     NVec<nfloat> mDeviceRotation;
     NVec<nfloat> mNorthEarthCoord;
-    NVec<nfloat> mNorthCoord;
-    NVec<nfloat> mPOICoord;
+    NVec<nfloat> mNorthGroundCoord;
+    NVec<nfloat> mNorthRotation;
+    NVec<nfloat> mPOIGroundCoord;
+    NVec<nfloat> mPOIScreenCoord;
     NVec<nfloat> mPOIAzimuthRotation;
     NVec<nfloat> mClassCoord;
     NVec<nfloat> mClassRotation;
+    NVec<nfloat> mEventCoord;
+    NVec<nfloat> mEventRotation;
+    NVec<nfloat> mFrontOrientation;
+    NVec<nfloat> mFrontCoord;
+    NVec<nfloat> mFrontRotation;
 
     nuint mcPreviewIndice;
     GraphicsTexture* mPreviewTexture;
@@ -76,7 +100,6 @@ public:
     GraphicsParam* mLabelTranslation;
     GraphicsParam* mLabelProjection;
     GraphicsParam* mLabelTextureUnit;
-    GraphicsParam* mLabelPosition;
     GraphicsParam* mLabelBox;
     GraphicsParam* mLabelColor;
 
@@ -90,6 +113,9 @@ public:
     GraphicsParam* mDebugTextureUnit;
     NArray<String> mDebugParamNameArray;
     NArray<GraphicsParam*> mDebugParamArray;
+
+    TimeStamp mFrameFirst;
+    nfloat mFrameCount;
 };
 
 } // End namespace

@@ -15,7 +15,7 @@ public:
 
 private:
     DrawableContainer(NKrossFriend* vNKrossFriend)
-        : Drawable(NSNKROSS::w->mNKrossFriend->instance<Drawable>())
+        : Drawable(NKrossWrapper::w->mNKrossFriend->instance<Drawable>())
     {
     }
 };

@@ -18,18 +18,28 @@ public:
 
     virtual ~Menu()
     {
-        NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
     virtual MenuItem* add(int groupId, int itemId, int order, const String& title)
     {
-        MenuItem* b = NSNKROSS::w->mNKrossFriend->pointer<MenuItem>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNGamma00, (NParam)this, (NParam)b, (NParam)groupId<<32|itemId, (NParam)order, NKrossParam(title).n));
+        MenuItem* b = NKrossWrapper::w->mNKrossFriend->pointer<MenuItem>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNGamma00, (NParam)this, (NParam)b, (NParam)groupId<<32|itemId, (NParam)order, NKrossParam(title).n));
     }
 
     virtual void removeItem(int id)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNDelta00, (NParam)this, (NParam)id);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNDelta00, (NParam)this, (NParam)id);
+    }
+
+    virtual void setGroupEnabled(int group, bool enabled)
+    {
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNDelta01, (NParam)this, (NParam)group, (NParam)enabled);
+    }
+
+    virtual void setGroupVisible(int group, bool visible)
+    {
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNEpsilon01, (NParam)this, (NParam)group, (NParam)visible);
     }
 
 private:

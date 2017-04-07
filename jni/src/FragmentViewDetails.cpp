@@ -35,23 +35,23 @@ void FragmentViewDetails::init(nuint vcView, DBObject* vDBObject)
             }
             addView(w->mWidgetMessageDetails);
 
-            w->mMenu->removeItem(Wrapper::kViewAdd);
-            w->mMenu->removeItem(Wrapper::kViewEdit);
-            w->mMenu->removeItem(Wrapper::kViewDelete);
-            w->mMenu->removeItem(Wrapper::kViewSave);
+            w->mMenu->removeItem(k::ViewAdd);
+            w->mMenu->removeItem(k::ViewEdit);
+            w->mMenu->removeItem(k::ViewDelete);
+            w->mMenu->removeItem(k::ViewSave);
 
-            MenuItem* vMenuItemDelete = w->mMenu->add(Menu::NONE, Wrapper::kViewDelete, 1, "Delete");
+            MenuItem* vMenuItemDelete = w->mMenu->add(Menu::NONE, k::ViewDelete, 1, "Delete");
             vMenuItemDelete->setIcon(w->maDrawable[8]);
             vMenuItemDelete->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
             delete vMenuItemDelete;
 
             if (!mIsInbound) {
-                MenuItem* vMenuItemEdit = w->mMenu->add(Menu::NONE, Wrapper::kViewEdit, 2, "Edit");
+                MenuItem* vMenuItemEdit = w->mMenu->add(Menu::NONE, k::ViewEdit, 2, "Edit");
                 vMenuItemEdit->setIcon(w->maDrawable[7]);
                 vMenuItemEdit->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
                 delete vMenuItemEdit;
             }
-            MenuItem* vMenuItemAdd = w->mMenu->add(Menu::NONE, Wrapper::kViewAdd, 3, "Add");
+            MenuItem* vMenuItemAdd = w->mMenu->add(Menu::NONE, k::ViewAdd, 3, "Add");
             vMenuItemAdd->setIcon(w->maDrawable[10]);
             vMenuItemAdd->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
             delete vMenuItemAdd;
@@ -72,19 +72,19 @@ bool FragmentViewDetails::onMenuItemSelected(nint id)
     bool ret = false;
 
     if (id == R::id::home) {
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewHome));
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(k::ViewAR));
         ret = true;
     }
-    if (id == Wrapper::kViewDelete) {
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNEpsilon00, new OpParam(mcDBObjectId, true));
+    if (id == k::ViewDelete) {
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNEpsilon00, new OpParam(mcDBObjectId, true));
         ret = true;
     }
-    if (id == Wrapper::kViewEdit) {
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewEdit, mcDBObjectId));
+    if (id == k::ViewEdit) {
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(k::ViewEdit, mcDBObjectId));
         ret = true;
     }
-    if (id == Wrapper::kViewAdd) {
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewAdd, 1));
+    if (id == k::ViewAdd) {
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(k::ViewAdd, 1));
         ret = true;
     }
     return ret;
@@ -123,7 +123,7 @@ bool FragmentViewDetails::onScroll(MotionEvent* e1, MotionEvent* e2, float dista
     nfloat vX = e2->getX() - mX;
     nfloat vY = e2->getY() - mY;
     nfloat vD = (e2->getEventTime() - mT)/1000.0;
-    bool ret = abs(vX) > Wrapper::SWIPE_MIN_DISTANCE && abs(vY) < Wrapper::SWIPE_MAX_OFF_PATH && abs(vX/vD) > Wrapper::SWIPE_THRESHOLD_VELOCITY;
+    bool ret = abs(vX) > k::SWIPE_MIN_DISTANCE && abs(vY) < k::SWIPE_MAX_OFF_PATH && abs(vX/vD) > k::SWIPE_THRESHOLD_VELOCITY;
     w->mTouchState = ( w->mTouchState == 2 ? 3 : 0 );
 
     LOGV(("Duration : #" + to_string(vD)).c_str());
@@ -140,7 +140,7 @@ bool FragmentViewDetails::onScroll(MotionEvent* e1, MotionEvent* e2, float dista
                 vNext = ((WidgetMessage*)w->mMessageLayout->getChildAt((vIndex + vSize + ( vX > 0 ? 1 : -1))%vSize))->mcDBObjectId;
             }
         }
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewDetails, vNext));
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(k::ViewDetails, vNext));
     }
     return ret;
 }

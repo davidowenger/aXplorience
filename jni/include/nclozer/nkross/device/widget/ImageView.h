@@ -12,9 +12,9 @@ public:
     enum ScaleType { CENTER, CENTER_CROP, CENTER_INSIDE, FIT_CENTER, FIT_END, FIT_START, FIT_XY, MATRIX };
 
     ImageView(Context* context)
-        : View(NSNKROSS::w->mNKrossFriend->instance<View>())
+        : View(NKrossWrapper::w->mNKrossFriend->instance<View>())
     {
-        NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNGamma00, (NParam)this, (NParam)context);
+        NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNGamma00, (NParam)this, (NParam)context);
     }
 
     virtual ~ImageView()
@@ -23,17 +23,17 @@ public:
 
     void setImageDrawable(Drawable* drawable)
     {
-        NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNDelta00, (NParam)this, (NParam)drawable);
+        NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNDelta00, (NParam)this, (NParam)drawable);
     }
 
     void setScaleType(ScaleType scaleType)
     {
-        NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNEpsilon00, (NParam)this, (NParam)scaleType);
+        NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNEpsilon00, (NParam)this, (NParam)scaleType);
     }
 
 private:
     ImageView(NKrossFriend* vNKrossFriend)
-        : View(NSNKROSS::w->mNKrossFriend->instance<View>())
+        : View(NKrossWrapper::w->mNKrossFriend->instance<View>())
     {
     }
 };

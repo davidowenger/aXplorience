@@ -15,7 +15,7 @@ public:
 
 private:
     Application(NKrossFriend* vNKrossFriend)
-        : ContextWrapper(NSNKROSS::w->mNKrossFriend->instance<ContextWrapper>())
+        : ContextWrapper(NKrossWrapper::w->mNKrossFriend->instance<ContextWrapper>())
     {
     }
 };

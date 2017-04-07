@@ -94,6 +94,13 @@ public class TVisitorWidgetView extends TKrossVisitor
         return 0;
     }
 
+    // void setFillViewport(bool fillViewport)
+    public long visit(TAlpha00 element, long a, long b, long c, long d, long e)
+    {
+        ((ScrollView)w.sObject.get(a)).setFillViewport( b != 0 ? true : false );
+        return 0;
+    }
+
     //******************************************************************************************
     //************************************** TextView ******************************************
     //******************************************************************************************
@@ -101,6 +108,13 @@ public class TVisitorWidgetView extends TKrossVisitor
     public long visit(TIota00 element, long a, long b, long c, long d, long e)
     {
         w.sObject.put(a, new TextView((Context)w.sObject.get(b)));
+        return 0;
+    }
+
+    // void setAllCaps(bool allCaps)
+    public long visit(TAlpha01 element, long a, long b, long c, long d, long e)
+    {
+        ((TextView)w.sObject.get(a)).setAllCaps( b != 0 ? true : false );
         return 0;
     }
 

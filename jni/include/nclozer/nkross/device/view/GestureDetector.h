@@ -26,6 +26,7 @@ public:
     GestureDetector(Context* context, GestureDetector::OnGestureListener* listener);
     virtual ~GestureDetector();
     virtual bool onTouchEvent(MotionEvent* ev);
+    virtual void setIsLongpressEnabled(bool enabled);
 private:
     GestureDetector(NKrossFriend* vNKrossFriend);
 };

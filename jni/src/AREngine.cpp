@@ -5,10 +5,15 @@ namespace NSDEVICE
 
 AREngine::AREngine(Wrapper* vWrapper) :
     SurfaceTexture::OnFrameAvailableListener(),
-    mUpdate(false), mGrey(0), mARState(1), mARSurface(1), mWidth(0), mHeight(0), mSpacingWidth(0), mSpacingHeight(0),
-    w(vWrapper), mEnv(nullptr), mGraphicsBuffer(nullptr),
-    mNorthAxis({0, 1, 0}), mUpAxis({0, 0, 1}), mChangeMatrix(9), mDeviceEarthCoord(3), mDeviceRotation(4),
-    mNorthEarthCoord(3), mNorthCoord(3), mPOICoord(3), mPOIAzimuthRotation(4), mClassCoord(16), mClassRotation(4),
+    mUpdate(false), mHasEvent(false), mIsEventDone(true), mGrey(0), mARState(1), mEventState(1),
+    mWidth(0), mHeight(0), mSpacingWidth(0), mSpacingHeight(0),
+    mMaxDistance(0.0), mMaxStatic(nullptr), mMaxSorted(nullptr),
+    maColumnOffset(new nfloat[k::LineCount]()), maItemCount(new nint[k::LineCount]()), maHasGap(new bool[k::LineCount]()), mItemTotal(0), mItemLast(nullptr),
+    w(vWrapper), mEnv(nullptr), mGraphicsBuffer(nullptr), mPerspectiveProjection(4),
+    mNorthAxis({0, 1, 0}), mUpAxis({0, 0, 1}), mChangeMatrix(9),
+    mDeviceEarthCoord(3), mDeviceRotation(4), mNorthEarthCoord(3), mNorthGroundCoord(3), mNorthRotation(4),
+    mPOIGroundCoord(3), mPOIScreenCoord(3), mPOIAzimuthRotation(4), mClassCoord(16), mClassRotation(4),
+    mEventCoord(3), mEventRotation(4), mFrontOrientation(3), mFrontCoord(3), mFrontRotation(4),
     mcPreviewIndice(6),
     mPreviewTexture(nullptr), mPreviewProgram(nullptr),
     mPreviewVertex(nullptr), mPreviewFragment(nullptr), mPreviewRotation(nullptr), mPreviewTextureUnit(nullptr),
@@ -18,20 +23,19 @@ AREngine::AREngine(Wrapper* vWrapper) :
     mcLabelIndice(6),
     mLabelTexture(nullptr), mLabelProgram(nullptr),
     mLabelVertex(nullptr), mLabelFragment(nullptr), mLabelRotation(nullptr), mLabelTranslation(nullptr), mLabelProjection(nullptr),
-    mLabelTextureUnit(nullptr), mLabelPosition(nullptr), mLabelBox(nullptr), mLabelColor(nullptr),
+    mLabelTextureUnit(nullptr), mLabelBox(nullptr), mLabelColor(nullptr),
     mcDebugIndice(6),
     mDebugTexture(nullptr), mDebugProgram(nullptr),
     mDebugVertex(nullptr), mDebugFragment(nullptr), mDebugPosition(nullptr), mDebugBox(nullptr), mDebugTextureUnit(nullptr),
     mDebugParamNameArray({
-        "vaVertex",
-        "vaFragment",
-        "vcRotation"
+        "vaFPS"
     }),
-    mDebugParamArray(mDebugParamNameArray.mcData)
+    mDebugParamArray(mDebugParamNameArray.mcData),
+    mFrameFirst(0), mFrameCount(0)
 {
     // Geomagnetic North Pole based on the WMM2015 coefficients for 2015.0
-    nfloat vLat = 80.31*M_PI_180;
-    nfloat vLong = -72.62*M_PI_180;
+    nfloat vLat = 80.31*k::PiOn180;
+    nfloat vLong = -72.62*k::PiOn180;
 
     mNorthEarthCoord.is(
         cos(vLat)*cos(vLong),
@@ -48,8 +52,7 @@ AREngine::~AREngine()
     mDeviceEarthCoord.discard();
     mDeviceRotation.discard();
     mNorthEarthCoord.discard();
-    mNorthCoord.discard();
-    mPOICoord.discard();
+    mNorthGroundCoord.discard();
     mPOIAzimuthRotation.discard();
     mClassCoord.discard();
     mClassRotation.discard();
@@ -58,19 +61,22 @@ AREngine::~AREngine()
 void AREngine::engineCreate()
 {
     LOGI("AREngine engineCreate");
-    w->mGraphicsHandler->createDisplayConfig();
     mEnv = (JNIEnv*)w->mNWrapper->mNKrossWrapper->mNKrossSystem->tAttachCurrentThread();
+    w->mGraphicsHandler->createDisplayConfig();
 }
 
 void AREngine::engineEnable(Surface* vSurface, nint vWidth, nint vHeight)
 {
     SLOGI("AREngine engineReset w: #" + to_string(vWidth) + " h: #" + to_string(vHeight));
 
+    //*******************************************************************************
+    //*************************** Display Surface ***********************************
+    //*******************************************************************************
     NReturnObject vSurfaceObject = w->mNWrapper->mNKrossWrapper->mNKrossSystem->tRunObject((NParam)vSurface, -2);
     EGLNativeWindowType vEGLNativeWindow = ANativeWindow_fromSurface(mEnv, vSurfaceObject);
 
     w->mGraphicsHandler->createDisplaySurface(vEGLNativeWindow);
-    w->mGraphicsHandler->enableRendering3D(vWidth, vHeight, true, true);
+    w->mGraphicsHandler->enableRendering3D(vWidth, vHeight, true, false);
     w->mGraphicsHandler->enableRenderingFont(36);
 
     mWidth = vWidth;
@@ -129,13 +135,15 @@ void AREngine::engineEnable(Surface* vSurface, nint vWidth, nint vHeight)
     mLabelTexture = w->mGraphicsHandler->factoryTexture(GL_TEXTURE_2D, GL_ALPHA, GL_UNSIGNED_BYTE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
     mDebugTexture = w->mGraphicsHandler->factoryTexture(GL_TEXTURE_2D, GL_RGB, GL_UNSIGNED_BYTE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_NEAREST, GL_NEAREST);
 
-    //*******************************************************************************
-    //*************************** PREVIEW *******************************************
-    //*******************************************************************************
-    nfloat vTanAlphaH = 1;
-
+    w->mcCameraMountOrientation = 0;
+    w->mcDisplayRotation = (4 - w->mDisplay->getRotation())%4;
     w->mTexturePreview = new SurfaceTexture(mPreviewTexture->mID);
     w->mTexturePreview->setOnFrameAvailableListener(this);
+
+    //*******************************************************************************
+    //*************************** Perspective Projection ****************************
+    //*******************************************************************************
+    nfloat vTanAlphaH = 1;
 
     if (w->maCameraId.mcData) {
         nint vCameraId = w->maCameraId.maData[Camera::CameraInfo::CAMERA_FACING_BACK];
@@ -147,8 +155,8 @@ void AREngine::engineEnable(Surface* vSurface, nint vWidth, nint vHeight)
         Camera::Parameters* vParameters = w->mCamera->getParameters();
         vector<Camera::Size> vSupportedPreviewSizes = vParameters->getSupportedPreviewSizes();
         w->mcCameraFocalLength = vParameters->getFocalLength()/1000;
-        w->mcCameraHorizontalAngle = vParameters->getHorizontalViewAngle()*M_PI_180;
-        w->mcCameraVerticalAngle = vParameters->getVerticalViewAngle()*M_PI_180;
+        w->mcCameraHorizontalAngle = vParameters->getHorizontalViewAngle()*k::PiOn180;
+        w->mcCameraVerticalAngle = vParameters->getVerticalViewAngle()*k::PiOn180;
         vTanAlphaH = 1/tan(w->mcCameraHorizontalAngle/2);
 
         while (
@@ -163,6 +171,16 @@ void AREngine::engineEnable(Surface* vSurface, nint vWidth, nint vHeight)
     } else {
         LOGE("Camera cannot be opened");
     }
+    mPerspectiveProjection.is({
+        ( mWidth > mHeight ? vTanAlphaH : vTanAlphaH ),
+        ( mWidth > mHeight ? vTanAlphaH*mWidth/mHeight : vTanAlphaH*mWidth/mHeight ),
+        3,
+        110000
+    });
+
+    //*******************************************************************************
+    //*************************** PREVIEW *******************************************
+    //*******************************************************************************
     mPreviewProgram = w->mGraphicsHandler->factoryProgram(NArray<String>({"Preview.vert", "Preview.frag"}), mcPreviewIndice);
     mPreviewVertex = mPreviewProgram->createParam("vaVertex", mGraphicsBuffer, 3);
     mPreviewFragment = mPreviewProgram->createParam("vaFragment", mGraphicsBuffer, 2);
@@ -179,12 +197,7 @@ void AREngine::engineEnable(Surface* vSurface, nint vWidth, nint vHeight)
     mPOIFragment = mPOIProgram->createParam("vaFragment", mGraphicsBuffer, 2);
     mPOIRotation = mPOIProgram->createParam("vaRotation", NArray<nfloat>(4));
     mPOITranslation = mPOIProgram->createParam("vaTranslation", NArray<nfloat>(3));
-    mPOIProjection = mPOIProgram->createParam("vaProjection", NArray<nfloat>({
-        ( mWidth > mHeight ? vTanAlphaH : vTanAlphaH ),
-        ( mWidth > mHeight ? vTanAlphaH*mWidth/mHeight : vTanAlphaH*mWidth/mHeight ),
-        3,
-        110000
-    }));
+    mPOIProjection = mPOIProgram->createParam("vaProjection", mPerspectiveProjection);
 
     //*******************************************************************************
     //*************************** LABEL *********************************************
@@ -194,18 +207,15 @@ void AREngine::engineEnable(Surface* vSurface, nint vWidth, nint vHeight)
     mLabelFragment = mLabelProgram->createParam("vaFragment", mGraphicsBuffer, 2);
     mLabelRotation = mLabelProgram->createParam("vaRotation", NArray<nfloat>(4));
     mLabelTranslation = mLabelProgram->createParam("vaTranslation", NArray<nfloat>(3));
-    mLabelProjection = mLabelProgram->createParam("vaProjection", NArray<nfloat>(4));
+    mLabelProjection = mLabelProgram->createParam("vaProjection", mPerspectiveProjection);
     mLabelTextureUnit = mLabelProgram->createParam("vTextureUnit", mLabelTexture);
-    mLabelPosition = mLabelProgram->createParam("vaLabelPosition", NArray<nfloat>(2));
     mLabelBox = mLabelProgram->createParam("vaLabelBox", NArray<nfloat>(4));
     mLabelColor = mLabelProgram->createParam("vaLabelColor", NArray<nfloat>({0.5, 0.14, 0.5, 1.0}));
-    mLabelProjection->is(mPOIProjection);
 
 #ifdef DEBUG
     //*******************************************************************************
     //*************************** DEBUG *********************************************
     //*******************************************************************************
-    nuint i;
     NArray<nbyte> vAtlasMonoNum = w->mGraphicsHandler->loadAsset("AtlasMonoNum.rtx");
 
     mDebugProgram = w->mGraphicsHandler->factoryProgram(NArray<String>({"Debug.vert", "Debug.frag"}), mcDebugIndice);
@@ -214,18 +224,14 @@ void AREngine::engineEnable(Surface* vSurface, nint vWidth, nint vHeight)
     mDebugPosition = mDebugProgram->createParam("vaDebugPosition", NArray<nfloat>(3));
     mDebugBox = mDebugProgram->createParam("vaDebugBox", NArray<nfloat>({(nfloat)mWidth, (nfloat)mHeight}));
     mDebugTextureUnit = mDebugProgram->createParam("vDebugTextureUnit", mDebugTexture);
-    mDebugParamArray.maData[0] = mDebugProgram->createParam(mDebugParamNameArray.maData[0].c_str(), NArray<nfloat>(3));
-    mDebugParamArray.maData[1] = mDebugProgram->createParam(mDebugParamNameArray.maData[1].c_str(), NArray<nfloat>(2));
-
-    for (i = 2 ; i < mDebugParamArray.mcData ; ++i) {
-        mDebugParamArray.maData[i] = mDebugProgram->createParam(mDebugParamNameArray.maData[i].c_str(), NArray<nfloat>(1));
-    }
+    mDebugParamArray.maData[0] = mDebugProgram->createParam(mDebugParamNameArray.maData[0].c_str(), NArray<nfloat>({0.0f, 0.0f, 0.0f}));
     mDebugTexture->setBitmap((nubyte*)vAtlasMonoNum.maData, 104, 10);
 #endif //DEBUG
 }
 
 void AREngine::engineEnd()
 {
+    SLOGI(String("AREngine engineEnd"));
     w->mGraphicsHandler->endRendering3D();
 
     if (w->mTexturePreview) {
@@ -240,87 +246,53 @@ void AREngine::engineEnd()
     }
 }
 
-void AREngine::enginePlay()
-{
-    bool vStarted = true;
-    mARState = 2;
-
-    while (vStarted) {
-        switch (mARState) {
-        case 0: // destroy
-            LOGI("AR Engine state 0 -> 1");
-            engineEnd();
-            mARState = 1;
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        case 1: // off
-            vStarted = false;
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        case 2: // create
-            if (w->mARState != 2 && w->mARSurface == 2) {
-                LOGI("AR Engine state 2 -> 3");
-                engineEnable(w->mSurface, w->mSurfaceWidth, w->mSurfaceHeight);
-                mARSurface = w->mARSurface;
-                mARState = 3;
-            }
-            if (w->mARState == 0) {
-                LOGI("AR Engine state 2 -> 0");
-                mARState = 0;
-            }
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        case 3: // resume
-            LOGI("AR Engine state 3 -> 4");
-            engineResume();
-            mARState = 4;
-
-            if (w->mARState != 3) {
-                LOGI("AR Engine state 3 -> 5");
-                mARState = 5;
-            }
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        case 4: // run
-            engineRun();
-
-            if (w->mARState != 3) {
-                LOGI("AR Engine state 4 -> 5");
-                mARState = 5;
-            }
-            break;
-        case 5: // pause
-            engineSleep();
-
-            if (w->mARState < 3) {
-                LOGI("AR Engine state 5 -> 0");
-                mARState = 0;
-            }
-            if (w->mARState == 3) {
-                LOGI("AR Engine state 5 -> 3");
-                mARState = 3;
-            }
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        default: // bad state
-            LOGE("AR Engine BAD state");
-            mARState = 0;
-            this_thread::sleep_for(chrono::milliseconds(40));
-            break;
-        }
-        this_thread::sleep_for(chrono::milliseconds(10));
-    }
-}
-
 void AREngine::engineResume()
 {
+    w->mAREngine->mPOIIt = w->maPOIStatic.begin();
     w->mOpUnitEvents->startEventsProduction();
 
     if (w->mCamera) {
-        mUpdate = false;
+        mUpdate = true;
         w->mCamera->startPreview();
     }
     glClearColor(mGrey, mGrey, mGrey, 1.0f);
+}
+
+void AREngine::engineRunEvent(nlong vT, nuint vX, nuint vY, nuint vState)
+{
+    if (vState > mEventState) {
+        mEventState = vState;
+
+        if (vState&1) {
+            mIsEventDone = true;
+        } else {
+            mEventT0 = vT;
+            mEventX0 = vX;
+            mEventY0 = vY;
+        }
+    }
+    if (!(vState&1)) {
+        mHasEvent = true;
+        mIsEventDone = false;
+
+        // Screen coordinate system
+        mEventCoord.is(
+            (2.0f*vX/mWidth - 1.0f)/mPerspectiveProjection[0],
+            (1.0f - 2.0f*vY/mHeight)/mPerspectiveProjection[1],
+            -1
+        );
+
+        // Geomagnetic north aligned coordinate system
+        mEventRotation.is4(mDeviceRotation).conj4();
+        mFrontOrientation.is(0, 0, -1).rot3(mEventRotation);
+        mFrontRotation.is4FromAxisAngle(mUpAxis, mFrontOrientation.angle2(mNorthAxis));
+        mEventRotation.mul4AtLeft(mFrontRotation);
+        mEventCoord.rot3(mEventRotation);
+        mEventCoord.is(
+            mPerspectiveProjection[0]*mEventCoord[0]/mEventCoord[1],
+            mPerspectiveProjection[1]*mEventCoord[2]/mEventCoord[1]
+        );
+    }
 }
 
 void AREngine::engineRun()
@@ -337,12 +309,13 @@ void AREngine::engineRun()
     //  X is the cross-product Y x Z, it is tangential to the ground and points approximately east
     //  Y-axis is tangential to the ground, and points toward the North Geomagnetic Pole
     //  Z-axis points toward the sky and is perpendicular to the ground plane
+    nfloat vLastX;
     nfloat vSinAlpha;
-    nfloat vNorthDeclination;
-    BOPOI* vPOI;
-    nfloat vPOIAzimuth;
-    nint vPOIDistance;
-    nfloat vPreviousValue;
+    nint vLine;
+    nint vMinLine;
+    nint vMinCount;
+    bool vIsNewGroup;
+    BOPOI* vPOI = mPOIIt->second;
     nint vClass = 0;
 
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -354,50 +327,102 @@ void AREngine::engineRun()
     updatePreview();
     mPreviewProgram->draw();
 
-    while ((vPOI = w->mPOISortList->updateHead())) {
-        //*******************************************************************************
-        //************************** POINT OF INTEREST **********************************
-        //*******************************************************************************
+    //*******************************************************************************
+    //************************** POINT OF INTEREST **********************************
+    //*******************************************************************************
+    if (mIsEventDone) {
         // Earth centered coordinate system
         mDeviceEarthCoord.is3(w->mCoordBuffer->getHead());
-        mPOICoord.is3(vPOI->maEarthCoord).sub3(mDeviceEarthCoord).scale3(6371000);
-        vPOIDistance = mPOICoord.magnitude3();
-        vPOIAzimuth = 100000;
-        vPreviousValue = 100000;
+        mDeviceRotation.is4(w->mRotationBuffer->getHead());
 
-        if (vPOIDistance >= 100000) {
-            vPreviousValue = w->mPOISortList->updateValue(vPOIDistance);
+        // North aligned coordinate system
+        vSinAlpha = sqrt(mDeviceEarthCoord[0]*mDeviceEarthCoord[0] + mDeviceEarthCoord[1]*mDeviceEarthCoord[1]);
+        mChangeMatrix.is(
+           -mDeviceEarthCoord[1]/vSinAlpha, -mDeviceEarthCoord[2]*mDeviceEarthCoord[0]/vSinAlpha, mDeviceEarthCoord[0],
+            mDeviceEarthCoord[0]/vSinAlpha, -mDeviceEarthCoord[2]*mDeviceEarthCoord[1]/vSinAlpha, mDeviceEarthCoord[1],
+            0.0f,                            vSinAlpha,                                           mDeviceEarthCoord[2]
+        ).inv9();
+
+        // Geomagnetic north aligned coordinate system
+        mNorthGroundCoord.is3(mNorthEarthCoord).sub3(mDeviceEarthCoord).mul3AtLeft(mChangeMatrix);
+        mNorthRotation.is4FromAxisAngle(mUpAxis, -mNorthAxis.angle2(mNorthGroundCoord));
+    }
+    if (!vPOI->mIsActive) {
+        mPOIGroundCoord.is3(vPOI->maEarthCoord).sub3(mDeviceEarthCoord).scale3(6371000);
+        vPOI->setDistance(mPOIGroundCoord.magnitude3());
+
+        if (vPOI->mDistance < mMaxDistance) {
+            vPOI->mIsActive = true;
+            mMaxStatic->mIsActive = false;
+            mMaxSorted->update(vPOI);
         }
-        if (vPOIDistance < 100000 || vPreviousValue < 100000) {
+    }
+    if (++mPOIIt == w->maPOIStatic.end()) {
+        mPOIIt = w->maPOIStatic.begin();
+    }
+    for (vLine = 0 ; vLine < k::LineCount ; ++vLine) {
+        maHasGap[vLine] = true;
+    }
+    mMaxDistance = 0;
+    vPOI = w->maPOISorted.getObject();
+
+    while (vPOI) {
+        // Earth centered coordinate system
+        mPOIGroundCoord.is3(vPOI->maEarthCoord).sub3(mDeviceEarthCoord).scale3(6371000);
+        vPOI->setDistance(mPOIGroundCoord.magnitude3());
+
+        if (vPOI->mDistance > mMaxDistance && vPOI->mType == 2) {
+            mMaxDistance = vPOI->mDistance;
+            mMaxSorted = vPOI;
+            mMaxStatic = w->maPOIStatic[vPOI->mId];
+        }
+        if (vPOI->mIsVisible) {
             // North aligned coordinate system
-            vSinAlpha = sqrt(mDeviceEarthCoord[0]*mDeviceEarthCoord[0] + mDeviceEarthCoord[1]*mDeviceEarthCoord[1]);
-            mChangeMatrix.is(
-               -mDeviceEarthCoord[1]/vSinAlpha, -mDeviceEarthCoord[2]*mDeviceEarthCoord[0]/vSinAlpha, mDeviceEarthCoord[0],
-                mDeviceEarthCoord[0]/vSinAlpha, -mDeviceEarthCoord[2]*mDeviceEarthCoord[1]/vSinAlpha, mDeviceEarthCoord[1],
-                0.0f,                            vSinAlpha,                                           mDeviceEarthCoord[2]
-            ).inv9();
-            mPOICoord.mul3AtLeft(mChangeMatrix);
+            mPOIGroundCoord.mul3AtLeft(mChangeMatrix);
+            vPOI->setAzimuth(w->maPOISorted.getValue(), mNorthGroundCoord.angle2(mPOIGroundCoord));
+        }
+        if (vPOI->mIsVisible) {
+            vIsNewGroup = true;
 
+            for (vLine = 0 ; vLine < k::LineCount ; ++vLine) {
+                vIsNewGroup &= maHasGap[vLine];
+            }
+            if (vIsNewGroup) {
+                for (vLine = 0 ; vLine < k::LineCount ; ++vLine) {
+                    maHasGap[vLine] = false;
+                    maItemCount[vLine] = 0;
+                    maColumnOffset[vLine] = -vPOI->mAzimuth - 0.5*k::MinGroupSpace;
+                }
+                mItemTotal = 0;
+            }
+            if (maItemCount[vPOI->mLine]++ > ++mItemTotal/k::LineCount) {
+                vMinLine = 0;
+                vMinCount = k::POICount;
+
+                for (vLine = 0 ; vLine < k::LineCount ; ++vLine) {
+                    if (maItemCount[vLine] < vMinCount) {
+                        vMinCount = maItemCount[vLine];
+                        vMinLine = vLine;
+                    }
+                }
+                vPOI->mLine = vMinLine;
+            }
+            maHasGap[vPOI->mLine] = (-vPOI->mAzimuth - maColumnOffset[vPOI->mLine] > k::MinGroupSpace);
+
+            if (maHasGap[vPOI->mLine]) {
+                maColumnOffset[vPOI->mLine] = -vPOI->mAzimuth - 0.5*k::MinGroupSpace;
+            }
             // Geomagnetic north aligned coordinate system
-            mNorthCoord.is3(mNorthEarthCoord).sub3(mDeviceEarthCoord).mul3AtLeft(mChangeMatrix);
-            vPOIAzimuth = mNorthCoord.angle2(mPOICoord);
-        }
-        if (vPOIDistance < 100000) {
-            vPreviousValue = w->mPOISortList->updateValue(vPOIAzimuth);
-        }
-        if (vPreviousValue < 100000) {
-            vNorthDeclination = mNorthAxis.angle2(mNorthCoord);
-            mPOICoord.rot3ByAxisAngle(mUpAxis, -vNorthDeclination);
+            mPOIGroundCoord.rot3(mNorthRotation);
 
-            // Device coordinate system
-            mDeviceRotation.is4(w->mRotationBuffer->getHead());
-            mPOIAzimuthRotation.is4(mDeviceRotation).mul4ByAxisAngle(mUpAxis, vPOIAzimuth);
-            mClassRotation.is4(mPOIAzimuthRotation).mul4ByAxisAngle(mNorthAxis, mClassCoord[vClass + 3]*M_PI/6.0f);
-            mPOICoord.rot3(mDeviceRotation);
+            // Screen coordinate system
+            mPOIAzimuthRotation.is4(mDeviceRotation).mul4ByAxisAngle(mUpAxis, vPOI->mAzimuth);
+            mClassRotation.is4(mPOIAzimuthRotation).mul4ByAxisAngle(mNorthAxis, mClassCoord[vClass + 3]*k::PiOn6);
+            mPOIScreenCoord.is3(mPOIGroundCoord).rot3(mDeviceRotation);
 
             // Draw
             mPOIProgram->use();
-            mPOITranslation->is3(mPOICoord);
+            mPOITranslation->is3(mPOIScreenCoord);
             mPOIRotation->is4(mClassRotation);
             mPOIProgram->draw();
 
@@ -405,45 +430,52 @@ void AREngine::engineRun()
             //*************************** LABEL *********************************************
             //*******************************************************************************
             mLabelProgram->use();
-            mLabelTranslation->is3(mPOICoord);
+            mLabelTranslation->is3(mPOIScreenCoord);
             mLabelRotation->is4(mPOIAzimuthRotation);
+            mLabelColor->is4(vPOI->maColor);
+            vLastX = w->mGraphicsHandler->renderFontLine(vPOI->mTitle, maColumnOffset[vPOI->mLine] + vPOI->mAzimuth, mClassCoord[vPOI->mLine*4 + 1], mLabelProgram, mLabelBox, mLabelTextureUnit);
+          //vLastX = max(
+          //    w->mGraphicsHandler->renderFontLine(vPOI->mTitle, mClassCoord[vClass], mClassCoord[vClass + 1], mLabelProgram, mLabelBox, mLabelTextureUnit),
+          //    w->mGraphicsHandler->renderFontLine(vPOI->mText, mClassCoord[vClass], mClassCoord[vClass + 2], mLabelProgram, mLabelBox, mLabelTextureUnit)
+          //);
+            maColumnOffset[vPOI->mLine] += vLastX;
 
-            mLabelPosition->is(mClassCoord[vClass], mClassCoord[vClass + 1]);
-            w->mGraphicsHandler->renderFontLine(vPOI->mLabel, mLabelProgram, mLabelPosition, mLabelBox, mLabelTextureUnit);
-            mLabelPosition->is(mClassCoord[vClass], mClassCoord[vClass + 2]);
-            w->mGraphicsHandler->renderFontLine(to_string(vPOIDistance) + "m", mLabelProgram, mLabelPosition, mLabelBox, mLabelTextureUnit);
-
-#ifdef DEBUG
             //*******************************************************************************
-            //*************************** DEBUG *********************************************
+            //*************************** Events ********************************************
             //*******************************************************************************
-            nuint vcShowDebugLine = 4;
-            nuint i = 0;
-            nuint j;
-            nuint k;
-            nuint l;
+            if (mHasEvent) {
+                // Geomagnetic north aligned coordinate system
+                mFrontCoord.is3(mPOIGroundCoord).rot3(mFrontRotation);
+                mFrontCoord.is(mFrontCoord[0], mFrontCoord[1] - 0.01f, mFrontCoord[2]);
 
-            mDebugProgram->use();
-            mDebugTexture->use();
-            mDebugParamArray[2]->is(getPreviewRotation(w->mcCameraMountOrientation, w->mcDisplayRotation));
+                if (mFrontCoord[1] - mPerspectiveProjection[2] >= 0) {
+                    nfloat vItemBoxGroundCoord[4] {
+                        mPerspectiveProjection[0]*(mFrontCoord[0]/mFrontCoord[1] + mClassCoord[vClass]),
+                        mPerspectiveProjection[1]*(mFrontCoord[2]/mFrontCoord[1] + mClassCoord[vClass + 2 - (vClass < 8)]),
+                        mPerspectiveProjection[0]*(mFrontCoord[0]/mFrontCoord[1] + mClassCoord[vClass] + vLastX),
+                        mPerspectiveProjection[1]*(mFrontCoord[2]/mFrontCoord[1] + mClassCoord[vClass + 1 + (vClass < 8)] + (nfloat)w->mNWrapper->mGraphicsWrapper->mGlyphHeight/mHeight)
+                    };
+                    nfloat vItemBoxMarginWidth = 0.1f*(vItemBoxGroundCoord[2] - vItemBoxGroundCoord[0]);
+                    nfloat vItemBoxMarginHeight = 0.1f*(vItemBoxGroundCoord[3] - vItemBoxGroundCoord[1]);
 
-            for (l = 0; l < vcShowDebugLine; ++l) {
-                for (k = 0; k < 4; ++k) {
-                    for (j = 0; j < 8; ++j) {
-                        mDebugPosition->is(j, k, l);
-                        mDebugParamArray[0]->is3(mGraphicsBuffer->mDataArray.maData + i + k*5);
-                        mDebugParamArray[1]->is2(mGraphicsBuffer->mDataArray.maData + i + k*5 + 3);
-                        mDebugProgram->draw();
+                    if (
+                        mEventCoord[0] >= vItemBoxGroundCoord[0] - vItemBoxMarginWidth && mEventCoord[1] >= vItemBoxGroundCoord[1] - vItemBoxMarginHeight &&
+                        mEventCoord[0] <= vItemBoxGroundCoord[2] + vItemBoxMarginWidth && mEventCoord[1] <= vItemBoxGroundCoord[3] + vItemBoxMarginHeight
+                    ) {
+                        vPOI->maColor[0] = 0.14;
+                        vPOI->maColor[1] = 0.5;
+                        vPOI->maColor[2] = 0.14;
+                        vPOI->maColor[3] = 1.0;
                     }
                 }
             }
-#endif //DEBUG
-
             vClass = (vClass + 4)%16;
         }
+        vPOI = w->maPOISorted.updateValue(-vPOI->mAzimuth);
     }
+    showDebug();
     w->mGraphicsHandler->flush();
-    w->mPOISortList->swap();
+    mHasEvent = false;
 }
 
 void AREngine::engineSleep()
@@ -472,6 +504,36 @@ bool AREngine::isSuitedPreviewOrientation(nint vTargetWidth, nint vTargetHeight,
         vIsSuited = (vSupportedWidth > vTargetHeight && vSupportedHeight > vTargetWidth);
     }
     return vIsSuited;
+}
+
+void AREngine::showDebug()
+{
+#ifdef DEBUG
+    //*******************************************************************************
+    //*************************** DEBUG *********************************************
+    //*******************************************************************************
+    nuint vcShowDebugLine = 3;
+    nuint j;
+    nuint k;
+    nuint l;
+
+    mDebugProgram->use();
+    mDebugTexture->use();
+
+    if (++mFrameCount > 200) {
+        mDebugParamArray[0]->is((nfloat)mFrameCount/(nfloat)(system_clock::now().time_since_epoch().count() - mFrameFirst)*w->mc1Seconde, 0, 0);
+        mFrameFirst = system_clock::now().time_since_epoch().count();
+        mFrameCount = 0;
+    }
+    for (l = 0; l < vcShowDebugLine; ++l) {
+        for (k = 0; k < 4; ++k) {
+            for (j = 0; j < 8; ++j) {
+                mDebugPosition->is(j, k, l);
+                mDebugProgram->draw();
+            }
+        }
+    }
+#endif //DEBUG
 }
 
 void AREngine::updatePreview()

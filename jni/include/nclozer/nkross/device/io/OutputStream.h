@@ -15,12 +15,12 @@ public:
 
     int close()
     {
-        return (nint)NSNKROSS::w->mNVisitorIO->tRun(NSNKROSS::w->mNAlpha01, (NParam)this);
+        return (nint)NKrossWrapper::w->mNVisitorIO->tRun(NKrossWrapper::w->mNAlpha01, (NParam)this);
     }
 
     int write(const string& packet)
     {
-        return (nint)NSNKROSS::w->mNVisitorIO->tRun(NSNKROSS::w->mNBeta01, (NParam)this, NKrossParam(packet).n);
+        return (nint)NKrossWrapper::w->mNVisitorIO->tRun(NKrossWrapper::w->mNBeta01, (NParam)this, NKrossParam(packet).n);
     }
 
 private:

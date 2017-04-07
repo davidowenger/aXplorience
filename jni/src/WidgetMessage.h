@@ -26,8 +26,7 @@ public:
     LinearLayout* mRight;
     ImageButton* mCategory;
     Button* mText;
-    ImageButton* mCheck;
-    ImageButton* mBuzz;
+    ImageButton* mState;
 };
 
 } // End namespace

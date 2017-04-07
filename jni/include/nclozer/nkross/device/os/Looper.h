@@ -11,24 +11,24 @@ friend NSNATIVE::NKrossFriend;
 public:
     static Looper* getMainLooper()
     {
-        Looper* b = NSNKROSS::w->mNKrossFriend->pointer<Looper>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorOS->tRun(NSNKROSS::w->mNGamma00, (NParam)b));
+        Looper* b = NKrossWrapper::w->mNKrossFriend->pointer<Looper>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorOS->tRun(NKrossWrapper::w->mNGamma00, (NParam)b));
     }
 
     static void loop()
     {
-        NSNKROSS::w->mNVisitorOS->tRun(NSNKROSS::w->mNDelta00);
+        NKrossWrapper::w->mNVisitorOS->tRun(NKrossWrapper::w->mNDelta00);
     }
 
     static Looper* myLooper()
     {
-        Looper* b = NSNKROSS::w->mNKrossFriend->pointer<Looper>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorOS->tRun(NSNKROSS::w->mNEpsilon00, (NParam)b));
+        Looper* b = NKrossWrapper::w->mNKrossFriend->pointer<Looper>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorOS->tRun(NKrossWrapper::w->mNEpsilon00, (NParam)b));
     }
 
     static void prepare()
     {
-        NSNKROSS::w->mNVisitorOS->tRun(NSNKROSS::w->mNBeta00);
+        NKrossWrapper::w->mNVisitorOS->tRun(NKrossWrapper::w->mNBeta00);
     }
 
     virtual ~Looper()
@@ -37,12 +37,12 @@ public:
 
     void quit()
     {
-        NSNKROSS::w->mNVisitorOS->tRun(NSNKROSS::w->mNDzeta00, (NParam)this);
+        NKrossWrapper::w->mNVisitorOS->tRun(NKrossWrapper::w->mNDzeta00, (NParam)this);
     }
 
     void quitSafely()
     {
-        NSNKROSS::w->mNVisitorOS->tRun(NSNKROSS::w->mNEta00, (NParam)this);
+        NKrossWrapper::w->mNVisitorOS->tRun(NKrossWrapper::w->mNEta00, (NParam)this);
     }
 
 private:

@@ -41,6 +41,7 @@ LOCAL_SRC_FILES := \
 	include/nclozer/nkross/NKrossParam.cpp \
 	include/nclozer/nkross/NKrossSystem.cpp \
 	include/nclozer/nkross/NKrossVisitor.cpp \
+	include/nclozer/nkross/NKrossCommon.cpp \
 	include/nclozer/op/OpParam.cpp \
 	include/nclozer/op/OpSquad.cpp \
 	include/nclozer/op/OpUnit.cpp \
@@ -50,32 +51,24 @@ LOCAL_SRC_FILES := \
 	src/AREngine.cpp \
 	src/BOMessage.cpp \
 	src/BOPOI.cpp \
-	src/FragmentViewEdit.cpp \
-	src/FragmentViewDetails.cpp \
-	src/FragmentViewSettings.cpp \
-	src/FragmentViewAbout.cpp \
-	src/FragmentViewAR.cpp \
-	src/FragmentViewHome.cpp \
-	src/FragmentLevel.cpp \
-	src/FragmentLevel2.cpp \
-	src/FragmentLevel1.cpp \
-	src/FragmentLevel0.cpp \
+	src/EventManager.cpp \
 	src/NActivity.cpp \
 	src/OpUnitEvents.cpp \
 	src/OpUnitAnim.cpp \
+	src/OpUnitAR.cpp \
+	src/OpUnitDB.cpp \
 	src/OpUnitListener.cpp \
 	src/OpUnitPeer.cpp \
 	src/OpUnitServer.cpp \
-	src/OpUnitUI.cpp \
 	src/OpUnitCore.cpp \
 	src/RootLayout.cpp \
-	src/WidgetMessageEdit.cpp \
-	src/WidgetMessageDetails.cpp \
-	src/WidgetMessage.cpp \
-	src/WidgetSettings.cpp \
-	src/WidgetAbout.cpp \
 	src/WidgetAR.cpp \
-	src/WidgetHome.cpp
+	src/WidgetAbout.cpp \
+	src/WidgetSettings.cpp \
+	src/WidgetMessage.cpp \
+	src/WidgetMessageList.cpp \
+	src/WidgetMessageDetails.cpp \
+	src/WidgetMessageEdit.cpp
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/include/freetype2 \

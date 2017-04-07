@@ -13,7 +13,7 @@ public:
 
     virtual ~Object()
     {
-        NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 };
 

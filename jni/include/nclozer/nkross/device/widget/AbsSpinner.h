@@ -15,12 +15,12 @@ public:
 
     virtual void setSelection(int position)
     {
-        NSNKROSS::w->mNVisitorWidget->tRun(NSNKROSS::w->mNAlpha00, (NParam)this, (NParam)position);
+        NKrossWrapper::w->mNVisitorWidget->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this, (NParam)position);
     }
 
 private:
     AbsSpinner(NKrossFriend* vNKrossFriend)
-        : AdapterView(NSNKROSS::w->mNKrossFriend->instance<AdapterView>())
+        : AdapterView(NKrossWrapper::w->mNKrossFriend->instance<AdapterView>())
     {
     }
 };

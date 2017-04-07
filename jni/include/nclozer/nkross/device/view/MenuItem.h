@@ -17,23 +17,23 @@ public:
 
     virtual ~MenuItem()
     {
-        NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
     virtual int getItemId()
     {
-        return (nint)NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNEpsilon00, (NParam)this);
+        return (nint)NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNEpsilon00, (NParam)this);
     }
 
     virtual MenuItem* setIcon(Drawable* icon)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNDzeta00, (NParam)this, (NParam)icon);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNDzeta00, (NParam)this, (NParam)icon);
         return this;
     }
 
     virtual MenuItem* setShowAsAction(int actionEnum)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNEta00, (NParam)this, (NParam)actionEnum);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNEta00, (NParam)this, (NParam)actionEnum);
         return this;
     }
 

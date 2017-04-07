@@ -15,15 +15,15 @@ public:
 
     public:
         LayoutParams(int _type, int _flags) :
-            ViewGroup::LayoutParams(NSNKROSS::w->mNKrossFriend->instance<ViewGroup::LayoutParams>())
+            ViewGroup::LayoutParams(NKrossWrapper::w->mNKrossFriend->instance<ViewGroup::LayoutParams>())
         {
-            NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNAlpha00, (NParam)this, (NParam)_type, (NParam)_flags);
+            NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this, (NParam)_type, (NParam)_flags);
         }
 
         LayoutParams(int _type, int _flags, int _format) :
-            ViewGroup::LayoutParams(NSNKROSS::w->mNKrossFriend->instance<ViewGroup::LayoutParams>())
+            ViewGroup::LayoutParams(NKrossWrapper::w->mNKrossFriend->instance<ViewGroup::LayoutParams>())
         {
-            NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNAlpha00, (NParam)this, (NParam)_type, (NParam)_flags, (NParam)_format);
+            NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this, (NParam)_type, (NParam)_flags, (NParam)_format);
         }
 
         virtual ~LayoutParams()
@@ -33,13 +33,13 @@ public:
 
     virtual ~WindowManager()
     {
-        NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
     Display* getDefaultDisplay()
     {
-        Display* b = NSNKROSS::w->mNKrossFriend->pointer<Display>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNNu00, (NParam)this, (NParam)b));
+        Display* b = NKrossWrapper::w->mNKrossFriend->pointer<Display>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNNu00, (NParam)this, (NParam)b));
     }
 
 private:

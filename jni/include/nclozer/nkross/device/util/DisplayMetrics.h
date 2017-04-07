@@ -19,7 +19,7 @@ public:
 
     virtual float getDensity()
     {
-        nlong vcValue = NSNKROSS::w->mNVisitorUtil->tRun(NSNKROSS::w->mNAlpha00, (NParam)this);
+        nlong vcValue = NKrossWrapper::w->mNVisitorUtil->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this);
         return (nfloat)*reinterpret_cast<ndouble*>(&vcValue);
     }
 

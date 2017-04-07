@@ -15,8 +15,8 @@ public:
 
     BluetoothGattServer* openGattServer(Context* context, BluetoothGattServerCallback* callback)
     {
-        BluetoothGattServer* b = NSNKROSS::w->mNKrossFriend->pointer<BluetoothGattServer>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNEpsilon02, (NParam)this, (NParam)b, (NParam)context, (NParam)callback));
+        BluetoothGattServer* b = NKrossWrapper::w->mNKrossFriend->pointer<BluetoothGattServer>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNEpsilon02, (NParam)this, (NParam)b, (NParam)context, (NParam)callback));
     }
 
 private:

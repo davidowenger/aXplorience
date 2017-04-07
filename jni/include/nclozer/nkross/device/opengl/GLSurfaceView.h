@@ -21,7 +21,7 @@ public:
     public:
         virtual ~EGLWindowSurfaceFactory()
         {
-            NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+            NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
         }
 
         virtual void* createWindowSurface(GL10* gll, void* display, void* config, Object* nativeWindow) = 0;
@@ -30,7 +30,7 @@ public:
     protected:
         EGLWindowSurfaceFactory()
         {
-            NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNMu00, (NParam)this);
+            NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNMu00, (NParam)this);
         }
     };
 
@@ -41,7 +41,7 @@ public:
     public:
         virtual ~Renderer()
         {
-            NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+            NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
         }
 
         virtual void onDrawFrame(GL10* gl) = 0;
@@ -51,14 +51,14 @@ public:
     protected:
         Renderer()
         {
-            NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNAlpha00, (NParam)this);
+            NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this);
         }
     };
 
     GLSurfaceView(Context* context)
-        : SurfaceView(NSNKROSS::w->mNKrossFriend->instance<SurfaceView>())
+        : SurfaceView(NKrossWrapper::w->mNKrossFriend->instance<SurfaceView>())
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNBeta00, (NParam)this, (NParam)context);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNBeta00, (NParam)this, (NParam)context);
     }
 
     virtual ~GLSurfaceView()
@@ -67,57 +67,57 @@ public:
 
     virtual void onPause()
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNGamma00, (NParam)this);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNGamma00, (NParam)this);
     }
 
     virtual void onResume()
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
     virtual void requestRender()
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNEpsilon00, (NParam)this);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNEpsilon00, (NParam)this);
     }
 
     virtual void setDebugFlags(int debugFlags)
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNDzeta00, (NParam)this, (NParam)debugFlags);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNDzeta00, (NParam)this, (NParam)debugFlags);
     }
 
     virtual void setEGLConfigChooser(int redSize, int greenSize, int blueSize, int alphaSize, int depthSize, int stencilSize)
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNEta00, (NParam)this, (NParam)((redSize<<24) + (greenSize<<16) + (blueSize<<8) + alphaSize), (NParam)depthSize, (NParam)stencilSize);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNEta00, (NParam)this, (NParam)((redSize<<24) + (greenSize<<16) + (blueSize<<8) + alphaSize), (NParam)depthSize, (NParam)stencilSize);
     }
 
     virtual void setEGLContextClientVersion(int version)
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNTheta00, (NParam)this, (NParam)version);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNTheta00, (NParam)this, (NParam)version);
     }
 
     virtual void setEGLWindowSurfaceFactory(GLSurfaceView::EGLWindowSurfaceFactory* factory)
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNNu00, (NParam)this, (NParam)factory);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNNu00, (NParam)this, (NParam)factory);
     }
 
     virtual void setPreserveEGLContextOnPause(bool preserveOnPause)
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNIota00, (NParam)this, (NParam)preserveOnPause);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNIota00, (NParam)this, (NParam)preserveOnPause);
     }
 
     virtual void setRenderMode(int renderMode)
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNKappa00, (NParam)this, (NParam)renderMode);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNKappa00, (NParam)this, (NParam)renderMode);
     }
 
     virtual void setRenderer(GLSurfaceView::Renderer* renderer)
     {
-        NSNKROSS::w->mNVisitorOpengl->tRun(NSNKROSS::w->mNLambda00, (NParam)this, (NParam)renderer);
+        NKrossWrapper::w->mNVisitorOpengl->tRun(NKrossWrapper::w->mNLambda00, (NParam)this, (NParam)renderer);
     }
 
 private:
     GLSurfaceView(NKrossFriend* vNKrossFriend)
-        : SurfaceView(NSNKROSS::w->mNKrossFriend->instance<SurfaceView>())
+        : SurfaceView(NKrossWrapper::w->mNKrossFriend->instance<SurfaceView>())
     {
     }
 };

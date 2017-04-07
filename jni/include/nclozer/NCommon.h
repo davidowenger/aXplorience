@@ -119,7 +119,8 @@ typedef string String;
 
 typedef void GL10;
 
-long long int to_long(const String& vsLong, int* vcError = nullptr);
+float to_float(const String& vFloatString, int* vError = nullptr);
+long long int to_long(const String& vLongString, int* vError = nullptr);
 
 vector<String> split(const String& str, const String& delimiter);
 
@@ -168,6 +169,16 @@ String to_string(T value)
 //*******************************************************************************
 //******************************* COMMON ****************************************
 //*******************************************************************************
+namespace NSNATIVE
+{
+
+class NKrossWrapper;
+class DBWrapper;
+class GraphicsWrapper;
+class OpWrapper;
+
+} // END namespace
+
 #include "NWrapper.h"
 
 #endif

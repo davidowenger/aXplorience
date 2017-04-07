@@ -10,9 +10,9 @@ friend NSNATIVE::NKrossFriend;
 
 public:
     SurfaceView(Context* context)
-        : View(NSNKROSS::w->mNKrossFriend->instance<View>())
+        : View(NKrossWrapper::w->mNKrossFriend->instance<View>())
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNMu00, (NParam)this, (NParam)context);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNMu00, (NParam)this, (NParam)context);
     }
 
     virtual ~SurfaceView()
@@ -21,13 +21,13 @@ public:
 
     SurfaceHolder* getHolder()
     {
-        SurfaceHolder* b = NSNKROSS::w->mNKrossFriend->pointer<SurfaceHolder>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNPhi00, (NParam)this, (NParam)b));
+        SurfaceHolder* b = NKrossWrapper::w->mNKrossFriend->pointer<SurfaceHolder>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNPhi00, (NParam)this, (NParam)b));
     }
 
 private:
     SurfaceView(NKrossFriend* vNKrossFriend)
-        : View(NSNKROSS::w->mNKrossFriend->instance<View>())
+        : View(NKrossWrapper::w->mNKrossFriend->instance<View>())
     {
     }
 };

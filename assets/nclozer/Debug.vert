@@ -73,40 +73,10 @@ void setDebugOutput(vec4 v0, vec4 v1, vec4 v2, vec4 v3)
 }
 
 // BEGIN debug
-uniform vec3 vaVertex;
-uniform vec2 vaFragment;
-uniform float vcRotation;
-
-void rotByAxisAngle(inout vec3 vTargetVec, vec3 vRotationAxis, float vRotationAngle)
-{
-    // Axis magnitude must be 1
-    vec4 q;
-    vRotationAngle /= 2.0;
-    q[3] = cos(vRotationAngle);
-    vRotationAngle = sin(vRotationAngle);
-    q[2] = vRotationAxis[2]*vRotationAngle;
-    q[1] = vRotationAxis[1]*vRotationAngle;
-    q[0] = vRotationAxis[0]*vRotationAngle;
-    vec4 t = vec4(
-       vTargetVec[0]*q[3] - vTargetVec[1]*q[2] + vTargetVec[2]*q[1],
-       vTargetVec[1]*q[3] - vTargetVec[2]*q[0] + vTargetVec[0]*q[2],
-       vTargetVec[2]*q[3] - vTargetVec[0]*q[1] + vTargetVec[1]*q[0],
-       vTargetVec[0]*q[0] + vTargetVec[1]*q[1] + vTargetVec[2]*q[2]
-    );
-    vTargetVec[0] = q[3]*t[0] + q[0]*t[3] + q[1]*t[2] - q[2]*t[1];
-    vTargetVec[1] = q[3]*t[1] + q[1]*t[3] + q[2]*t[0] - q[0]*t[2];
-    vTargetVec[2] = q[3]*t[2] + q[2]*t[3] + q[0]*t[1] - q[1]*t[0];
-}
+uniform vec3 vaFPS;
 
 void main() {
-    vec3 p = vec3(
-        vaVertex.x,
-        vaVertex.y,
-        vaVertex.z
-    );
-    rotByAxisAngle(p, vec3(0.0, 0.0, 1.0), vcRotation);
-    gl_Position = vec4(p.x, p.y, p.z, 1.0);
-    maFragment = vaFragment;
+    gl_Position = vec4(vaFPS.x, vaFPS.y, vaFPS.z, 0.0);
 
     // APPLY debug
     setDebugOutput(gl_Position, gl_Position, gl_Position, gl_Position);

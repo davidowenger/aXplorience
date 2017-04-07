@@ -37,7 +37,7 @@ void FragmentLevel::onDetach()
     if (mFragmentLayout.mcPriority != 0 && w->mcMaxLevel > 0 && w->mMenu) {
         --w->mcMaxLevel;
         w->mcView = w->maRootLayoutItem[mcView].maFragmentLayout[w->mcMaxLevel].mcView;
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(w->maRootLayoutItem[mcView].maFragmentLayout[w->mcMaxLevel].mcRootLayoutItem, mcDBObjectId));
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(w->maRootLayoutItem[mcView].maFragmentLayout[w->mcMaxLevel].mcRootLayoutItem, mcDBObjectId));
     }
     Fragment::onDetach();
 }

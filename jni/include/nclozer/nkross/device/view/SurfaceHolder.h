@@ -16,7 +16,7 @@ public:
     public:
         virtual ~Callback()
         {
-            NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+            NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
         }
 
         virtual void surfaceChanged(SurfaceHolder* holder, int format, int width, int height) = 0;
@@ -26,7 +26,7 @@ public:
     protected:
         Callback()
         {
-            NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNOmicron00, (NParam)this);
+            NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNOmicron00, (NParam)this);
         }
 
     private:
@@ -49,7 +49,7 @@ public:
     protected:
         Callback2()
         {
-            NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNPi00, (NParam)this);
+            NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNPi00, (NParam)this);
         }
 
     private:
@@ -60,28 +60,28 @@ public:
 
     virtual ~SurfaceHolder()
     {
-        NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
     void addCallback(SurfaceHolder::Callback* callback)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNRho00, (NParam)this, (NParam)callback);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNRho00, (NParam)this, (NParam)callback);
     }
 
     Surface* getSurface()
     {
-        Surface* b = NSNKROSS::w->mNKrossFriend->pointer<Surface>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNSigma00, (NParam)this, (NParam)b));
+        Surface* b = NKrossWrapper::w->mNKrossFriend->pointer<Surface>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNSigma00, (NParam)this, (NParam)b));
     }
 
     void removeCallback(SurfaceHolder::Callback* callback)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNTau00, (NParam)this, (NParam)callback);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNTau00, (NParam)this, (NParam)callback);
     }
 
     void setKeepScreenOn(bool screenOn)
     {
-        NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNUpsilon00, (NParam)this, (NParam)screenOn);
+        NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNUpsilon00, (NParam)this, (NParam)screenOn);
     }
 
 private:

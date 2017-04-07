@@ -10,9 +10,9 @@ friend NSNATIVE::NKrossFriend;
 
 public:
     Button(Context* context)
-        : TextView(NSNKROSS::w->mNKrossFriend->instance<TextView>())
+        : TextView(NKrossWrapper::w->mNKrossFriend->instance<TextView>())
     {
-        NSNKROSS::w->mNVisitorWidget->tRun(NSNKROSS::w->mNIota00, (NParam)this, (NParam)context);
+        NKrossWrapper::w->mNVisitorWidget->tRun(NKrossWrapper::w->mNIota00, (NParam)this, (NParam)context);
     }
 
     virtual ~Button()
@@ -21,7 +21,7 @@ public:
 
 private:
     Button(NKrossFriend* vNKrossFriend)
-        : TextView(NSNKROSS::w->mNKrossFriend->instance<TextView>())
+        : TextView(NKrossWrapper::w->mNKrossFriend->instance<TextView>())
     {
     }
 };

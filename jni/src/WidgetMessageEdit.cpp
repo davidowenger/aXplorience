@@ -4,10 +4,12 @@
 namespace NSDEVICE
 {
 
-WidgetMessageEdit::WidgetMessageEdit(Wrapper* const w)
-    : Widget(w), mcPadding((nint)(10*w->mcDensity)), mDBObject(nullptr), mcCategoryId(0),
+WidgetMessageEdit::WidgetMessageEdit(Wrapper* const w) :
+    Widget(w), mcPadding((nint)(10*w->mcDensity)), mDBObject(nullptr), mcCategoryId(0),
     mAdapterCategory(nullptr), mScrollView(nullptr), mContent(nullptr), mCategory(nullptr), mTitle(nullptr), mText(nullptr), mLink(nullptr)
 {
+    LinearLayout::LayoutParams vLayoutMargins(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT);
+
     mAdapterCategory = new AdapterCategory(w);
     mScrollView = new ScrollView(w->mApplication);
     mContent = new LinearLayout(w->mApplication);
@@ -16,10 +18,15 @@ WidgetMessageEdit::WidgetMessageEdit(Wrapper* const w)
     mText = new EditText(w->mNActivity);
     mLink = new EditText(w->mNActivity);
 
-    setGravity(Gravity::LEFT|Gravity::TOP);
-    setOrientation(LinearLayout::VERTICAL);
-    setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT));
+    vLayoutMargins.setMargins(mcPadding, mcPadding, mcPadding, mcPadding);
+    setLayoutParams(&vLayoutMargins);
     setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
+    setBackgroundColor(w->maColor[Theme::kColorTransparent]);
+    setOnTouchListener(this);
+
+    mScrollView->setLayoutParams(new ViewGroup::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT));
+    mScrollView->setFillViewport(true);
+    mScrollView->setBackgroundColor(w->maColor[Theme::kColorApplicationBackground]);
 
     mContent->setGravity(Gravity::LEFT|Gravity::TOP);
     mContent->setOrientation(LinearLayout::VERTICAL);
@@ -99,16 +106,41 @@ WidgetMessageEdit::~WidgetMessageEdit()
     }
 }
 
+void WidgetMessageEdit::init(nuint vcView, DBObject* vDBObject)
+{
+    update(vDBObject);
+
+    w->mMenu->setGroupVisible(k::ViewDelete, ( vDBObject->mId != 1 ));
+    w->mMenu->setGroupVisible(k::ViewEdit, false);
+    w->mMenu->setGroupVisible(k::ViewSave, true);
+    w->mMenu->setGroupVisible(k::ViewList, false);
+    w->mMenu->setGroupVisible(k::ViewAdd, ( vDBObject->mId != 1 ));
+
+    w->mActionBar->setDisplayHomeAsUpEnabled(true);
+    w->mActionBar->setHomeButtonEnabled(true);
+}
+
 void WidgetMessageEdit::update(DBObject* vDBObject)
 {
     mcDBObjectId = vDBObject->mId;
-    mcCategoryId = vDBObject->count("sCategoryId");
+    mcCategoryId = vDBObject->count("CategoryId");
 
     mCategory->setSelection(mcCategoryId);
-    mTitle->setText(vDBObject->get("sTitle"), TextView::NORMAL);
-    mText->setText(vDBObject->get("text"), TextView::NORMAL);
-    mLink->setText(vDBObject->get("link"), TextView::NORMAL);
+    mTitle->setText(vDBObject->get("Title"), TextView::NORMAL);
+    mText->setText(vDBObject->get("Text"), TextView::NORMAL);
+    mLink->setText(vDBObject->get("Link"), TextView::NORMAL);
     requestLayout();
+}
+
+//*******************************************************************************************
+//**************************************  OnTouchListener  **********************************
+//*******************************************************************************************
+bool WidgetMessageEdit::onTouch(View* vView, MotionEvent* event)
+{
+    if (w->mTouchState == 3) {
+        w->mTouchState = 0;
+    }
+    return true;
 }
 
 //*******************************************************************************************

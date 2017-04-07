@@ -3,22 +3,40 @@
 namespace NSNATIVE
 {
 
-long long int to_long(const string& vsLong, int* vcError)
+float to_float(const String& vFloatString, int* vError)
 {
-    long long int vcRet = 0;
-    istringstream vistringstream(vsLong);
-    vistringstream >> vcRet;
+    float vRet = 0;
+    istringstream vIStringStream(vFloatString);
+    vIStringStream >> vRet;
 #ifdef DEBUG
-    int vcErrorInternal = vsLong.empty() || vistringstream.fail();
+    int vErrorInternal = vFloatString.empty() || vIStringStream.fail();
 
-    if (vcError) {
-        *vcError = vcErrorInternal;
+    if (vError) {
+        *vError = vErrorInternal;
     }
-    if (vcErrorInternal) {
-        vcRet = 0;
+    if (vErrorInternal) {
+        vRet = 0;
     }
 #endif
-    return vcRet;
+    return vRet;
+}
+
+long long int to_long(const String& vLongString, int* vError)
+{
+    long long int vRet = 0;
+    istringstream vIStringStream(vLongString);
+    vIStringStream >> vRet;
+#ifdef DEBUG
+    int vErrorInternal = vLongString.empty() || vIStringStream.fail();
+
+    if (vError) {
+        *vError = vErrorInternal;
+    }
+    if (vErrorInternal) {
+        vRet = 0;
+    }
+#endif
+    return vRet;
 }
 
 vector<string> split(const string& str, const string& delimiter)

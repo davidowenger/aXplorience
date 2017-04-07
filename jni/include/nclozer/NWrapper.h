@@ -4,11 +4,6 @@
 namespace NSNATIVE
 {
 
-class DBWrapper;
-class GraphicsWrapper;
-class NKrossWrapper;
-class OpWrapper;
-
 class NWrapper
 {
 public:

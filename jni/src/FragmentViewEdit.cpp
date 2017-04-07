@@ -26,17 +26,17 @@ void FragmentViewEdit::init(nuint vcView, DBObject* vDBObject)
         w->mWidgetMessageEdit->update(vDBObject);
     }
     if (w->mMenu) {
-        w->mMenu->removeItem(Wrapper::kViewAdd);
-        w->mMenu->removeItem(Wrapper::kViewEdit);
-        w->mMenu->removeItem(Wrapper::kViewDelete);
-        w->mMenu->removeItem(Wrapper::kViewSave);
+        w->mMenu->removeItem(k::ViewAdd);
+        w->mMenu->removeItem(k::ViewEdit);
+        w->mMenu->removeItem(k::ViewDelete);
+        w->mMenu->removeItem(k::ViewSave);
 
-        MenuItem* vMenuItemDelete = w->mMenu->add(Menu::NONE, Wrapper::kViewDelete, 1, "Delete");
+        MenuItem* vMenuItemDelete = w->mMenu->add(Menu::NONE, k::ViewDelete, 1, "Delete");
         vMenuItemDelete->setIcon(w->maDrawable[8]);
         vMenuItemDelete->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
         delete vMenuItemDelete;
 
-        MenuItem* vMenuItemSave = w->mMenu->add(Menu::NONE, Wrapper::kViewSave, 2, "Save");
+        MenuItem* vMenuItemSave = w->mMenu->add(Menu::NONE, k::ViewSave, 2, "Save");
         vMenuItemSave->setIcon(w->maDrawable[9]);
         vMenuItemSave->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
         delete vMenuItemSave;
@@ -51,16 +51,16 @@ bool FragmentViewEdit::onMenuItemSelected(nint id)
     bool ret = false;
 
     if (id == R::id::home && mcDBObjectId == 1) {
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewHome));
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(k::ViewAR));
         ret = true;
     }
     if (id == R::id::home && mcDBObjectId > 1) {
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewDetails, mcDBObjectId));
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(k::ViewDetails, mcDBObjectId));
         ret = true;
     }
-    if (id == Wrapper::kViewSave && mcDBObjectId == 1) {
+    if (id == k::ViewSave && mcDBObjectId == 1) {
         // ADD
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNDelta00, new OpMessage(
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNDelta00, new OpMessage(
            to_string(w->mWidgetMessageEdit->mCategory->getSelectedItemPosition()),
            w->mWidgetMessageEdit->mTitle->getText(),
            w->mWidgetMessageEdit->mText->getText(),
@@ -68,9 +68,9 @@ bool FragmentViewEdit::onMenuItemSelected(nint id)
         ));
         ret = true;
     }
-    if (id == Wrapper::kViewSave && mcDBObjectId != 1) {
+    if (id == k::ViewSave && mcDBObjectId != 1) {
         // EDIT
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNTheta00, new OpMessage(
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNTheta00, new OpMessage(
            to_string(w->mWidgetMessageEdit->mCategory->getSelectedItemPosition()),
            w->mWidgetMessageEdit->mTitle->getText(),
            w->mWidgetMessageEdit->mText->getText(),
@@ -80,8 +80,8 @@ bool FragmentViewEdit::onMenuItemSelected(nint id)
         ));
         ret = true;
     }
-    if (id == Wrapper::kViewDelete) {
-        w->mNActivity->sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNEpsilon00, new OpParam(mcDBObjectId, true));
+    if (id == k::ViewDelete) {
+        w->mNActivity->sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNEpsilon00, new OpParam(mcDBObjectId, true));
         ret = true;
     }
     return ret;

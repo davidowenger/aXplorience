@@ -4,26 +4,41 @@
 namespace NSDEVICE
 {
 
+namespace k
+{
+    const nfloat Pi = 3.14159265358979323846f;
+    const nfloat PiOn2 = Pi/2.0f;
+    const nfloat PiOn4 = Pi/4.0f;
+    const nfloat PiOn6 = Pi/6.0f;
+    const nfloat PiOn180 = Pi/180.0f;
+    const nfloat MaxFloat = std::numeric_limits<nfloat>::max();
+
+    const ndouble PiLong = 3.141592653589793238462643383279502884L;
+    const ndouble PiOn180Long = PiLong/180.0L;
+
+    const nint ViewNone = 0;
+    const nint ViewAR = ViewNone + 1;
+    const nint ViewAbout = ViewAR + 1;
+    const nint ViewSettings = ViewAbout + 1;
+    const nint ViewList = ViewSettings + 1;
+    const nint ViewDetails = ViewList + 1;
+    const nint ViewEdit = ViewDetails + 1;
+    const nint ViewAdd = ViewEdit + 1;
+    const nint ViewSave = ViewAdd + 1;
+    const nint ViewDelete = ViewSave + 1;
+
+    const nint POICount = 30;
+    const nint LineCount = 4;
+    const nfloat MinGroupSpace = 0.2f;
+
+    const nint SWIPE_MAX_OFF_PATH = 250;
+    const nint SWIPE_MIN_DISTANCE = 100;
+    const nint SWIPE_THRESHOLD_VELOCITY = 250;
+}
+
 class Wrapper
 {
 public:
-    static const int kViewNone = 0;
-    static const int kViewHome = 1;
-    static const int kViewAbout = 2;
-    static const int kViewSettings = 3;
-    static const int kViewDetails = 4;
-    static const int kViewEdit = 5;
-    static const int kViewAdd = 6;
-    static const int kViewDelete = 7;
-    static const int kViewSave = 8;
-    static const int kViewAR = kViewSave + 1;
-    static const int kViewEnable = kViewAR + 1;
-    static const int kViewBuzz = kViewEnable + 1;
-
-    static const int SWIPE_MAX_OFF_PATH = 250;
-    static const int SWIPE_MIN_DISTANCE = 100;
-    static const int SWIPE_THRESHOLD_VELOCITY = 250;
-
     NWrapper* mNWrapper;
 
     Application* mApplication;
@@ -36,21 +51,23 @@ public:
     std::string sServiceName;
     std::string sUuidService;
     BluetoothAdapter* dBluetoothAdapter;
+    nint mcConnected;
 
     nint cMaxOpUnit;
     OpSquad* opSquad;
     OpUnitCore* opUnitCore;
-    OpUnitUI* opUnitUI;
+    OpUnitDB* opUnitDB;
     OpUnitServer* opUnitServer;
     OpUnitEvents* mOpUnitEvents;
     OpUnitAnim* mOpUnitAnim;
+    OpUnitAR* mOpUnitAR;
     nint mOpUnitEventsId;
     nint mOpUnitServerId;
     nint mOpUnitAppId;
     nint mOpUnitCoreId;
-    nint mOpUnitUIId;
+    nint mOpUnitDBId;
     nint mOpUnitAnimId;
-    nint mcConnected;
+    nint mOpUnitARId;
     list<Sort> maSort;
 
     nuint mcBTStateChange;
@@ -66,7 +83,7 @@ public:
     map<nuint,WidgetMessage*> maWidgetMessage;
     list<WidgetMessage*> maWidgetMessageSorted;
 
-    BOHandlerMessage* mBOHandlerMessage;
+    BOMessageHandler* mBOMessageHandler;
     DBObject* mDBObjectApplication;
     DBObject* mDBObjectSeedEdit;
 
@@ -109,45 +126,39 @@ public:
     nuint mcView;
     nuint mcMaxLevel;
     Menu* mMenu;
+    MenuItem* mMenuItemList;
+    MenuItem* mMenuItemAdd;
+    MenuItem* mMenuItemEdit;
+    MenuItem* mMenuItemDelete;
+    MenuItem* mMenuItemSave;
 
-    WidgetHome* mWidgetHome;
+    NArray<Widget*> maWidget;
+    WidgetAR* mWidgetAR;
+    WidgetAbout* mWidgetAbout;
+    WidgetSettings* mWidgetSettings;
+    WidgetMessageList* mWidgetMessageList;
     WidgetMessageDetails* mWidgetMessageDetails;
     WidgetMessageEdit* mWidgetMessageEdit;
-    WidgetSettings* mWidgetSettings;
-    WidgetAbout* mWidgetAbout;
-    WidgetAR* mWidgetAR;
-
-    nuint mcFragmentView;
-    FragmentView** maFragmentView;
-    GestureDetector** maGestureDetector;
-    FragmentViewHome* mFragmentViewHome;
-    FragmentViewSettings* mFragmentViewSettings;
-    FragmentViewAbout* mFragmentViewAbout;
-    FragmentViewDetails* mFragmentViewDetails;
-    FragmentViewEdit* mFragmentViewEdit;
-    FragmentViewAR* mFragmentViewAR;
-
-    nuint mcFragmentLevel;
-    FragmentLevel** maFragmentLevel;
-    FragmentLevel0* mFragmentLevel0;
-    FragmentLevel1* mFragmentLevel1;
-    FragmentLevel2* mFragmentLevel2;
 
     GraphicsHandler* mGraphicsHandler;
-    SurfaceView* mSurfaceView;
     Surface* mSurface;
     nint mSurfaceWidth;
     nint mSurfaceHeight;
     nuint mARState;
     nuint mARSurface;
     AREngine* mAREngine;
+    nuint mAREventState;
+    nuint mAREventIndex;
+    nfloat mAREventX;
+    nfloat mAREventY;
 
     LocationManager* mLocationManager;
     NArray<String> maLocationProviderType;
     NArray<LocationProvider*> maLocationProvider;
     NArray<LocationListener*> maLocationListener;
-    NArray<BOPOI*> maPOI;
-    NSortList<BOPOI,nfloat>* mPOISortList;
+    map<nuint,BOPOI*> maPOIStatic;
+    map<nuint,BOPOI*> maPOIDynamic;
+    NSortList<BOPOI*,nfloat> maPOISorted;
     NConcurrentCircularBuffer<nfloat>* mCoordBuffer;
     NConcurrentCircularBuffer<nfloat>* mRotationBuffer;
 

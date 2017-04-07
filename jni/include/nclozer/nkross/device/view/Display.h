@@ -15,7 +15,7 @@ public:
 
     int getRotation()
     {
-        return NSNKROSS::w->mNVisitorView->tRun(NSNKROSS::w->mNXi00, (NParam)this);
+        return NKrossWrapper::w->mNVisitorView->tRun(NKrossWrapper::w->mNXi00, (NParam)this);
     }
 
 private:

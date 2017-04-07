@@ -65,7 +65,7 @@ public:
     GLuint loadProgramAsset(const String& vVertexFile, const String& vFragmentFile);
     GLuint loadProgramText(const char* vVertexText, const char* vFragmentText);
     GLuint loadShaderText(GLenum vcType, const char* vShaderText);
-    nint renderFontLine(const String& vLabel, GraphicsProgram* vProgram, GraphicsParam* vPosition, GraphicsParam* vBox, GraphicsParam* vTextureUnit);
+    nfloat renderFontLine(const String& vLabel, nfloat vX, nfloat vY, GraphicsProgram* vProgram, GraphicsParam* vBox, GraphicsParam* vTextureUnit);
     nint setFontSize(nuint vFontSize);
     nint writeFile(const String& vFilePath, NArray<nbyte> vFile);
 

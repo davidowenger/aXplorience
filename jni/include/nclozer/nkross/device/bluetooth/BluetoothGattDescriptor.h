@@ -11,7 +11,7 @@ friend NSNATIVE::NKrossFriend;
 public:
     BluetoothGattDescriptor(const String& uuid, int permissions)
     {
-        NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNEta01, (NParam)this, NKrossParam(uuid).n, (NParam)permissions);
+        NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNEta01, (NParam)this, NKrossParam(uuid).n, (NParam)permissions);
     }
 
     virtual ~BluetoothGattDescriptor()
@@ -20,24 +20,24 @@ public:
 
     virtual int getPermissions()
     {
-        return NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNTheta01, (NParam)this);
+        return NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNTheta01, (NParam)this);
     }
 
     virtual String getUuid()
     {
-        NReturn index = NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNIota01, (NParam)this);
-        return NSNKROSS::w->mNKrossSystem->tGetString(NSNKROSS::w->mNKrossSystem->tRunObject((NParam)index));
+        NReturn index = NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNIota01, (NParam)this);
+        return NKrossWrapper::w->mNKrossSystem->tGetString(NKrossWrapper::w->mNKrossSystem->tRunObject((NParam)index));
     }
 
     virtual NArray<nubyte> getValue()
     {
-        NReturn index = NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNKappa01, (NParam)this);
-        NReturn size = NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNAlpha01, index, -1);
+        NReturn index = NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNKappa01, (NParam)this);
+        NReturn size = NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNAlpha01, index, -1);
         NArray<nubyte> vNArray = NArray<nubyte>(size);
         nuint i;
 
         for (i = 0 ; i < size ; ++i) {
-            vNArray.maData[i] = (nubyte)NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNAlpha01, index, (NParam)i, -1);
+            vNArray.maData[i] = (nubyte)NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNAlpha01, index, (NParam)i, -1);
         }
         return vNArray;
     }
@@ -45,12 +45,12 @@ public:
     virtual bool setValue(NArray<nubyte> value)
     {
         nuint vcIndex;
-        nlong vcKey = NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNBeta01, 0, value.mcData);
+        nlong vcKey = NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNBeta01, 0, value.mcData);
 
         for (vcIndex = 0 ; vcIndex < value.mcData ; ++vcIndex) {
-            NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNBeta01, vcKey, vcIndex, value.maData[vcIndex]);
+            NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNBeta01, vcKey, vcIndex, value.maData[vcIndex]);
         };
-        return NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNLambda01, (NParam)this, (NParam)vcKey);
+        return NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNLambda01, (NParam)this, (NParam)vcKey);
     }
 
 private:

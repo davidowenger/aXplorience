@@ -15,36 +15,36 @@ public:
 
     float getAccuracy()
     {
-        nlong vcValue = (nint)NSNKROSS::w->mNVisitorLocation->tRun(NSNKROSS::w->mNAlpha00, (NParam)this);
+        nlong vcValue = (nint)NKrossWrapper::w->mNVisitorLocation->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this);
         return (nfloat)*reinterpret_cast<ndouble*>(&vcValue);
     }
 
     double getAltitude()
     {
-        nlong vcValue = (nlong)NSNKROSS::w->mNVisitorLocation->tRun(NSNKROSS::w->mNBeta00, (NParam)this);
+        nlong vcValue = (nlong)NKrossWrapper::w->mNVisitorLocation->tRun(NKrossWrapper::w->mNBeta00, (NParam)this);
         return *reinterpret_cast<ndouble*>(&vcValue);
     }
 
     double getLatitude()
     {
-        nlong vcValue = (nlong)NSNKROSS::w->mNVisitorLocation->tRun(NSNKROSS::w->mNGamma00, (NParam)this);
+        nlong vcValue = (nlong)NKrossWrapper::w->mNVisitorLocation->tRun(NKrossWrapper::w->mNGamma00, (NParam)this);
         return *reinterpret_cast<ndouble*>(&vcValue);
     }
 
     double getLongitude()
     {
-        nlong vcValue = (nlong)NSNKROSS::w->mNVisitorLocation->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        nlong vcValue = (nlong)NKrossWrapper::w->mNVisitorLocation->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
         return *reinterpret_cast<ndouble*>(&vcValue);
     }
 
     long long int getTime()
     {
-        return NSNKROSS::w->mNVisitorLocation->tRun(NSNKROSS::w->mNEpsilon00, (NParam)this);
+        return NKrossWrapper::w->mNVisitorLocation->tRun(NKrossWrapper::w->mNEpsilon00, (NParam)this);
     }
 
     bool hasAltitude()
     {
-        return NSNKROSS::w->mNVisitorLocation->tRun(NSNKROSS::w->mNDzeta00, (NParam)this);
+        return NKrossWrapper::w->mNVisitorLocation->tRun(NKrossWrapper::w->mNDzeta00, (NParam)this);
     }
 
 private:

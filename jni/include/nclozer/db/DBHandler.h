@@ -64,11 +64,14 @@ public:
     DBTableHandler(NWrapper* vWrappe, DBTable* dbTable);
    ~DBTableHandler();
 
-    nint load();
-    void drop();
+    void discardTable();
+    void free(DBCollection* vDBCollection);
+    void free(DBObject* vDBObject);
     DBObject* getInstance();
     DBObject* getInstance(nuint id);
+    DBObject* getInstance(const String& field, const String& value);
     DBCollection* getCollection();
+    nint load();
 
     NWrapper* mNWrapper;
     DBTable* mDBTable;
@@ -81,23 +84,29 @@ public:
 class DBObject
 {
 public:
-    DBObject(NWrapper* vWrappe, DBTableHandler* dbTableHandler, nuint id);
+    DBObject(NWrapper* vWrappe, DBTableHandler* dbTableHandler, nuint id, bool vIsFromCollection);
    ~DBObject();
 
     bool apply(DBFilter* filtre, bool selected);
     DBObject* commit();
     nlong count(const String& field);
-    void drop();
+    void discardRow();
     String* get();
     String get(const String& field);
     nuint getFieldIndex(const String& field);
     bool is(const String& field);
     DBObject* set(String* aValue, nuint count);
     DBObject* set(const String& field, const String& value);
+    DBObject* set(const String& field, nint value);
+    DBObject* set(const String& field, nuint value);
     DBObject* set(const String& field, nlong value);
+    DBObject* set(const String& field, nulong value);
+    DBObject* set(const String& field, nfloat value);
+    DBObject* set(const String& field, ndouble value);
     DBObject* set(nint index, const String& value);
 
     bool mIsCache;
+    bool mIsFromCollection;
     nuint mcField;
     nuint mId;
 
@@ -128,14 +137,16 @@ public:
     DBCollection(NWrapper* vWrappe, DBTableHandler* dbTableHandler);
    ~DBCollection();
 
+    nuint count();
+    DBObject* first(const String& field, const String& value);
     DBCollection* load();
-    DBObject* get(nuint index);
-    DBCollection* sort(const String& field, bool ascending = true);
-    DBCollection* sort(list<Sort> vaSort);
     DBCollection* filter(const String& field, const String& value, const String& op);
     DBCollection* filter(const String& field, nlong value, const String& op);
     DBCollection* filter(DBFilter* left, DBFilter* right, const String& op);
-    nuint count();
+    DBObject* get(nuint index);
+    DBCollection* sort(const String& field, bool ascending = true);
+    DBCollection* sort(list<Sort> vaSort);
+    DBCollection* unload();
 
     bool isLoaded;
     nuint mcField;

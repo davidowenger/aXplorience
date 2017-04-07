@@ -4,19 +4,29 @@
 namespace NSDEVICE
 {
 
-WidgetMessageDetails::WidgetMessageDetails(Wrapper* const w)
-    : Widget(w), mcPadding((nint)(10*w->mcDensity)), mDBObject(nullptr), mcCategoryId(0), mCategory(nullptr), mTitle(nullptr), mText(nullptr), mLink(nullptr)
+WidgetMessageDetails::WidgetMessageDetails(Wrapper* const w) :
+    Widget(w), mcPadding((nint)(10*w->mcDensity)), mDBObject(nullptr), mcCategoryId(0),
+    mLinearLayout(nullptr), mCategory(nullptr), mTitle(nullptr), mText(nullptr), mLink(nullptr)
 {
+    LinearLayout::LayoutParams vLayoutMargins(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT);
+
+    mLinearLayout = new LinearLayout(w->mApplication);
     mCategory = new TextView(w->mApplication);
     mTitle = new TextView(w->mApplication);
     mText = new TextView(w->mApplication);
     mLink = new TextView(w->mApplication);
 
-    setGravity(Gravity::LEFT|Gravity::TOP);
-    setOrientation(LinearLayout::VERTICAL);
-    setLayoutParams(new LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT, 1));
+    vLayoutMargins.setMargins(mcPadding, mcPadding, mcPadding, mcPadding);
+    setLayoutParams(&vLayoutMargins);
     setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
+    setBackgroundColor(w->maColor[Theme::kColorTransparent]);
     setOnTouchListener(this);
+
+    mLinearLayout->setLayoutParams(new LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT));
+    mLinearLayout->setGravity(Gravity::LEFT|Gravity::TOP);
+    mLinearLayout->setOrientation(LinearLayout::VERTICAL);
+    mLinearLayout->setBackgroundColor(w->maColor[Theme::kColorApplicationBackground]);
+    mLinearLayout->setOnTouchListener(this);
 
     mCategory->setGravity(Gravity::START);
     mCategory->setPadding(mcPadding, mcPadding, mcPadding, mcPadding);
@@ -46,10 +56,11 @@ WidgetMessageDetails::WidgetMessageDetails(Wrapper* const w)
     mLink->setTextSize(w->mcTextSize);
     mLink->setOnTouchListener(this);
 
-    addView(mCategory);
-    addView(mTitle);
-    addView(mText);
-    addView(mLink);
+    mLinearLayout->addView(mCategory);
+    mLinearLayout->addView(mTitle);
+    mLinearLayout->addView(mText);
+    mLinearLayout->addView(mLink);
+    addView(mLinearLayout);
 }
 
 WidgetMessageDetails::~WidgetMessageDetails()
@@ -71,16 +82,30 @@ WidgetMessageDetails::~WidgetMessageDetails()
     }
 }
 
+void WidgetMessageDetails::init(nuint vcView, DBObject* vDBObject)
+{
+    update(vDBObject);
+
+    w->mMenu->setGroupVisible(k::ViewDelete, true);
+    w->mMenu->setGroupVisible(k::ViewEdit, true);
+    w->mMenu->setGroupVisible(k::ViewSave, false);
+    w->mMenu->setGroupVisible(k::ViewList, false);
+    w->mMenu->setGroupVisible(k::ViewAdd, true);
+
+    w->mActionBar->setDisplayHomeAsUpEnabled(true);
+    w->mActionBar->setHomeButtonEnabled(true);
+}
+
 void WidgetMessageDetails::update(DBObject* vDBObject)
 {
     mcDBObjectId = vDBObject->mId;
-    mcCategoryId = vDBObject->count("sCategoryId");
+    mcCategoryId = vDBObject->count("CategoryId");
 
     mCategory->setBackgroundColor(w->maColor[Theme::kColorCategoryBackground + mcCategoryId*3]);
     mCategory->setText(w->maCategory[mcCategoryId]);
-    mTitle->setText(vDBObject->get("sTitle"));
-    mText->setText(vDBObject->get("text"));
-    mLink->setText(vDBObject->get("link"));
+    mTitle->setText(vDBObject->get("Title"));
+    mText->setText(vDBObject->get("Text"));
+    mLink->setText(vDBObject->get("Link"));
     requestLayout();
 }
 
@@ -89,9 +114,6 @@ void WidgetMessageDetails::update(DBObject* vDBObject)
 //*******************************************************************************************
 bool WidgetMessageDetails::onTouch(View* vView, MotionEvent* event)
 {
-    if (w->mTouchState == 3) {
-        w->mTouchState = 0;
-    }
     return true;
 }
 

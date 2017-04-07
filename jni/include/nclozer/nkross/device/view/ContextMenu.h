@@ -16,7 +16,7 @@ public:
     public:
         virtual ~ContextMenuInfo()
         {
-            NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+            NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
         }
 
     protected:
@@ -27,12 +27,12 @@ public:
 
     virtual ~ContextMenu()
     {
-        NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
 private:
     ContextMenu(NKrossFriend* vNKrossFriend)
-        : Menu(NSNKROSS::w->mNKrossFriend->instance<Menu>())
+        : Menu(NKrossWrapper::w->mNKrossFriend->instance<Menu>())
     {
     }
 };

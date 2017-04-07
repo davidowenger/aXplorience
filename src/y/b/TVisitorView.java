@@ -52,6 +52,13 @@ public class TVisitorView extends TKrossVisitor
         return ( ((GestureDetector)w.sObject.get(a)).onTouchEvent(w.mTKrossSystem.getValue(b, MotionEvent.class)) ? 1 : 0 );
     }
 
+    // void setIsLongpressEnabled(bool enabled)
+    public long visit(TKhi00 element, long a, long b, long c, long d, long e)
+    {
+        ((GestureDetector)w.sObject.get(a)).setIsLongpressEnabled(b != 0);
+        return 0;
+    }
+
     //*******************************************************************************************
     //****************************************** Menu *******************************************
     //*******************************************************************************************
@@ -65,6 +72,20 @@ public class TVisitorView extends TKrossVisitor
     public long visit(TDelta00 element, long a, long b, long c, long d, long e)
     {
         ((Menu)w.sObject.get(a)).removeItem((int)b);
+        return 0;
+    }
+
+    // void setGroupEnabled(int group, bool enabled)
+    public long visit(TDelta01 element, long a, long b, long c, long d, long e)
+    {
+        ((Menu)w.sObject.get(a)).setGroupEnabled((int)b, ( c != 0 ? true : false ));
+        return 0;
+    }
+
+    // void setGroupVisible(int group, bool visible)
+    public long visit(TEpsilon01 element, long a, long b, long c, long d, long e)
+    {
+        ((Menu)w.sObject.get(a)).setGroupVisible((int)b, ( c != 0 ? true : false ));
         return 0;
     }
 
@@ -94,10 +115,40 @@ public class TVisitorView extends TKrossVisitor
     //*******************************************************************************************
     //*************************************** MotionEvent ***************************************
     //*******************************************************************************************
+    // int getActionIndex()
+    public long visit(TPsi00 element, long a, long b, long c, long d, long e)
+    {
+        return ((MotionEvent)w.sObject.get(a)).getActionIndex();
+    }
+
+    // int getActionMasked()
+    public long visit(TOmega00 element, long a, long b, long c, long d, long e)
+    {
+        return ((MotionEvent)w.sObject.get(a)).getActionMasked();
+    }
+
+    // nlong getEventTime()
+    public long visit(TLambda00 element, long a, long b, long c, long d, long e)
+    {
+        return ((MotionEvent)w.sObject.get(a)).getEventTime();
+    }
+
+    // int getPointerCount()
+    public long visit(TGamma01 element, long a, long b, long c, long d, long e)
+    {
+        return ((MotionEvent)w.sObject.get(a)).getPointerCount();
+    }
+
     // float getX()
     public long visit(TTheta00 element, long a, long b, long c, long d, long e)
     {
         return Double.doubleToRawLongBits(((MotionEvent)w.sObject.get(a)).getX());
+    }
+
+    // float getX(int pointerIndex)
+    public long visit(TAlpha01 element, long a, long b, long c, long d, long e)
+    {
+        return Double.doubleToRawLongBits(((MotionEvent)w.sObject.get(a)).getX((int)b));
     }
 
     // float getY()
@@ -106,10 +157,10 @@ public class TVisitorView extends TKrossVisitor
         return Double.doubleToRawLongBits(((MotionEvent)w.sObject.get(a)).getY());
     }
 
-    // nlong getEventTime()
-    public long visit(TLambda00 element, long a, long b, long c, long d, long e)
+    // float getY(int pointerIndex)
+    public long visit(TBeta01 element, long a, long b, long c, long d, long e)
     {
-        return ((MotionEvent)w.sObject.get(a)).getEventTime();
+        return Double.doubleToRawLongBits(((MotionEvent)w.sObject.get(a)).getY((int)b));
     }
 
     //*******************************************************************************************
@@ -168,7 +219,7 @@ public class TVisitorView extends TKrossVisitor
     // void setKeepScreenOn(bool screenOn)
     public long visit(TUpsilon00 element, long a, long b, long c, long d, long e)
     {
-       ((SurfaceHolder)w.sObject.get(a)).setKeepScreenOn( b != 0 ? true : false );
+       ((SurfaceHolder)w.sObject.get(a)).setKeepScreenOn(b != 0);
         return 0;
     }
 

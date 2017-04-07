@@ -14,8 +14,8 @@ Activity* Activity::getInstance(NWrapper* vNWrapper)
     return new NActivity(w);
 }
 
-NActivity::NActivity(Wrapper* vWrapper)
-    : Activity(), OpUnit(vWrapper->mNWrapper), mState(7), mResourcesState(0), w(vWrapper)
+NActivity::NActivity(Wrapper* vWrapper) :
+    Activity(), OpUnit(vWrapper->mNWrapper), mLevel(0), mView(0), w(vWrapper)
 {
     mcUnitType = OpUnit::OPUNIT_TYPE_ACTIVITY;
 }
@@ -26,8 +26,6 @@ NActivity::~NActivity()
 
 void NActivity::onCreate(Bundle* savedInstanceState)
 {
-    nuint i;
-
     Activity::onCreate(savedInstanceState);
 
     w->mNActivity = this;
@@ -67,22 +65,7 @@ void NActivity::onCreate(Bundle* savedInstanceState)
         0xFFFF4E00, //orange
         0xFF99CC00, //green selected
     };
-    w->mcRootLayoutItem = 10;
-    w->maRootLayoutItem = new RootLayoutItem[w->mcRootLayoutItem];
-    w->maRootLayoutItem[Wrapper::kViewNone] =     {0, {{0,0,0,0}, {0,0,0,0}, {0,0,0,0}}};
-    w->maRootLayoutItem[Wrapper::kViewHome] =     {0, {{0,0,2,1}, {0,0,0,0}, {0,0,0,0}}};
-    w->maRootLayoutItem[Wrapper::kViewAbout] =    {1, {{0,0,1,1}, {1,1,2,2}, {0,0,0,0}}};
-    w->maRootLayoutItem[Wrapper::kViewSettings] = {1, {{0,0,1,1}, {2,0,2,3}, {0,0,0,0}}};
-    w->maRootLayoutItem[Wrapper::kViewDetails] =  {1, {{0,0,2,1}, {3,1,2,4}, {0,0,0,0}}};
-    w->maRootLayoutItem[Wrapper::kViewEdit] =     {2, {{0,0,2,1}, {3,1,2,4}, {4,1,2,5}}};
-    w->maRootLayoutItem[Wrapper::kViewAdd] =      {1, {{0,0,2,1}, {4,1,2,6}, {0,0,0,0}}};
-    w->maRootLayoutItem[Wrapper::kViewDelete] =   {0, {{0,0,2,1}, {0,0,0,0}, {0,0,0,0}}};
-    w->maRootLayoutItem[Wrapper::kViewSave] =     {1, {{0,0,2,1}, {3,1,2,8}, {0,0,0,0}}};
-    w->maRootLayoutItem[Wrapper::kViewAR] =       {1, {{0,0,1,1}, {5,0,2,9}, {0,0,0,0}}};
-
-    w->mRootLayoutId = 0x001FF100;
     w->mRootLayout = new RootLayout(w);
-    w->mRootLayout->setId(w->mRootLayoutId);
     setContentView((View*)w->mRootLayout);
 
     w->maDrawable = new Drawable*[12] {
@@ -118,41 +101,29 @@ void NActivity::onCreate(Bundle* savedInstanceState)
         "Bluetooth ENABLED",
         "Bluetooth OFF",
     };
-    w->mARState = 1;
-    w->mARSurface = 1;
+    w->mMenu = nullptr;
     w->mActionBar = getActionBar();
     w->mActionBar->setIcon(w->maDrawable[11]);
-    w->mSurfaceView = new SurfaceView(w->mApplication);
+
+    w->mARState = 0;
+    w->mARSurface = 0;
     w->mMessageLayout = new LinearLayout(w->mApplication);
-    w->mWidgetHome = new WidgetHome(w);
-    w->mWidgetMessageDetails = new WidgetMessageDetails(w);
-    w->mWidgetMessageEdit = new WidgetMessageEdit(w);
-    w->mWidgetSettings = new WidgetSettings(w);
-    w->mWidgetAbout = new WidgetAbout(w);
-    w->mWidgetAR = new WidgetAR(w);
+    w->maWidget = NArray<Widget*>({
+        nullptr,
+        (w->mWidgetAR = new WidgetAR(w)),
+        (w->mWidgetAbout = new WidgetAbout(w)), //(w->mWidgetAbout = new WidgetAbout(w)),
+        (w->mWidgetSettings = new WidgetSettings(w)),
+        (w->mWidgetMessageList = new WidgetMessageList(w)), //(w->mWidgetMessageList = new WidgetMessageList(w)),
+        (w->mWidgetMessageDetails = new WidgetMessageDetails(w)),
+        (w->mWidgetMessageEdit = new WidgetMessageEdit(w))
+    });
 
-    w->mcFragmentView = 6;
-    w->maGestureDetector = new GestureDetector*[w->mcFragmentView];
-    w->maFragmentView = new FragmentView*[w->mcFragmentView] {
-        (w->mFragmentViewHome = new FragmentViewHome(w)),
-        (w->mFragmentViewAbout = new FragmentViewAbout(w)),
-        (w->mFragmentViewSettings = new FragmentViewSettings(w)),
-        (w->mFragmentViewDetails = new FragmentViewDetails(w)),
-        (w->mFragmentViewEdit = new FragmentViewEdit(w)),
-        (w->mFragmentViewAR = new FragmentViewAR(w))
-    };
-    for (i = 0 ; i < w->mcFragmentView ; ++i) {
-        w->maGestureDetector[i] = new GestureDetector(w->mApplication, w->maFragmentView[i]);
-    };
-    w->mcFragmentLevel = 3;
-    w->maFragmentLevel = new FragmentLevel*[w->mcFragmentLevel] {
-        (w->mFragmentLevel0 = new FragmentLevel0(w)),
-        (w->mFragmentLevel1 = new FragmentLevel1(w)),
-        (w->mFragmentLevel2 = new FragmentLevel2(w))
-    };
-    w->mMenu = nullptr;
+    w->mLocationManager = (LocationManager*)w->mNActivity->getSystemService(Context::LOCATION_SERVICE);
+    w->mGraphicsHandler = new GraphicsHandler(w->mNWrapper);
+    w->mCoordBuffer = new NConcurrentCircularBuffer<nfloat>(24);
+    w->mRotationBuffer = new NConcurrentCircularBuffer<nfloat>(32);
+
     w->cMaxOpUnit = 18;
-
     w->opSquad = new OpSquad(w->mNWrapper, w->cMaxOpUnit);
     w->opSquad->add(this);
     w->mOpUnitAppId = mId;
@@ -161,9 +132,9 @@ void NActivity::onCreate(Bundle* savedInstanceState)
     w->opSquad->add(w->opUnitCore);
     w->mOpUnitCoreId = w->opUnitCore->mId;
 
-    w->opUnitUI = new OpUnitUI(w);
-    w->opSquad->add(w->opUnitUI);
-    w->mOpUnitUIId = w->opUnitUI->mId;
+    w->opUnitDB = new OpUnitDB(w);
+    w->opSquad->add(w->opUnitDB);
+    w->mOpUnitDBId = w->opUnitDB->mId;
 
     w->opUnitServer = new OpUnitServer(w);
     w->opSquad->add(w->opUnitServer);
@@ -177,26 +148,38 @@ void NActivity::onCreate(Bundle* savedInstanceState)
     w->opSquad->add(w->mOpUnitAnim);
     w->mOpUnitAnimId = w->mOpUnitAnim->mId;
 
+    w->mOpUnitAR = new OpUnitAR(w);
+    w->opSquad->add(w->mOpUnitAR);
+    w->mOpUnitARId = w->mOpUnitAR->mId;
+
     w->opUnitCore->start();
+}
+
+void NActivity::onStart()
+{
+    w->mWidgetAR->setState(1);
+    Activity::onStart();
 }
 
 void NActivity::onResume()
 {
-    sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNBeta00, new Op());
+    if (w->mMenu) {
+        sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNGamma00, new Op());
+    }
+    w->mWidgetAR->setState(2);
     Activity::onResume();
 }
 
 void NActivity::onPause()
 {
-    // Commit fragment transactions before activity state is saved
-    setView(0, nullptr);
+    w->mWidgetAR->setState(3);
     Activity::onPause();
 }
 
 void NActivity::onStop()
 {
     // Stop animations
-    setResources(0);
+    w->mWidgetAR->setState(0);
     Activity::onStop();
 }
 
@@ -214,21 +197,21 @@ void NActivity::onDestroy()
         delete w->maDrawable[i];
     }
     i = 5;
-    while (--i >= 0) {
-        delete w->maFragmentView[i];
-    }
-    i = 5;
-    while (--i >= 0) {
-        delete w->maGestureDetector[i];
-    }
-    i = 3;
-    while (--i >= 0) {
-        delete w->maFragmentLevel[i];
-    }
     for (WidgetMessage* vWidgetMessage : w->maWidgetMessageSorted) {
         delete vWidgetMessage;
     }
     if (w->mMenu) {
+        w->mMenu->removeItem(k::ViewDelete);
+        w->mMenu->removeItem(k::ViewEdit);
+        w->mMenu->removeItem(k::ViewSave);
+        w->mMenu->removeItem(k::ViewList);
+        w->mMenu->removeItem(k::ViewAdd);
+
+        delete w->mMenuItemDelete;
+        delete w->mMenuItemEdit;
+        delete w->mMenuItemSave;
+        delete w->mMenuItemList;
+        delete w->mMenuItemAdd;
         delete w->mMenu;
     }
     delete[] w->maDrawable;
@@ -236,9 +219,6 @@ void NActivity::onDestroy()
     delete[] w->maRootLayoutItem;
     delete[] w->maMenu;
     delete[] w->maCategory;
-    delete[] w->maFragmentView;
-    delete[] w->maGestureDetector;
-    delete[] w->maFragmentLevel;
 
     delete w->mRootLayout;
     delete w->mActionBar;
@@ -247,7 +227,7 @@ void NActivity::onDestroy()
     delete w->mResources;
     delete w->mConfiguration;
     delete w->mMessageLayout;
-    delete w->mWidgetHome;
+    delete w->mWidgetMessageList;
     delete w->mWidgetMessageDetails;
     delete w->mWidgetMessageEdit;
     delete w->mWidgetSettings;
@@ -261,11 +241,24 @@ void NActivity::onDestroy()
     Activity::onDestroy();
 }
 
-void NActivity::addWidget()
+void NActivity::appSetView(nint vcView, DBObject* vDBObject)
 {
-    WidgetMessage* vWidgetMessage = new WidgetMessage(w);
-    w->maWidgetMessageSorted.push_front(vWidgetMessage);
-    w->mMessageLayout->addView(vWidgetMessage, 0);
+    mView = vcView;
+    mDBObjectId = ( vDBObject ? vDBObject->mId : 0 );
+    w->maWidget[vcView]->init(vcView, vDBObject);
+
+    if (mLevel == 0) {
+        mLevel = 1;
+        w->mRootLayout->addView(w->maWidget[k::ViewAR], 0);
+    }
+    if (mLevel == 2) {
+        mLevel = 1;
+        w->mRootLayout->removeViewAt(1);
+    }
+    if (vcView != k::ViewAR) {
+        mLevel = 2;
+        w->mRootLayout->addView(w->maWidget[vcView], 1);
+    }
 }
 
 void NActivity::handleMessage(long long int m)
@@ -273,6 +266,49 @@ void NActivity::handleMessage(long long int m)
     //LOGE("NActivity::handleMessage");
     nRun(((Op*)m)->mNElement, ((Op*)m)->a, ((Op*)m)->b, ((Op*)m)->c, ((Op*)m)->d, ((Op*)m)->e);
     delete (Op*)m;
+}
+
+void NActivity::onBackPressed()
+{
+        onReceiveOption(R::id::home);
+//    if (mLevel == 2) {
+//        onReceiveOption(R::id::home);
+//    } else {
+//        Activity::onBackPressed();
+//    }
+}
+
+bool NActivity::onCreateOptionsMenu(Menu* vMenu)
+{
+    w->mMenu = vMenu;
+    w->mMenuItemDelete = w->mMenu->add(k::ViewDelete, k::ViewDelete, 1, "Delete");
+    w->mMenuItemDelete->setIcon(w->maDrawable[8]);
+    w->mMenuItemDelete->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+
+    w->mMenuItemEdit = w->mMenu->add(k::ViewEdit, k::ViewEdit, 2, "Edit");
+    w->mMenuItemEdit->setIcon(w->maDrawable[7]);
+    w->mMenuItemEdit->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+
+    w->mMenuItemSave = w->mMenu->add(k::ViewSave, k::ViewSave, 3, "Save");
+    w->mMenuItemSave->setIcon(w->maDrawable[9]);
+    w->mMenuItemSave->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+
+    w->mMenuItemList = w->mMenu->add(k::ViewList, k::ViewList, 4, "List");
+    w->mMenuItemList->setIcon(w->maDrawable[5]);
+    w->mMenuItemList->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+
+    w->mMenuItemAdd = w->mMenu->add(k::ViewAdd, k::ViewAdd, 5, "Add");
+    w->mMenuItemAdd->setIcon(w->maDrawable[10]);
+    w->mMenuItemAdd->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
+
+    sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNGamma00, new Op());
+    Activity::onCreateOptionsMenu(vMenu);
+    return true;
+}
+
+bool NActivity::onOptionsItemSelected(MenuItem* vMenuItem)
+{
+    return onReceiveOption(vMenuItem->getItemId());
 }
 
 void NActivity::onReceiveDiscoveryFinished()
@@ -285,78 +321,64 @@ void NActivity::onReceiveFoundDevice(BluetoothDevice* dBluetoothDevice)
     sendOp(w->mOpUnitCoreId, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam((NParam)dBluetoothDevice));
 }
 
-void NActivity::removeWidget(nuint vcDBObjectId)
+bool NActivity::onReceiveOption(nint vMenuItemId)
 {
-    nuint vcIndex = 0;
-    list<WidgetMessage*>::iterator vIt = w->maWidgetMessageSorted.begin();
+    bool vRet = false;
 
-    while (vIt != w->maWidgetMessageSorted.end()) {
-        if ((*vIt)->mcDBObjectId == vcDBObjectId) {
-            w->mMessageLayout->removeViewAt(vcIndex);
-            delete (WidgetMessage*)(*vIt);
-            vIt = w->maWidgetMessageSorted.erase(vIt);
+    if (vMenuItemId == R::id::home) {
+        if (mView == k::ViewEdit && mDBObjectId != 1) {
+            sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam(k::ViewDetails, mDBObjectId));
+        } else if (mView == k::ViewList) {
+            sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam(k::ViewAR, 0));
+        } else if (mView == k::ViewAbout) {
+            sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam(k::ViewAR, 0));
         } else {
-            ++vIt;
-            ++vcIndex;
+            sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam(k::ViewAbout, 0));
+            //sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNLambda00, new Op());
         }
+        vRet = true;
     }
-    w->maWidgetMessage.erase(vcDBObjectId);
+    if (vMenuItemId == k::ViewList) {
+        sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNLambda00, new Op());
+        vRet = true;
+    }
+    if (vMenuItemId == k::ViewDelete) {
+        sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNTheta00, new OpParam(mDBObjectId, 1));
+        vRet = true;
+    }
+    if (vMenuItemId == k::ViewEdit) {
+        sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam(k::ViewEdit, mDBObjectId));
+        vRet = true;
+    }
+    if (vMenuItemId == k::ViewSave) {
+        if (mDBObjectId == 1) {
+            sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNEta00, new OpMessage(
+                to_string(w->mWidgetMessageEdit->mCategory->getSelectedItemPosition()),
+                w->mWidgetMessageEdit->mTitle->getText(),
+                w->mWidgetMessageEdit->mText->getText(),
+                w->mWidgetMessageEdit->mLink->getText()
+            ));
+        } else {
+            sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNIota00, new OpMessage(
+                to_string(mDBObjectId),
+                to_string(w->mWidgetMessageEdit->mCategory->getSelectedItemPosition()),
+                w->mWidgetMessageEdit->mTitle->getText(),
+                w->mWidgetMessageEdit->mText->getText(),
+                w->mWidgetMessageEdit->mLink->getText()
+            ));
+        }
+        vRet = true;
+    }
+    if (vMenuItemId == k::ViewAdd) {
+        sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam(k::ViewEdit, 1));
+        vRet = true;
+    }
+    return vRet;
 }
 
-void NActivity::renderHeader()
+void NActivity::poiList(DBCollection* vDBCollection)
 {
-    w->mWidgetHome->initHeader();
-}
-
-void NActivity::setResources(nint vcState)
-{
-    if (mResourcesState == 0) {
-        if (vcState == 1) {
-            w->mWidgetAR->onCreate();
-            mResourcesState = 1;
-        }
-    }
-    if (mResourcesState == 1) {
-        if (vcState == 2) {
-            w->mWidgetAR->onPause();
-            mResourcesState = 2;
-        }
-        if (vcState == 0) {
-            w->mWidgetAR->onPause();
-            w->mWidgetAR->onDestroy();
-            mResourcesState = 0;
-        }
-    }
-    if (mResourcesState == 2) {
-        if (vcState == 1) {
-            w->mWidgetAR->onCreate();
-            mResourcesState = 1;
-        }
-        if (vcState == 0) {
-            w->mWidgetAR->onDestroy();
-            mResourcesState = 0;
-        }
-    }
-}
-
-void NActivity::setView(nint vcView, DBObject* vDBObject)
-{
-    nuint i;
-    setResources(2 - 1*(vcView == Wrapper::kViewAR));
-
-    for (i = 0 ; i < w->mcFragmentLevel ; ++i) {
-        w->maFragmentLevel[i]->init(vcView, vDBObject);
-    }
-    if (vDBObject) {
-        delete vDBObject;
-    }
-}
-
-void NActivity::sort(DBCollection* vDBCollection)
-{
-    DBObject* vDBObject;
     WidgetMessage* vWidgetMessageNew;
-
     nint vcIndex = w->maWidgetMessageSorted.size();
     nint vcDBCollectionSize = vDBCollection->count();
 
@@ -374,81 +396,45 @@ void NActivity::sort(DBCollection* vDBCollection)
     vcIndex = -1;
 
     for (WidgetMessage* vWidgetMessage : w->maWidgetMessageSorted) {
-        vDBObject = vDBCollection->get(++vcIndex);
-        vWidgetMessage->update(vDBObject);
-        w->maWidgetMessage[vDBObject->mId] = vWidgetMessage;
+        vWidgetMessage->update(vDBCollection->get(++vcIndex));
     }
-    delete vDBCollection;
 }
 
-void NActivity::tilt(nuint color)
+void NActivity::poiSort(DBCollection* vDBCollection)
 {
-    w->mRootLayout->setBackgroundColor(color);
-    w->mRootLayout->invalidate();
-    mState = color;
+    poiList(vDBCollection);
+    w->mWidgetMessageList->initHeader();
 }
 
-void NActivity::update(DBObject* vDBObject, nint vcView)
-{
-    map<nuint,WidgetMessage*>::iterator vIt;
-
-    if (vcView == Wrapper::kViewNone && (vIt = w->maWidgetMessage.find(vDBObject->mId)) != w->maWidgetMessage.end()) {
-        vIt->second->update(vDBObject);
-    }
-    if (vcView == Wrapper::kViewDetails || vcView == Wrapper::kViewSave) {
-        w->mWidgetMessageDetails->update(vDBObject);
-    }
-    if (vcView == Wrapper::kViewEdit || vcView == Wrapper::kViewAdd) {
-        w->mWidgetMessageEdit->update(vDBObject);
-    }
-    delete vDBObject;
-}
-
-NReturn NActivity::visit(NAlpha01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    addWidget();
-    return 0;
-}
-
-NReturn NActivity::visit(NBeta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    removeWidget((nuint)a);
-    return 0;
-}
-
-NReturn NActivity::visit(NGamma01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    sort((DBCollection*)a);
-    return 0;
-}
-
-NReturn NActivity::visit(NDelta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    setView((nint)a, (DBObject*)b);
-    return 0;
-}
-
-NReturn NActivity::visit(NEpsilon01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    tilt((nuint)a);
-    return 0;
-}
-
-NReturn NActivity::visit(NDzeta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    renderHeader();
-    return 0;
-}
-
-NReturn NActivity::visit(NEta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
-{
-    update((DBObject*)a, (nint)b);
-    return 0;
-}
-
-NReturn NActivity::visit(NTheta01* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+void NActivity::settingsFeed()
 {
     w->mWidgetSettings->init();
+}
+
+NReturn NActivity::visit(NAlpha00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    appSetView((nint)a, (DBObject*)b);
+    if (b) delete (DBObject*)b;
+    return 0;
+}
+
+NReturn NActivity::visit(NBeta00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    poiList((DBCollection*)a);
+    delete (DBCollection*)a;
+    return 0;
+}
+
+NReturn NActivity::visit(NGamma00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    poiSort((DBCollection*)a);
+    delete (DBCollection*)a;
+    return 0;
+}
+
+NReturn NActivity::visit(NEpsilon00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+{
+    settingsFeed();
     return 0;
 }
 

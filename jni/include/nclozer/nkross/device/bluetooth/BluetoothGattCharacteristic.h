@@ -31,7 +31,7 @@ public:
 
     BluetoothGattCharacteristic(const String& uuid, int properties, int permissions)
     {
-        NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNDelta00, (NParam)this, NKrossParam(uuid).n, (NParam)properties, (NParam)permissions);
+        NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNDelta00, (NParam)this, NKrossParam(uuid).n, (NParam)properties, (NParam)permissions);
     }
 
     virtual ~BluetoothGattCharacteristic()
@@ -40,78 +40,78 @@ public:
 
     virtual bool addDescriptor(BluetoothGattDescriptor* descriptor)
     {
-        return NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNUpsilon01, (NParam)this, (NParam)descriptor);
+        return NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNUpsilon01, (NParam)this, (NParam)descriptor);
     }
 
     virtual BluetoothGattDescriptor* getDescriptor(const String& uuid)
     {
-        BluetoothGattDescriptor* b = NSNKROSS::w->mNKrossFriend->pointer<BluetoothGattDescriptor>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNGamma01, (NParam)this, (NParam)b, NKrossParam(uuid).n));
+        BluetoothGattDescriptor* b = NKrossWrapper::w->mNKrossFriend->pointer<BluetoothGattDescriptor>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNGamma01, (NParam)this, (NParam)b, NKrossParam(uuid).n));
     }
 
     virtual NArray<BluetoothGattDescriptor*> getDescriptors()
     {
-        NReturn index = NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNBeta01, (NParam)this);
-        NReturn size = NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNAlpha01, index, -1);
+        NReturn index = NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNBeta01, (NParam)this);
+        NReturn size = NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNAlpha01, index, -1);
         NArray<BluetoothGattDescriptor*> vNArray = NArray<BluetoothGattDescriptor*>(size);
         nuint i;
 
         for (i = 0 ; i < size ; ++i) {
-            BluetoothGattDescriptor* b = NSNKROSS::w->mNKrossFriend->pointer<BluetoothGattDescriptor>();
-            vNArray.maData[i] = NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNAlpha01, index, (NParam)i, (NParam)b));
+            BluetoothGattDescriptor* b = NKrossWrapper::w->mNKrossFriend->pointer<BluetoothGattDescriptor>();
+            vNArray.maData[i] = NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNAlpha01, index, (NParam)i, (NParam)b));
         }
         return vNArray;
     }
 
     virtual int getProperties()
     {
-        return NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNEpsilon01, (NParam)this);
+        return NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNEpsilon01, (NParam)this);
     }
 
     virtual String getUuid()
     {
-        NReturn index = NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNDzeta01, (NParam)this);
-        return NSNKROSS::w->mNKrossSystem->tGetString(NSNKROSS::w->mNKrossSystem->tRunObject((NParam)index));
+        NReturn index = NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNDzeta01, (NParam)this);
+        return NKrossWrapper::w->mNKrossSystem->tGetString(NKrossWrapper::w->mNKrossSystem->tRunObject((NParam)index));
     }
 
     virtual NArray<nubyte> getValue()
     {
-        NReturn index = NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNEpsilon00, (NParam)this);
-        NReturn size = NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNAlpha01, index, -1);
+        NReturn index = NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNEpsilon00, (NParam)this);
+        NReturn size = NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNAlpha01, index, -1);
         NArray<nubyte> vNArray =  NArray<nubyte>(size);
         nuint i;
 
         for (i = 0 ; i < size ; ++i) {
-            vNArray.maData[i] = (nubyte)NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNAlpha01, index, (NParam)i);
+            vNArray.maData[i] = (nubyte)NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNAlpha01, index, (NParam)i);
         }
         return vNArray;
     }
 
     virtual String getStringValue(int offset)
     {
-        NReturn index = NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNDzeta00, (NParam)this, (NParam)offset);
-        return NSNKROSS::w->mNKrossSystem->tGetString(NSNKROSS::w->mNKrossSystem->tRunObject((NParam)index));
+        NReturn index = NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNDzeta00, (NParam)this, (NParam)offset);
+        return NKrossWrapper::w->mNKrossSystem->tGetString(NKrossWrapper::w->mNKrossSystem->tRunObject((NParam)index));
     }
 
     virtual bool setValue(NArray<nubyte> value)
     {
         nuint vcIndex;
-        nlong vcKey = NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNBeta01, 0, value.mcData);
+        nlong vcKey = NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNBeta01, 0, value.mcData);
 
         for (vcIndex = 0 ; vcIndex < value.mcData ; ++vcIndex) {
-            NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNBeta01, vcKey, vcIndex, value.maData[vcIndex]);
+            NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNBeta01, vcKey, vcIndex, value.maData[vcIndex]);
         };
-        return NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNEta00, (NParam)this, (NParam)vcKey);
+        return NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNEta00, (NParam)this, (NParam)vcKey);
     }
 
     virtual bool setValue(const String& value)
     {
-        return NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNTheta00, (NParam)this, NKrossParam(value).n);
+        return NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNTheta00, (NParam)this, NKrossParam(value).n);
     }
 
     virtual void setWriteType(int writeType)
     {
-        NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNIota00, (NParam)this, (NParam)writeType);
+        NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNIota00, (NParam)this, (NParam)writeType);
     }
 
 private:

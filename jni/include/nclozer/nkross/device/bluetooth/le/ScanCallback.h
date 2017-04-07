@@ -16,7 +16,7 @@ public:
 
     ScanCallback()
     {
-        NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNMu00, (NParam)this);
+        NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNMu00, (NParam)this);
     }
 
     virtual ~ScanCallback()

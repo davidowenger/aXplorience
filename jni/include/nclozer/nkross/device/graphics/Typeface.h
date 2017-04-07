@@ -22,14 +22,14 @@ public:
 
     static Typeface* create(const String& familyName, int style)
     {
-        Typeface* b = NSNKROSS::w->mNKrossFriend->pointer<Typeface>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNGamma00, (NParam)b, NKrossParam(familyName).n, (NParam)style));
+        Typeface* b = NKrossWrapper::w->mNKrossFriend->pointer<Typeface>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNGamma00, (NParam)b, NKrossParam(familyName).n, (NParam)style));
     }
 
     static Typeface* defaultFromStyle(int style)
     {
-        Typeface* b = NSNKROSS::w->mNKrossFriend->pointer<Typeface>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNDelta00, (NParam)b, (NParam)style));
+        Typeface* b = NKrossWrapper::w->mNKrossFriend->pointer<Typeface>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNDelta00, (NParam)b, (NParam)style));
     }
 
     virtual ~Typeface()

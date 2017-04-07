@@ -31,7 +31,7 @@ public:
 protected:
     BluetoothGattServerCallback()
     {
-        NSNKROSS::w->mNVisitorBluetoothGatt->tRun(NSNKROSS::w->mNNu00, (NParam)this);
+        NKrossWrapper::w->mNVisitorBluetoothGatt->tRun(NKrossWrapper::w->mNNu00, (NParam)this);
     }
 };
 

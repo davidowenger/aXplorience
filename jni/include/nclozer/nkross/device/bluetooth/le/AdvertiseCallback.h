@@ -17,7 +17,7 @@ public:
 
     AdvertiseCallback()
     {
-        NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNAlpha00, (NParam)this);
+        NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this);
     }
 
     virtual ~AdvertiseCallback()

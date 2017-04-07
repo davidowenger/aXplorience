@@ -76,6 +76,36 @@ public:
         return 0;
     }
 
+    NReturn visit(NKhi00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+    {
+        ((Activity*)a)->onBackPressed();
+        return 0;
+    }
+
+    NReturn visit(NIota00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+    {
+        NReturn vcRet = 0;
+        if (b == -1 && c == 1) vcRet = (NReturn)mNWrapper->mNKrossWrapper->mNKrossFriend->pointer<Menu>();
+        if (b != -1) vcRet = ((Activity*)a)->onCreateOptionsMenu((Menu*)b);
+        return vcRet;
+    }
+
+    NReturn visit(NLambda00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+    {
+        NReturn vcRet = 0;
+        if (b == -1 && c == 1) vcRet = (NReturn)mNWrapper->mNKrossWrapper->mNKrossFriend->pointer<MenuItem>();
+        if (b != -1) vcRet = ((Activity*)a)->onOptionsItemSelected((MenuItem*)b);
+        return vcRet;
+    }
+
+    NReturn visit(NKappa00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
+    {
+        NReturn vcRet = 0;
+        if (b == -1 && c == 1) vcRet = (NReturn)mNWrapper->mNKrossWrapper->mNKrossFriend->pointer<Menu>();
+        if (b != -1) vcRet = ((Activity*)a)->onPrepareOptionsMenu((Menu*)b);
+        return vcRet;
+    }
+
     NReturn visit(NOmicron00* element, NParam a, NParam b, NParam c, NParam d, NParam e)
     {
         ((Activity*)a)->onReceiveDiscoveryFinished();

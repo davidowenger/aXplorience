@@ -15,17 +15,17 @@ public:
 
     virtual void setButtonDrawable(Drawable* d)
     {
-        NSNKROSS::w->mNVisitorWidget->tRun(NSNKROSS::w->mNLambda00, (NParam)this, (NParam)d);
+        NKrossWrapper::w->mNVisitorWidget->tRun(NKrossWrapper::w->mNLambda00, (NParam)this, (NParam)d);
     }
 
     virtual bool isChecked()
     {
-        return (bool)NSNKROSS::w->mNVisitorWidget->tRun(NSNKROSS::w->mNOmega00, (NParam)this);
+        return (bool)NKrossWrapper::w->mNVisitorWidget->tRun(NKrossWrapper::w->mNOmega00, (NParam)this);
     }
 
 private:
     CompoundButton(NKrossFriend* vNKrossFriend)
-        : Button(NSNKROSS::w->mNKrossFriend->instance<Button>())
+        : Button(NKrossWrapper::w->mNKrossFriend->instance<Button>())
     {
     }
 };

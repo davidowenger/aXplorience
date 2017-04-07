@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class TActivity extends Activity
 {
@@ -227,6 +229,13 @@ public class TActivity extends Activity
         TWrapper.w = null;
     }
 
+    public void discoverable(int nTimeout)
+    {
+        Intent intentDiscoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        intentDiscoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, nTimeout);
+        startActivityForResult(intentDiscoverable, 1);
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
         if (intent != null && intent.getAction() != null) {
@@ -242,11 +251,33 @@ public class TActivity extends Activity
         }
     }
 
-    public void discoverable(int nTimeout)
+    public void onBackPressed()
     {
-        Intent intentDiscoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        intentDiscoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, nTimeout);
-        startActivityForResult(intentDiscoverable, 1);
+        w.mTVisitorAppActivity.nRun(w.mTKhi00, n);
+    }
+
+    public boolean onCreateOptionsMenu(Menu vMenu)
+    {
+        long vcKey;
+        return ( w.mTVisitorAppActivity.nRun(w.mTIota00, n,
+            (vcKey = w.mTKrossSystem.getKey(vMenu)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppActivity.nRun(w.mTIota00, n, -1, 1), vMenu)
+        ) != 0 ? true : false );
+    }
+
+    public boolean onOptionsItemSelected(MenuItem vMenuItem)
+    {
+        long vcKey;
+        return ( w.mTVisitorAppActivity.nRun(w.mTLambda00, n,
+            (vcKey = w.mTKrossSystem.getKey(vMenuItem)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppActivity.nRun(w.mTLambda00, n, -1, 1), vMenuItem)
+        ) != 0 ? true : false );
+    }
+
+    public boolean onPrepareOptionsMenu(Menu vMenu)
+    {
+        long vcKey;
+        return ( w.mTVisitorAppActivity.nRun(w.mTKappa00, n,
+            (vcKey = w.mTKrossSystem.getKey(vMenu)) != -1 ? vcKey : w.mTKrossSystem.putKey(w.mTVisitorAppActivity.nRun(w.mTKappa00, n, -1, 1), vMenu)
+        ) != 0 ? true : false );
     }
 
     public void onCreateParent(Bundle vBundle)
@@ -282,6 +313,26 @@ public class TActivity extends Activity
     public void onDestroyParent()
     {
         super.onDestroy();
+    }
+
+    public void onBackPressedParent()
+    {
+        super.onBackPressed();
+    }
+
+    public boolean onCreateOptionsMenuParent(Menu vMenu)
+    {
+        return super.onCreateOptionsMenu(vMenu);
+    }
+
+    public boolean onOptionsItemSelectedParent(MenuItem vMenuItem)
+    {
+        return super.onOptionsItemSelected(vMenuItem);
+    }
+
+    public boolean onPrepareOptionsMenuParent(Menu vMenu)
+    {
+        return super.onPrepareOptionsMenu(vMenu);
     }
 }
 

@@ -19,14 +19,14 @@ public:
     //******************************************************************************************
     virtual View* getDropDownView(int position, View* convertView, ViewGroup* parent)
     {
-        View* b = NSNKROSS::w->mNKrossFriend->pointer<View>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorWidget->tRun(NSNKROSS::w->mNGamma00, (NParam)this, (NParam)b, (NParam)position, (NParam)convertView, (NParam)parent));
+        View* b = NKrossWrapper::w->mNKrossFriend->pointer<View>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorWidget->tRun(NKrossWrapper::w->mNGamma00, (NParam)this, (NParam)b, (NParam)position, (NParam)convertView, (NParam)parent));
     }
 
 protected:
     BaseAdapter()
     {
-        NSNKROSS::w->mNVisitorWidget->tRun(NSNKROSS::w->mNBeta00, (NParam)this);
+        NKrossWrapper::w->mNVisitorWidget->tRun(NKrossWrapper::w->mNBeta00, (NParam)this);
     }
 
 private:

@@ -164,8 +164,8 @@ public:
         // <this> is the "up" axis of the observer orientation
         // Angle sign is based on the mixed product of the three vectors
         // No zero division check - <vVector1> and <vVector2> must be non-zero
-        T vSign = 1 - 2*(mix(vVector1, vVector2) < 0);
-        return acos(vVector1.dot3(vVector2)/sqrt(vVector1.dot3(vVector1)*vVector2.dot3(vVector2)))*vSign;
+        T vSign = 1 - 2*(mix3(vVector1, vVector2) < 0);
+        return vSign*acos(vVector1.dot3(vVector2)/sqrt(vVector1.dot3(vVector1)*vVector2.dot3(vVector2)));
     }
 
     NVec<T> cross3(NVec<T> vVector)
@@ -330,6 +330,25 @@ public:
             vQuat.d[3]*d[1] + vQuat.d[1]*d[3] + vQuat.d[2]*d[0] - vQuat.d[0]*d[2],
             vQuat.d[3]*d[2] + vQuat.d[2]*d[3] + vQuat.d[0]*d[1] - vQuat.d[1]*d[0],
             vQuat.d[3]*d[3] - vQuat.d[0]*d[0] - vQuat.d[1]*d[1] - vQuat.d[2]*d[2]
+        };
+        return this->is4(t);
+    }
+
+    NVec<T> mul4AtLeftByAxisAngle(NVec<T> vRotationAxis, T vRotationAngle)
+    {
+        // Axis magnitude must be 1
+        T q[4];
+        vRotationAngle /= 2;
+        q[3] = cos(vRotationAngle);
+        vRotationAngle = sin(vRotationAngle);
+        q[2] = vRotationAxis.d[2]*vRotationAngle;
+        q[1] = vRotationAxis.d[1]*vRotationAngle;
+        q[0] = vRotationAxis.d[0]*vRotationAngle;
+        T t[4] {
+            q[3]*d[0] + q[0]*d[3] + q[1]*d[2] - q[2]*d[1],
+            q[3]*d[1] + q[1]*d[3] + q[2]*d[0] - q[0]*d[2],
+            q[3]*d[2] + q[2]*d[3] + q[0]*d[1] - q[1]*d[0],
+            q[3]*d[3] - q[0]*d[0] - q[1]*d[1] - q[2]*d[2]
         };
         return this->is4(t);
     }

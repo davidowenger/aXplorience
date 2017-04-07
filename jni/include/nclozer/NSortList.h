@@ -9,7 +9,7 @@ class NSortListItem
 {
 public:
     NSortListItem()
-        : mObject(nullptr), mValue{}
+        : mObject{}, mValue(0)
     {
         mNext = this;
     }
@@ -18,7 +18,7 @@ public:
     {
     }
 
-    T* mObject;
+    T mObject;
     U mValue;
     NSortListItem<T, U>* mNext;
 };
@@ -28,116 +28,150 @@ class NSortList
 {
 public:
     NSortList() :
-        mGet(0), mSet(1), mSize(0),
-        mFirstItem(new NSortListItem<T, U>*[2] {new NSortListItem<T, U>(), new NSortListItem<T, U>()}),
-        mHeadItem(new NSortListItem<T, U>*[2] {new NSortListItem<T, U>(), new NSortListItem<T, U>()}),
-        mTailItem(new NSortListItem<T, U>*[2] {new NSortListItem<T, U>(), new NSortListItem<T, U>()})
+        mSize(0),
+        mHeadItem(new NSortListItem<T, U>()),
+        mTailItem(new NSortListItem<T, U>()),
+        mLastItem(new NSortListItem<T, U>())
     {
-        mFirstItem[mGet]->mNext = mHeadItem[mGet];
-        mHeadItem[mGet]->mNext = mTailItem[mGet];
-        mFirstItem[mSet]->mNext = mHeadItem[mSet];
-        mHeadItem[mSet]->mNext = mTailItem[mSet];
+        mHeadItem->mNext = mTailItem;
+        mTailItem->mNext = mLastItem;
     }
 
    ~NSortList()
     {
         NSortListItem<T, U>* vItem;
 
-        while ((vItem = mFirstItem[mGet])) {
-            mFirstItem[mGet] = ( vItem != vItem->mNext ? vItem->mNext : nullptr );
-            delete vItem;
-        }
-        while ((vItem = mFirstItem[mSet])) {
-            mFirstItem[mSet] = ( vItem != vItem->mNext ? vItem->mNext : nullptr );
+        while ((vItem = mHeadItem)) {
+            mHeadItem = ( vItem != vItem->mNext ? vItem->mNext : nullptr );
             delete vItem;
         }
     }
 
-    T* updateHead()
+    void add(nint vSize)
     {
-        return ( mHeadItem[mGet]->mNext != mTailItem[mGet] ? (mHeadItem[mGet] = mHeadItem[mGet]->mNext)->mObject : nullptr );
-    };
-
-    U updateValue(U vValue)
-    {
-        NSortListItem<T, U>* vCurrentItem;
-        NSortListItem<T, U>* vPreviousItem = mHeadItem[mSet];
-
-        while (vPreviousItem->mNext != mTailItem[mSet] && vPreviousItem->mNext->mValue < vValue) {
-            vPreviousItem = vPreviousItem->mNext;
-        }
-        vCurrentItem = mFirstItem[mSet]->mNext;
-        mFirstItem[mSet]->mNext = vCurrentItem->mNext;
-        vCurrentItem->mObject = mHeadItem[mGet]->mObject;
-        vCurrentItem->mValue = vValue;
-        vCurrentItem->mNext = vPreviousItem->mNext;
-        vPreviousItem->mNext = vCurrentItem;
-        return mHeadItem[mGet]->mValue;
-    };
-
-    void resize(nint vSize)
-    {
-        if (vSize - mSize >= 0) {
-            sizeAdd(vSize - mSize);
-        } else {
-            sizeSub(mSize - vSize);
+        while (vSize--) {
+            NSortListItem<T, U>* vItem;
+            vItem = new NSortListItem<T, U>();
+            vItem->mNext = mHeadItem->mNext;
+            mHeadItem->mNext = vItem;
+            ++mSize;
         }
     }
 
-    void setValue(T* vObject, U vValue)
+    void add(T vObject, U vValue)
     {
         NSortListItem<T, U>* vCurrentItem;
-        NSortListItem<T, U>* vPreviousItem = mHeadItem[mSet];
+        NSortListItem<T, U>* vPreviousItem = mHeadItem;
 
-        while (vPreviousItem->mNext != mTailItem[mSet] && vPreviousItem->mNext->mValue < vValue) {
+        while (vPreviousItem->mNext->mValue <= vValue && vPreviousItem->mNext != mTailItem) {
             vPreviousItem = vPreviousItem->mNext;
         }
-        vCurrentItem = mFirstItem[mSet]->mNext;
-        mFirstItem[mSet]->mNext = vCurrentItem->mNext;
+        vCurrentItem = new NSortListItem<T, U>();
         vCurrentItem->mObject = vObject;
         vCurrentItem->mValue = vValue;
         vCurrentItem->mNext = vPreviousItem->mNext;
         vPreviousItem->mNext = vCurrentItem;
+        ++mSize;
     }
 
-    void sizeAdd(nint vSize)
+    T getObject()
     {
-        while (vSize--) {
-            NSortListItem<T, U>* vItem;
-            vItem = new NSortListItem<T, U>();
-            vItem->mNext = mFirstItem[mGet]->mNext;
-            mFirstItem[mGet]->mNext = vItem;
-            vItem = new NSortListItem<T, U>();
-            vItem->mNext = mFirstItem[mSet]->mNext;
-            mFirstItem[mSet]->mNext = vItem;
+        return mHeadItem->mNext->mObject;
+    }
+
+    U getValue()
+    {
+        return mHeadItem->mNext->mValue;
+    }
+
+    void remove(T vObject)
+    {
+        NSortListItem<T, U>* vCurrentItem;
+        NSortListItem<T, U>* vPreviousItem = mHeadItem;
+
+        while (vPreviousItem->mNext->mObject != vObject && vPreviousItem->mNext != mTailItem) {
+            vPreviousItem = vPreviousItem->mNext;
+        }
+        vCurrentItem = vPreviousItem->mNext;
+
+        if (vCurrentItem != mTailItem) {
+            vPreviousItem->mNext = vCurrentItem->mNext;
+            delete vCurrentItem;
+            --mSize;
         }
     }
 
-    void sizeSub(nint vSize)
+    void remove(nint vSize)
     {
         while (vSize--) {
             NSortListItem<T, U>* vItem;
-            vItem = mFirstItem[mGet]->mNext;
-            mFirstItem[mGet]->mNext = vItem->mNext;
+            vItem = mHeadItem->mNext;
+            mHeadItem->mNext = vItem->mNext;
             delete vItem;
-            vItem = mFirstItem[mSet]->mNext;
-            mFirstItem[mSet]->mNext = vItem->mNext;
-            delete vItem;
+            --mSize;
         }
     }
 
-    void swap()
+    void resize(nint vSize)
     {
-        mGet = !mGet;
-        mSet = !mSet;
+        if (vSize - mSize >= 0) {
+            add(vSize - mSize);
+        } else {
+            remove(mSize - vSize);
+        }
     }
 
-    nubyte mGet;
-    nubyte mSet;
+    T updateObject(T vObject, U vValue)
+    {
+        NSortListItem<T, U>* vCurrentItem;
+        NSortListItem<T, U>* vPreviousItem = mTailItem;
+
+        while (vPreviousItem->mNext->mValue <= vValue && vPreviousItem->mNext != mLastItem) {
+            vPreviousItem = vPreviousItem->mNext;
+        }
+        vCurrentItem = mHeadItem->mNext;
+        mHeadItem->mNext = vCurrentItem->mNext;
+        vCurrentItem->mObject = vObject;
+        vCurrentItem->mValue = vValue;
+        vCurrentItem->mNext = vPreviousItem->mNext;
+        vPreviousItem->mNext = vCurrentItem;
+        return swap();
+    }
+
+    T updateValue(U vValue)
+    {
+        NSortListItem<T, U>* vCurrentItem;
+        NSortListItem<T, U>* vPreviousItem = mTailItem;
+
+        while (vPreviousItem->mNext->mValue <= vValue && vPreviousItem->mNext != mLastItem) {
+            vPreviousItem = vPreviousItem->mNext;
+        }
+        vCurrentItem = mHeadItem->mNext;
+        mHeadItem->mNext = vCurrentItem->mNext;
+        vCurrentItem->mValue = vValue;
+        vCurrentItem->mNext = vPreviousItem->mNext;
+        vPreviousItem->mNext = vCurrentItem;
+        return swap();
+    }
+
+    T swap()
+    {
+        T vNextObject = mHeadItem->mNext->mObject;
+
+        if (mHeadItem->mNext == mTailItem) {
+            mHeadItem->mNext = mTailItem->mNext;
+            mLastItem->mNext = mTailItem;
+            mTailItem = mLastItem;
+            mLastItem = mLastItem->mNext;
+            mLastItem->mNext = mLastItem;
+        }
+        return vNextObject;
+    }
+
     nint mSize;
-    NSortListItem<T, U>** mFirstItem;
-    NSortListItem<T, U>** mHeadItem;
-    NSortListItem<T, U>** mTailItem;
+    NSortListItem<T, U>* mHeadItem;
+    NSortListItem<T, U>* mTailItem;
+    NSortListItem<T, U>* mLastItem;
 };
 
 } // End namespace

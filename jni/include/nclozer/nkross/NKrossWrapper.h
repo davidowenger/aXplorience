@@ -7,6 +7,8 @@ namespace NSNATIVE
 class NKrossWrapper
 {
 public:
+    static NKrossWrapper* w;
+
     nuint mcNVisitor;
     nlong* maNVisitor;
 

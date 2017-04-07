@@ -10,9 +10,9 @@ friend NSNATIVE::NKrossFriend;
 
 public:
     ColorDrawable(int color)
-        : Drawable(NSNKROSS::w->mNKrossFriend->instance<Drawable>())
+        : Drawable(NKrossWrapper::w->mNKrossFriend->instance<Drawable>())
     {
-        NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNEpsilon00, (NParam)this, (NParam)color);
+        NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNEpsilon00, (NParam)this, (NParam)color);
     }
 
     virtual ~ColorDrawable()
@@ -21,7 +21,7 @@ public:
 
 private:
     ColorDrawable(NKrossFriend* vNKrossFriend)
-        : Drawable(NSNKROSS::w->mNKrossFriend->instance<Drawable>())
+        : Drawable(NKrossWrapper::w->mNKrossFriend->instance<Drawable>())
     {
     }
 };

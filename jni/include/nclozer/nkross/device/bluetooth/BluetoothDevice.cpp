@@ -21,99 +21,99 @@ const String BluetoothDevice::EXTRA_PREVIOUS_BOND_STATE = "android.bluetooth.dev
 
 BluetoothGatt* BluetoothDevice::connectGatt(Context* context, bool autoConnect, BluetoothGattCallback* callback)
 {
-    BluetoothGatt* b = NSNKROSS::w->mNKrossFriend->pointer<BluetoothGatt>();
-    return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNXi01, (NParam)this, (NParam)b, (NParam)context, (NParam)autoConnect, (NParam)callback));
+    BluetoothGatt* b = NKrossWrapper::w->mNKrossFriend->pointer<BluetoothGatt>();
+    return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNXi01, (NParam)this, (NParam)b, (NParam)context, (NParam)autoConnect, (NParam)callback));
 }
 
 BluetoothGatt* BluetoothDevice::connectGatt(Context* context, bool autoConnect, BluetoothGattCallback* callback, int transport)
 {
-    BluetoothGatt* b = NSNKROSS::w->mNKrossFriend->pointer<BluetoothGatt>();
-    return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNOmicron01, (NParam)this, (NParam)b, (NParam)context, (((NParam)transport)<<32) + autoConnect, (NParam)callback));
+    BluetoothGatt* b = NKrossWrapper::w->mNKrossFriend->pointer<BluetoothGatt>();
+    return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNOmicron01, (NParam)this, (NParam)b, (NParam)context, (((NParam)transport)<<32) + autoConnect, (NParam)callback));
 }
 
 bool BluetoothDevice::equals(BluetoothDevice* dBluetoothDevice)
 {
-    return (bool)NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNAlpha01, (NParam)this, (NParam)dBluetoothDevice);
+    return (bool)NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNAlpha01, (NParam)this, (NParam)dBluetoothDevice);
 }
 
 int BluetoothDevice::hashCode()
 {
-    return (nint)NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNBeta01, (NParam)this);
+    return (nint)NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNBeta01, (NParam)this);
 }
 
 String BluetoothDevice::toString()
 {
-    NReturn index = NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNGamma01, (NParam)this);
-    return NSNKROSS::w->mNKrossSystem->tGetString(NSNKROSS::w->mNKrossSystem->tRunObject((NParam)index));
+    NReturn index = NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNGamma01, (NParam)this);
+    return NKrossWrapper::w->mNKrossSystem->tGetString(NKrossWrapper::w->mNKrossSystem->tRunObject((NParam)index));
 }
 
 int BluetoothDevice::describeContents()
 {
-    return (nint)NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNDelta01, (NParam)this);
+    return (nint)NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNDelta01, (NParam)this);
 }
 
 void BluetoothDevice::writeToParcel(void* out, int flags)
 {
     //TODO: implement
-    //NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNepsilon01, (NParam)this, (NParam)out, (NParam)flags);
+    //NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNepsilon01, (NParam)this, (NParam)out, (NParam)flags);
 }
 
 String BluetoothDevice::getAddress()
 {
-    NReturn index = NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNDzeta01, (NParam)this);
-    return NSNKROSS::w->mNKrossSystem->tGetString(NSNKROSS::w->mNKrossSystem->tRunObject((NParam)index));
+    NReturn index = NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNDzeta01, (NParam)this);
+    return NKrossWrapper::w->mNKrossSystem->tGetString(NKrossWrapper::w->mNKrossSystem->tRunObject((NParam)index));
 }
 
 String BluetoothDevice::getName()
 {
-    NReturn index = NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNEta01, (NParam)this);
-    return NSNKROSS::w->mNKrossSystem->tGetString(NSNKROSS::w->mNKrossSystem->tRunObject((NParam)index));
+    NReturn index = NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNEta01, (NParam)this);
+    return NKrossWrapper::w->mNKrossSystem->tGetString(NKrossWrapper::w->mNKrossSystem->tRunObject((NParam)index));
 }
 
 int BluetoothDevice::getBondState()
 {
-    return (nint)NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNTheta01, (NParam)this);
+    return (nint)NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNTheta01, (NParam)this);
 }
 
 BluetoothClass* BluetoothDevice::getBluetoothClass()
 {
-    BluetoothClass* b = NSNKROSS::w->mNKrossFriend->pointer<BluetoothClass>();
-    return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNIota01, (NParam)this, (NParam)b));
+    BluetoothClass* b = NKrossWrapper::w->mNKrossFriend->pointer<BluetoothClass>();
+    return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNIota01, (NParam)this, (NParam)b));
 }
 
 int BluetoothDevice::getType()
 {
-    return (nint)NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNPi01, (NParam)this);
+    return (nint)NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNPi01, (NParam)this);
 }
 
 BluetoothSocket* BluetoothDevice::createInsecureRfcommSocket(int port)
 {
-    BluetoothSocket* b = NSNKROSS::w->mNKrossFriend->pointer<BluetoothSocket>();
-    return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNNu01, (NParam)this, (NParam)b, (NParam)port));
+    BluetoothSocket* b = NKrossWrapper::w->mNKrossFriend->pointer<BluetoothSocket>();
+    return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNNu01, (NParam)this, (NParam)b, (NParam)port));
 }
 
 BluetoothSocket* BluetoothDevice::createInsecureRfcommSocketToServiceRecord(const String& uuid)
 {
-    BluetoothSocket* b = NSNKROSS::w->mNKrossFriend->pointer<BluetoothSocket>();
-    return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNLambda01, (NParam)this, (NParam)b, NKrossParam(uuid).n));
+    BluetoothSocket* b = NKrossWrapper::w->mNKrossFriend->pointer<BluetoothSocket>();
+    return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNLambda01, (NParam)this, (NParam)b, NKrossParam(uuid).n));
 }
 
 BluetoothSocket* BluetoothDevice::createRfcommSocketToServiceRecord(const String& uuid)
 {
-    BluetoothSocket* b = NSNKROSS::w->mNKrossFriend->pointer<BluetoothSocket>();
-    return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNKappa01, (NParam)this, (NParam)b, NKrossParam(uuid).n));
+    BluetoothSocket* b = NKrossWrapper::w->mNKrossFriend->pointer<BluetoothSocket>();
+    return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNKappa01, (NParam)this, (NParam)b, NKrossParam(uuid).n));
 }
 
 vector<ParcelUuid*> BluetoothDevice::getUuids()
 {
-    NReturn index = NSNKROSS::w->mNVisitorBluetooth->tRun(NSNKROSS::w->mNMu01, (NParam)this);
-    NReturn size = NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNAlpha01, index, -1);
+    NReturn index = NKrossWrapper::w->mNVisitorBluetooth->tRun(NKrossWrapper::w->mNMu01, (NParam)this);
+    NReturn size = NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNAlpha01, index, -1);
     vector<ParcelUuid*> vVector(size);
     nuint i;
 
     for (i = 0 ; i < size ; ++i) {
-        ParcelUuid* b = NSNKROSS::w->mNKrossFriend->pointer<ParcelUuid>();
-        vVector.push_back(NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNAlpha01, index, (NParam)i, (NParam)b)));
+        ParcelUuid* b = NKrossWrapper::w->mNKrossFriend->pointer<ParcelUuid>();
+        vVector.push_back(NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNAlpha01, index, (NParam)i, (NParam)b)));
     }
     return vVector;
 }

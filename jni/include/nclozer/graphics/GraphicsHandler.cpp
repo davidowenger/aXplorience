@@ -395,15 +395,34 @@ GLuint GraphicsHandler::loadShaderText(GLenum vcType, const char* vsSource)
     return vhShader;
 }
 
-nint GraphicsHandler::renderFontLine(const String& vLabel, GraphicsProgram* vProgram, GraphicsParam* vPosition, GraphicsParam* vBox, GraphicsParam* vTextureUnit)
+nfloat GraphicsHandler::renderFontLine(const String& vLabel, nfloat vX, nfloat vY, GraphicsProgram* vProgram, GraphicsParam* vBox, GraphicsParam* vTextureUnit)
 {
     const nbyte* vChar;
+    nint vCode;
     nint vError = 0;
     GraphicsTexture* vTexture = ((GraphicsParamTex*)vTextureUnit)->mGraphicsTexture;
-    nfloat vCoord[2] {vPosition->mNVec[0], vPosition->mNVec[1]};
+    nfloat vCoord[2] {vX, vY};
 
-    for (vChar = vLabel.c_str() ; *vChar ; ++vChar) {
-        vError = FT_Load_Char(mNWrapper->mGraphicsWrapper->mFontFace, *vChar, FT_LOAD_RENDER);
+    for (vChar = vLabel.c_str() ; *vChar ; ) {
+        switch (((*vChar&0xE0) == 0xC0) + ((*vChar&0xF0) == 0xE0) + ((*vChar&0xF8) == 0xF0)) {
+        case 0:
+            vCode = *vChar;
+            vChar += 1;
+            break;
+        case 1:
+            vCode = ((*(vChar+0)&0x1F)<<6) + ((*(vChar+1)&0x3F)<<0);
+            vChar += 2;
+            break;
+        case 2:
+            vCode = ((*(vChar+0)&0x0F)<<12) + ((*(vChar+1)&0x3F)<<6) + ((*(vChar+2)&0x3F)<<0);
+            vChar += 3;
+            break;
+        case 3:
+            vCode = ((*(vChar+0)&0x03)<<18) + ((*(vChar+1)&0x3F)<<12) + ((*(vChar+2)&0x3F)<<6) + ((*(vChar+3)&0x3F)<<0);
+            vChar += 4;
+            break;
+        }
+        vError = FT_Load_Char(mNWrapper->mGraphicsWrapper->mFontFace, vCode, FT_LOAD_RENDER);
 
         if (!vError) {
             vTexture->setBitmap(
@@ -412,21 +431,19 @@ nint GraphicsHandler::renderFontLine(const String& vLabel, GraphicsProgram* vPro
                 mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.rows
             );
             vBox->is(
-                (nfloat)mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap_left/mWidth,
-                (nfloat)mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap_top/mHeight,
+                (nfloat)mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap_left/mWidth + vCoord[0],
+                (nfloat)mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap_top/mHeight + vCoord[1],
                 (nfloat)mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.width/mWidth,
                 (nfloat)mNWrapper->mGraphicsWrapper->mGlyphSlot->bitmap.rows/mHeight
             );
             vProgram->draw();
-            vPosition->is(
-                vCoord[0] += (nfloat)(mNWrapper->mGraphicsWrapper->mGlyphSlot->advance.x >> 6)/mWidth,
-                vCoord[1] += (nfloat)(mNWrapper->mGraphicsWrapper->mGlyphSlot->advance.y >> 6)/mHeight
-            );
+            vCoord[0] += (nfloat)(mNWrapper->mGraphicsWrapper->mGlyphSlot->advance.x >> 6)/mWidth;
+            vCoord[1] += (nfloat)(mNWrapper->mGraphicsWrapper->mGlyphSlot->advance.y >> 6)/mHeight;
         } else {
             LOGE("Unknown char :" + *vChar);
         }
     }
-    return vError;
+    return vCoord[0] - vX;
 }
 
 nint GraphicsHandler::writeFile(const String& vFilePath, NArray<nbyte> vFile)

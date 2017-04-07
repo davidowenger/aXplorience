@@ -17,17 +17,17 @@ public:
 
     virtual void setIcon(Drawable* icon)
     {
-        NSNKROSS::w->mNVisitorApp->tRun(NSNKROSS::w->mNAlpha00, (NParam)this, (NParam)icon);
+        NKrossWrapper::w->mNVisitorApp->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this, (NParam)icon);
     }
 
     virtual void setDisplayHomeAsUpEnabled(bool showHomeAsUp)
     {
-        NSNKROSS::w->mNVisitorApp->tRun(NSNKROSS::w->mNBeta00, (NParam)this, (NParam)showHomeAsUp);
+        NKrossWrapper::w->mNVisitorApp->tRun(NKrossWrapper::w->mNBeta00, (NParam)this, (NParam)showHomeAsUp);
     }
 
     virtual void setHomeButtonEnabled(bool enabled)
     {
-        NSNKROSS::w->mNVisitorApp->tRun(NSNKROSS::w->mNGamma00, (NParam)this, (NParam)enabled);
+        NKrossWrapper::w->mNVisitorApp->tRun(NKrossWrapper::w->mNGamma00, (NParam)this, (NParam)enabled);
     }
 
 private:

@@ -10,7 +10,7 @@ friend NSNATIVE::NKrossFriend;
 
 public:
     Bundle()
-        : BaseBundle(NSNKROSS::w->mNKrossFriend->instance<BaseBundle>())
+        : BaseBundle(NKrossWrapper::w->mNKrossFriend->instance<BaseBundle>())
     {
     }
 
@@ -20,7 +20,7 @@ public:
 
 protected:
     Bundle(NKrossFriend* vNKrossFriend)
-        : BaseBundle(NSNKROSS::w->mNKrossFriend->instance<BaseBundle>())
+        : BaseBundle(NKrossWrapper::w->mNKrossFriend->instance<BaseBundle>())
     {
     }
 };

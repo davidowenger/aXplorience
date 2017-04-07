@@ -21,7 +21,6 @@ public:
     NArray(initializer_list<T> vInit)
         : maData(new T[vInit.size()]()), mcData(vInit.size())
     {
-        //memcpy(maData, vInit.begin(), mcData*sizeof(T));
         nuint i;
 
         for (i = 0 ; i < mcData ; ++i) {
@@ -42,6 +41,16 @@ public:
     {
         if (maData) {
             delete[] maData;
+        }
+    }
+
+    void is(initializer_list<T> vInit)
+    {
+        nuint i;
+        mcData = vInit.size();
+
+        for (i = 0 ; i < mcData ; ++i) {
+            maData[i] = *(vInit.begin() + i);
         }
     }
 

@@ -23,16 +23,16 @@ public:
 
     public:
         LayoutParams(int width, int height)
-            : ViewGroup::MarginLayoutParams(NSNKROSS::w->mNKrossFriend->instance<ViewGroup::MarginLayoutParams>())
+            : ViewGroup::MarginLayoutParams(NKrossWrapper::w->mNKrossFriend->instance<ViewGroup::MarginLayoutParams>())
         {
-            NSNKROSS::w->mNVisitorWidgetLayout->tRun(NSNKROSS::w->mNAlpha01, (NParam)this, (NParam)width, (NParam)height);
+            NKrossWrapper::w->mNVisitorWidgetLayout->tRun(NKrossWrapper::w->mNAlpha01, (NParam)this, (NParam)width, (NParam)height);
         }
 
         LayoutParams(int width, int height, float weight)
-            : ViewGroup::MarginLayoutParams(NSNKROSS::w->mNKrossFriend->instance<ViewGroup::MarginLayoutParams>())
+            : ViewGroup::MarginLayoutParams(NKrossWrapper::w->mNKrossFriend->instance<ViewGroup::MarginLayoutParams>())
         {
             ndouble vcWeight = weight;
-            NSNKROSS::w->mNVisitorWidgetLayout->tRun(NSNKROSS::w->mNBeta01, (NParam)this, (NParam)width, (NParam)height, *reinterpret_cast<nlong*>(&vcWeight));
+            NKrossWrapper::w->mNVisitorWidgetLayout->tRun(NKrossWrapper::w->mNBeta01, (NParam)this, (NParam)width, (NParam)height, *reinterpret_cast<nlong*>(&vcWeight));
         }
 
         virtual ~LayoutParams()
@@ -41,15 +41,15 @@ public:
 
     private:
         LayoutParams(NKrossFriend* vNKrossFriend)
-            : ViewGroup::MarginLayoutParams(NSNKROSS::w->mNKrossFriend->instance<ViewGroup::MarginLayoutParams>())
+            : ViewGroup::MarginLayoutParams(NKrossWrapper::w->mNKrossFriend->instance<ViewGroup::MarginLayoutParams>())
         {
         }
     };
 
     LinearLayout(Context* context)
-        : ViewGroup(NSNKROSS::w->mNKrossFriend->instance<ViewGroup>())
+        : ViewGroup(NKrossWrapper::w->mNKrossFriend->instance<ViewGroup>())
     {
-        NSNKROSS::w->mNVisitorWidgetLayout->tRun(NSNKROSS::w->mNGamma00, (NParam)this, (NParam)context);
+        NKrossWrapper::w->mNVisitorWidgetLayout->tRun(NKrossWrapper::w->mNGamma00, (NParam)this, (NParam)context);
     }
 
     virtual ~LinearLayout()
@@ -58,27 +58,27 @@ public:
 
     virtual void invalidate()
     {
-        NSNKROSS::w->mNVisitorWidgetLayout->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        NKrossWrapper::w->mNVisitorWidgetLayout->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
     virtual void setGravity(int gravity)
     {
-        NSNKROSS::w->mNVisitorWidgetLayout->tRun(NSNKROSS::w->mNEpsilon00, (NParam)this, (NParam)gravity);
+        NKrossWrapper::w->mNVisitorWidgetLayout->tRun(NKrossWrapper::w->mNEpsilon00, (NParam)this, (NParam)gravity);
     }
 
     virtual void requestLayout()
     {
-        NSNKROSS::w->mNVisitorWidgetLayout->tRun(NSNKROSS::w->mNDzeta00, (NParam)this);
+        NKrossWrapper::w->mNVisitorWidgetLayout->tRun(NKrossWrapper::w->mNDzeta00, (NParam)this);
     }
 
     virtual void setOrientation(int orientation)
     {
-        NSNKROSS::w->mNVisitorWidgetLayout->tRun(NSNKROSS::w->mNEta00, (NParam)this, (NParam)orientation);
+        NKrossWrapper::w->mNVisitorWidgetLayout->tRun(NKrossWrapper::w->mNEta00, (NParam)this, (NParam)orientation);
     }
 
 private:
     LinearLayout(NKrossFriend* vNKrossFriend)
-        : ViewGroup(NSNKROSS::w->mNKrossFriend->instance<ViewGroup>())
+        : ViewGroup(NKrossWrapper::w->mNKrossFriend->instance<ViewGroup>())
     {
     }
 };

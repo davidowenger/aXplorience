@@ -10,28 +10,33 @@ friend NSNATIVE::NKrossFriend;
 
 public:
     ScrollView(Context* context)
-        : FrameLayout(NSNKROSS::w->mNKrossFriend->instance<FrameLayout>())
+        : FrameLayout(NKrossWrapper::w->mNKrossFriend->instance<FrameLayout>())
     {
-        NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNDzeta00, (NParam)this, (NParam)context);
+        NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNDzeta00, (NParam)this, (NParam)context);
     }
 
     virtual ~ScrollView()
     {
     }
 
-    void addView(View* view)
+    virtual void addView(View* view)
     {
-        NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNEta00, (NParam)this, (NParam)view);
+        NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNEta00, (NParam)this, (NParam)view);
     }
 
-    void requestLayout()
+    virtual void requestLayout()
     {
-        NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNTheta00, (NParam)this);
+        NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNTheta00, (NParam)this);
+    }
+
+    virtual void setFillViewport(bool fillViewport)
+    {
+        NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this, (NParam)fillViewport);
     }
 
 private:
     ScrollView(NKrossFriend* vNKrossFriend)
-        : FrameLayout(NSNKROSS::w->mNKrossFriend->instance<FrameLayout>())
+        : FrameLayout(NKrossWrapper::w->mNKrossFriend->instance<FrameLayout>())
     {
     }
 };

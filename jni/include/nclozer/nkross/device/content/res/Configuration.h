@@ -18,23 +18,23 @@ public:
 
     virtual float getFontScale()
     {
-        nlong vcValue = NSNKROSS::w->mNVisitorContentRes->tRun(NSNKROSS::w->mNAlpha00, (NParam)this);
+        nlong vcValue = NKrossWrapper::w->mNVisitorContentRes->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this);
         return (nfloat)*reinterpret_cast<ndouble*>(&vcValue);
     }
 
     virtual int getOrientation()
     {
-        return (int)NSNKROSS::w->mNVisitorContentRes->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        return (int)NKrossWrapper::w->mNVisitorContentRes->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
     virtual int getScreenWidthDp()
     {
-        return (int)NSNKROSS::w->mNVisitorContentRes->tRun(NSNKROSS::w->mNBeta00, (NParam)this);
+        return (int)NKrossWrapper::w->mNVisitorContentRes->tRun(NKrossWrapper::w->mNBeta00, (NParam)this);
     }
 
     virtual int getSmallestScreenWidthDp()
     {
-        return (int)NSNKROSS::w->mNVisitorContentRes->tRun(NSNKROSS::w->mNGamma00, (NParam)this);
+        return (int)NKrossWrapper::w->mNVisitorContentRes->tRun(NKrossWrapper::w->mNGamma00, (NParam)this);
     }
 
 private:

@@ -11,8 +11,8 @@ friend NSNATIVE::NKrossFriend;
 public:
     String toString()
     {
-        NReturn index = NSNKROSS::w->mNVisitorOS->tRun(NSNKROSS::w->mNAlpha00, (NParam)this);
-        return NSNKROSS::w->mNKrossSystem->tGetString(NSNKROSS::w->mNKrossSystem->tRunObject((NParam)index));
+        NReturn index = NKrossWrapper::w->mNVisitorOS->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this);
+        return NKrossWrapper::w->mNKrossSystem->tGetString(NKrossWrapper::w->mNKrossSystem->tRunObject((NParam)index));
     }
 
 private:

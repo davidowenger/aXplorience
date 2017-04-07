@@ -6,7 +6,7 @@ import android.content.Context;
 
 public class TWrapper
 {
-    public static final boolean kDoDebug = false;
+    public static final boolean kDoDebug = true;
     static {
         System.loadLibrary("gnustl_shared");
         System.loadLibrary("TActivity");

@@ -37,7 +37,7 @@ void OpUnitListener::run()
             LOGI("Data received");
 
             if (mAlive && (vcStart = mBuffer.find("2#")) >= 0 && (vcEnd = mBuffer.rfind("3#")) >= 0 && vcStart < vcEnd) {
-                sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNGamma00, new OpMessage(mBuffer.substr(vcStart, vcEnd + 2 - vcStart)));
+                sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNDzeta00, new OpMessage(mBuffer.substr(vcStart, vcEnd + 2 - vcStart)));
                 mBuffer = mBuffer.substr(vcEnd + 2);
             }
         }

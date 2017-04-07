@@ -16,7 +16,7 @@ public:
 protected:
     EGLSurface()
     {
-        NSNKROSS::w->mNVisitorMicroedition->tRun(NSNKROSS::w->mNAlpha00, (NParam)this);
+        NKrossWrapper::w->mNVisitorMicroedition->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this);
     }
 
 private:

@@ -26,12 +26,12 @@ void FragmentViewSettings::init(nuint vcView, DBObject* vDBObject)
     if (w->mMenu) {
         w->mWidgetSettings->init();
 
-        w->mMenu->removeItem(Wrapper::kViewAdd);
-        w->mMenu->removeItem(Wrapper::kViewEdit);
-        w->mMenu->removeItem(Wrapper::kViewDelete);
-        w->mMenu->removeItem(Wrapper::kViewSave);
+        w->mMenu->removeItem(k::ViewAdd);
+        w->mMenu->removeItem(k::ViewEdit);
+        w->mMenu->removeItem(k::ViewDelete);
+        w->mMenu->removeItem(k::ViewSave);
 
-        MenuItem* vMenuItemAdd = w->mMenu->add(Menu::NONE, Wrapper::kViewAdd, 1, "Add");
+        MenuItem* vMenuItemAdd = w->mMenu->add(Menu::NONE, k::ViewAdd, 1, "Add");
         vMenuItemAdd->setIcon(w->maDrawable[10]);
         vMenuItemAdd->setShowAsAction(MenuItem::SHOW_AS_ACTION_IF_ROOM);
         delete vMenuItemAdd;
@@ -51,11 +51,11 @@ bool FragmentViewSettings::onMenuItemSelected(nint id)
     bool ret = false;
 
     if (id == R::id::home) {
-        w->mNActivity->sendOp(w->mOpUnitUIId,w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewHome, 0));
+        w->mNActivity->sendOp(w->mOpUnitDBId,w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(k::ViewAR, 0));
         ret = true;
     }
-    if (id == Wrapper::kViewAdd) {
-        w->mNActivity->sendOp(w->mOpUnitUIId,w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewAdd, 1));
+    if (id == k::ViewAdd) {
+        w->mNActivity->sendOp(w->mOpUnitDBId,w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(k::ViewAdd, 1));
         ret = true;
     }
     return ret;
@@ -94,7 +94,7 @@ bool FragmentViewSettings::onScroll(MotionEvent* e1, MotionEvent* e2, float dist
     nfloat vX = e2->getX() - mX;
     nfloat vY = e2->getY() - mY;
     nfloat vD = (e2->getEventTime() - mT)/1000.0;
-    bool ret = abs(vX) > Wrapper::SWIPE_MIN_DISTANCE && abs(vY) < Wrapper::SWIPE_MAX_OFF_PATH && abs(vX/vD) > Wrapper::SWIPE_THRESHOLD_VELOCITY;
+    bool ret = abs(vX) > k::SWIPE_MIN_DISTANCE && abs(vY) < k::SWIPE_MAX_OFF_PATH && abs(vX/vD) > k::SWIPE_THRESHOLD_VELOCITY;
     w->mTouchState = ( w->mTouchState == 2 ? 3 : 0 );
 
     LOGV(("Duration : #" + to_string(vD)).c_str());
@@ -103,9 +103,9 @@ bool FragmentViewSettings::onScroll(MotionEvent* e1, MotionEvent* e2, float dist
 
     if (ret) {
         if (vX > 0) {
-            w->mNActivity->sendOp(w->mOpUnitUIId,w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewAR, 1));
+            w->mNActivity->sendOp(w->mOpUnitDBId,w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(k::ViewAR, 1));
         } else {
-            w->mNActivity->sendOp(w->mOpUnitUIId,w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(Wrapper::kViewHome, 1));
+            w->mNActivity->sendOp(w->mOpUnitDBId,w->mNWrapper->mNKrossWrapper->mNIota00, new OpParam(k::ViewAR, 1));
         }
     }
     return ret;

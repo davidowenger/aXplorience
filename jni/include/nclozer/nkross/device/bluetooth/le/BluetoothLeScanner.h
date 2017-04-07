@@ -15,17 +15,17 @@ public:
 
     void flushPendingScanResults(ScanCallback* callback)
     {
-        NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNIota00, (NParam)this, (NParam)callback);
+        NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNIota00, (NParam)this, (NParam)callback);
     }
 
     void startScan(ScanCallback* callback)
     {
-        NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNKappa00, (NParam)this,(NParam)callback);
+        NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNKappa00, (NParam)this,(NParam)callback);
     }
 
     void stopScan(ScanCallback* callback)
     {
-        NSNKROSS::w->mNVisitorBluetoothLe->tRun(NSNKROSS::w->mNLambda00, (NParam)this, (NParam)callback);
+        NKrossWrapper::w->mNVisitorBluetoothLe->tRun(NKrossWrapper::w->mNLambda00, (NParam)this, (NParam)callback);
     }
 
 private:

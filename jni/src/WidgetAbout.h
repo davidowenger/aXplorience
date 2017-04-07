@@ -10,6 +10,8 @@ public:
     WidgetAbout(Wrapper* w);
     virtual ~WidgetAbout() override;
 
+    void init(nuint vcView, DBObject* vDBObject);
+
     // View::OnTouchListener
     virtual bool onTouch(View* v, MotionEvent* event) override;
 

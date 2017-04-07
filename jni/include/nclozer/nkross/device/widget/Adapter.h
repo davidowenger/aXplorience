@@ -13,7 +13,7 @@ friend SpinnerAdapter;
 public:
     virtual ~Adapter()
     {
-        NSNKROSS::w->mNKrossSystem->tRun(NSNKROSS::w->mNDelta00, (NParam)this);
+        NKrossWrapper::w->mNKrossSystem->tRun(NKrossWrapper::w->mNDelta00, (NParam)this);
     }
 
     virtual int getCount() = 0;

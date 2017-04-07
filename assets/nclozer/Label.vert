@@ -6,7 +6,6 @@ attribute vec2 vaFragment;
 uniform vec4 vaRotation;
 uniform vec3 vaTranslation;
 uniform vec4 vaProjection;
-uniform vec2 vaLabelPosition;
 uniform vec4 vaLabelBox;
 
 void rot(inout vec3 vTargetVec, vec4 vRotationQuat)
@@ -26,9 +25,9 @@ void rot(inout vec3 vTargetVec, vec4 vRotationQuat)
 void main()
 {
     vec3 p = vec3(
-        vaLabelPosition.x + vaLabelBox.x + vaVertex[0]*vaLabelBox[2],
+        vaLabelBox.x + vaVertex[0]*vaLabelBox[2],
        -vaVertex.z,
-        vaLabelPosition.y + vaLabelBox.y - vaVertex[1]*vaLabelBox[3]
+        vaLabelBox.y - vaVertex[1]*vaLabelBox[3]
     );
     rot(p, vaRotation);
     p.z = -vaTranslation.z - p.z;

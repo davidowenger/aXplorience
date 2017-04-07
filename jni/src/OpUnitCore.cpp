@@ -8,10 +8,6 @@ OpUnitCore::OpUnitCore(Wrapper* const vWrapper)
     : OpUnit(vWrapper->mNWrapper), mcProcessedDevice(0), mcTimeStampBTDiscovery(0), mcTimeStampBTState(0), mcInterruptDone(0), mcRunningInitializations(0),
       mcDiscovery(0), mcDiscoveryDone(0), mcState(0), w(vWrapper), maMacInitializing(), maMacConnected(), maBluetoothDevice()
 {
-    w->mhDB = new DBHandler(w->mNWrapper);
-    w->mhDB->add<Table_Message>("Message");
-    w->mhDB->add<Table_Application>("Application");
-
     nint i = Camera::getNumberOfCameras();
     w->maCameraInfo = NArray<Camera::CameraInfo>(i);
     w->maCameraId = NArray<nint>(i);
@@ -26,7 +22,6 @@ OpUnitCore::~OpUnitCore()
 {
     w->maCameraInfo.discard();
     w->maCameraId.discard();
-    delete w->mhDB;
 }
 
 void OpUnitCore::run()
@@ -40,48 +35,16 @@ void OpUnitCore::run()
     w->mcInterrupt = 0;
     w->mIsInterrupted = false;
 
-    // Init database
-    DBCollection* vaApplication =  w->mhDB->get("Application")->getCollection();
-    DBCollection* vaMessage =  w->mhDB->get("Message")->getCollection();
-
-    if (vaApplication->count()) {
-        w->mDBObjectApplication =  w->mhDB->get("Application")->getInstance(1);
-    } else {
-        w->mDBObjectApplication =  w->mhDB->get("Application")->getInstance();
-        w->mDBObjectApplication->set("sDBObjectId", "1");
-        w->mDBObjectApplication->set("sView", "2");
-        w->mDBObjectApplication->set("sSort0", "sTitle");
-        w->mDBObjectApplication->set("sAscending0", kTrue);
-        w->mDBObjectApplication->set("sSort1", "sIn");
-        w->mDBObjectApplication->set("sAscending1", kTrue);
-        w->mDBObjectApplication->set("sSort2", "sCategoryId");
-        w->mDBObjectApplication->set("sAscending2", kTrue);
-        w->mDBObjectApplication->set("sCategory0", kTrue);
-        w->mDBObjectApplication->set("sCategory1", kTrue);
-        w->mDBObjectApplication->set("sCategory2", kTrue);
-        w->mDBObjectApplication->set("sCategory3", kTrue);
-    }
-    if (vaMessage->count()) {
-        w->mDBObjectSeedEdit =  w->mhDB->get("Message")->getInstance(1);
-    } else {
-        w->mDBObjectSeedEdit =  w->mhDB->get("Message")->getInstance();
-    }
-    delete vaApplication;
-    delete vaMessage;
-
     w->mcConnected = 0;
     w->mac = parseMac(w->dBluetoothAdapter->getAddress());
     w->sServiceName = "Proximity service";
     w->sUuidService = "0000F9B3-0000-0000-0000-";
 
-    w->maSort.emplace_back(w->mDBObjectApplication->get("sSort0"), w->mDBObjectApplication->is("sAscending0"));
-    w->maSort.emplace_back(w->mDBObjectApplication->get("sSort1"), w->mDBObjectApplication->is("sAscending1"));
-    w->maSort.emplace_back(w->mDBObjectApplication->get("sSort2"), w->mDBObjectApplication->is("sAscending2"));
-
     // Start other threads
-    w->opUnitUI->start();
+    w->opUnitDB->start();
     w->opUnitServer->start();
     w->mOpUnitAnim->start();
+    w->mOpUnitAR->start();
 
     handleOp();
     cancel();
@@ -110,7 +73,7 @@ void OpUnitCore::handleOp()
             vcBTState = w->dBluetoothAdapter->isEnabled();
             w->mcBTState = vcBTState + (vcBTState && w->dBluetoothAdapter->getScanMode() == w->dBluetoothAdapter->SCAN_MODE_CONNECTABLE_DISCOVERABLE);
             LOGD((String("Bluetooth state : #") + ( w->mcBTState == 2 ? "DISCOVERABLE" : ( w->mcBTState == 1 ? "ENABLED" : "OFF" ) )).c_str());
-            sendOp(w->mOpUnitAppId, w->mNWrapper->mNKrossWrapper->mNTheta01, new Op());
+            sendOp(w->mOpUnitAppId, w->mNWrapper->mNKrossWrapper->mNEpsilon00, new Op());
             mcState *= (bool)w->mcBTState;
             mcTimeStampBTState = vcTimeStampNow;
         }
@@ -205,7 +168,7 @@ void OpUnitCore::registerConnection(OpUnitPeer* vOpUnitPeer, const String& vsMac
     }
     if (vIsAlive) {
         ++w->mcConnected;
-        sendOp(w->mOpUnitUIId, w->mNWrapper->mNKrossWrapper->mNRho00, new OpParam(vOpUnitPeer->mId));
+        sendOp(w->mOpUnitDBId, w->mNWrapper->mNKrossWrapper->mNEpsilon00, new OpParam(vOpUnitPeer->mId));
         w->opSquad->add(new OpUnitListener(w, vOpUnitPeer))->start();
     }
     if (vcOrigin == 1) {

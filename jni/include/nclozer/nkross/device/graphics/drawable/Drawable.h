@@ -15,17 +15,17 @@ public:
 
     virtual int getIntrinsicHeight()
     {
-        return (int)NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNDzeta00, (NParam)this);
+        return (int)NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNDzeta00, (NParam)this);
     }
 
     virtual int getIntrinsicWidth()
     {
-        return (int)NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNEta00, (NParam)this);
+        return (int)NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNEta00, (NParam)this);
     }
 
     virtual void invalidateSelf()
     {
-        NSNKROSS::w->mNVisitorGraphics->tRun(NSNKROSS::w->mNTheta00, (NParam)this);
+        NKrossWrapper::w->mNVisitorGraphics->tRun(NKrossWrapper::w->mNTheta00, (NParam)this);
     }
 
 private:

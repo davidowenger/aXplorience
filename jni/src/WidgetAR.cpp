@@ -5,18 +5,20 @@ namespace NSDEVICE
 {
 
 WidgetAR::WidgetAR(Wrapper* const w)
-    : Widget(w), SurfaceHolder::Callback(), mcPadding((nint)(15*w->mcDensity))
+    : Widget(w), SurfaceHolder::Callback(), mcPadding((nint)(15*w->mcDensity)), mState(0), mSurfaceView(nullptr), mSurfaceHolder(nullptr)
 {
-    LinearLayout::LayoutParams vWidgetParams = LinearLayout::LayoutParams(0, LinearLayout::LayoutParams::MATCH_PARENT, 1);
+    LinearLayout::LayoutParams vWidgetParams = LinearLayout::LayoutParams(LinearLayout::LayoutParams::MATCH_PARENT, LinearLayout::LayoutParams::MATCH_PARENT);
     setLayoutParams(&vWidgetParams);
-    setGravity(Gravity::TOP);
-    setOrientation(LinearLayout::HORIZONTAL);
+    setGravity(Gravity::BOTTOM);
+    setOrientation(LinearLayout::VERTICAL);
     setPadding(0, 0, 0, 0);
     setOnTouchListener(this);
 
-    mSurfaceHolder = w->mSurfaceView->getHolder();
+    mEventManager = new EventManager(w);
+    mSurfaceView = new SurfaceView(w->mApplication);
+    mSurfaceHolder = mSurfaceView->getHolder();
     mSurfaceHolder->addCallback(this);
-    addView(w->mSurfaceView);
+    addView(mSurfaceView);
 }
 
 WidgetAR::~WidgetAR()
@@ -25,10 +27,30 @@ WidgetAR::~WidgetAR()
         delete w->mSurface;
     }
     delete mSurfaceHolder;
+    delete mSurfaceView;
 }
 
-void WidgetAR::init()
+void WidgetAR::init(nuint vcView, DBObject* vDBObject)
 {
+//    w->mMenu->setGroupVisible(k::ViewDelete, false);
+//    w->mMenu->setGroupVisible(k::ViewEdit, false);
+//    w->mMenu->setGroupVisible(k::ViewSave, false);
+//    w->mMenu->setGroupVisible(k::ViewList, true);
+//    w->mMenu->setGroupVisible(k::ViewAdd, true);
+
+    w->mMenu->setGroupVisible(k::ViewDelete, false);
+    w->mMenu->setGroupVisible(k::ViewEdit, false);
+    w->mMenu->setGroupVisible(k::ViewSave, false);
+    w->mMenu->setGroupVisible(k::ViewList, false);
+    w->mMenu->setGroupVisible(k::ViewAdd, false);
+
+    w->mActionBar->setDisplayHomeAsUpEnabled(true);
+    w->mActionBar->setHomeButtonEnabled(false);
+}
+
+void WidgetAR::setState(nint vState)
+{
+    w->mARState = vState;
 }
 
 void WidgetAR::onCreate()
@@ -37,7 +59,7 @@ void WidgetAR::onCreate()
 
     if (w->mARState < 2) {
         w->mARState = 2;
-        w->mOpUnitAnim->sendOp(w->mOpUnitAnimId, w->mNWrapper->mNKrossWrapper->mNBeta00, new Op());
+        w->mOpUnitAR->sendOp(w->mOpUnitARId, w->mNWrapper->mNKrossWrapper->mNAlpha00, new Op());
     }
     onResume();
 }
@@ -51,12 +73,7 @@ void WidgetAR::onResume()
 void WidgetAR::onPause()
 {
     LOGI("Pausing AR");
-
-    if (w->mARSurface) {
-        w->mARState = 4;
-    } else {
-        w->mARState = 0;
-    }
+    w->mARState = 4;
 }
 
 void WidgetAR::onDestroy()
@@ -71,6 +88,7 @@ void WidgetAR::surfaceChanged(SurfaceHolder* holder, int format, int width, int 
     LOGI("surfaceChanged");
     w->mSurfaceWidth = width;
     w->mSurfaceHeight = height;
+    //FIXME: delete w->mSurface
     w->mSurface = holder->getSurface();
     w->mARSurface = 2;
 }
@@ -91,12 +109,17 @@ void WidgetAR::surfaceDestroyed(SurfaceHolder* holder)
 }
 
 //*******************************************************************************************//
-//**************************************  OnTouchListener  **********************************//
+//*************************************** OnTouchListener ***********************************//
 //*******************************************************************************************//
 bool WidgetAR::onTouch(View* vView, MotionEvent* event)
 {
-    if (w->mTouchState == 3) {
-        w->mTouchState = 0;
+    if (mEventManager->onMove(vView, event)) {
+       w->mOpUnitAR->sendOp(w->mOpUnitARId, w->mNWrapper->mNKrossWrapper->mNBeta00, new OpParam(
+            mEventManager->mT,
+            mEventManager->mX,
+            mEventManager->mY,
+            mEventManager->mState
+       ));
     }
     return true;
 }

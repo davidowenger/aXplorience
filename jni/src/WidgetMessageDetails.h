@@ -10,6 +10,7 @@ public:
     WidgetMessageDetails(Wrapper* w);
     virtual ~WidgetMessageDetails() override;
 
+    void init(nuint vcView, DBObject* vDBObject);
     void update(DBObject* vDBObject);
 
     // View::OnTouchListener
@@ -19,6 +20,7 @@ public:
     DBObject* mDBObject;
     nint mcCategoryId;
 
+    LinearLayout* mLinearLayout;
     TextView* mCategory;
     TextView* mTitle;
     TextView* mText;

@@ -1,26 +1,28 @@
-#ifndef __WidgetHome_H__
-#define __WidgetHome_H__
+#ifndef __WidgetMessageList_H__
+#define __WidgetMessageList_H__
 
 namespace NSDEVICE
 {
 
-class WidgetHome : public Widget, public View::OnTouchListener
+class WidgetMessageList : public Widget, public View::OnTouchListener
 {
 public:
-    WidgetHome(Wrapper* w);
-    virtual ~WidgetHome() override;
+    WidgetMessageList(Wrapper* w);
+    virtual ~WidgetMessageList() override;
 
+    void init(nuint vcView, DBObject* vDBObject);
     void initHeader();
 
     // View::OnTouchListener
     virtual bool onTouch(View* v, MotionEvent* event) override;
 
+    LinearLayout* mLinearLayout;
     LinearLayout* mHeader;
     ScrollView* mScrollView;
     TextView* mTextView;
     ToggleButton* mCategoryId;
     ToggleButton* mTitle;
-    ToggleButton* mIn;
+    ToggleButton* mEnabled;
     GestureDetector* mGestureDetector;
 
     nint mcPadding;

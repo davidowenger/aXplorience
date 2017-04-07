@@ -21,13 +21,13 @@ public:
         Object* b = nullptr;
 
         if (name == Context::BLUETOOTH_SERVICE) {
-            b = (Object*)NSNKROSS::w->mNKrossFriend->pointer<BluetoothManager>();
+            b = (Object*)NKrossWrapper::w->mNKrossFriend->pointer<BluetoothManager>();
         }
         if (name == Context::LOCATION_SERVICE) {
-            b = (Object*)NSNKROSS::w->mNKrossFriend->pointer<LocationManager>();
+            b = (Object*)NKrossWrapper::w->mNKrossFriend->pointer<LocationManager>();
         }
         if (b) {
-            b = NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorContent->tRun(NSNKROSS::w->mNGamma00, (NParam)this, (NParam)b, NKrossParam(name).n));
+            b = NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorContent->tRun(NKrossWrapper::w->mNGamma00, (NParam)this, (NParam)b, NKrossParam(name).n));
         }
         return b;
     }

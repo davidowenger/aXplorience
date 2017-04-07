@@ -1,14 +1,12 @@
 #ifndef __NKrossCommon_H__
 #define __NKrossCommon_H__
 
-#ifndef NSNKROSS_EXPORT
-#define NSNKROSS_EXPORT extern
-#endif //NSNKROSS_EXPORT
-
 #include <NCommon.h>
 
 namespace NSDEVICE
 {
+
+using NSNATIVE::NKrossWrapper;
 
 class Bundle;
 class FragmentTransaction;
@@ -24,6 +22,7 @@ class BluetoothManager;
 
 namespace NSNATIVE
 {
+
 using namespace NSDEVICE;
 
 class NVisitor;
@@ -51,18 +50,9 @@ class NVisitorWidget;
 #include "NKrossWrapper.h"
 #include "NKrossVisitor.h"
 #include "NKrossSystem.h"
+#include "NKrossHolder.h"
 
-namespace NSNKROSS
-{
-    NSNKROSS_EXPORT NKrossWrapper* w;
-}
-
-namespace NSNCLOZER
-{
-    NSNKROSS_EXPORT NWrapper* w;
-}
 #include "device/lang/object.h"
-//#include "device/microedition/khronos/egl/EGLSurface.h"
 #include "device/R.h"
 #include "device/util/DisplayMetrics.h"
 #include "device/os/Build.h"

@@ -1,6 +1,7 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#include <limits>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <op/OpCommon.h>
@@ -8,16 +9,6 @@
 #include <graphics/GraphicsCommon.h>
 #include <NConcurrentCircularBuffer.h>
 #include <NSortList.h>
-
-#ifndef M_PIl
-#define M_PIl 3.141592653589793238462643383279502884L
-#endif
-#ifndef M_PI_180
-#define M_PI_180 M_PI/180.0f
-#endif
-#ifndef M_PI_180l
-#define M_PI_180l M_PIl/180.0L
-#endif
 
 //*******************************************************************************
 //************************************* ANDROID *********************************
@@ -29,28 +20,20 @@
 
 using namespace std::chrono;
 
-//TODO: include base header in widget header
 namespace NSDEVICE
 {
 
-class OpUnitUI;
+class OpUnitDB;
 class AREngineListener;
 class AREngine;
 class Widget;
-class WidgetHome;
 class WidgetAR;
+class WidgetAbout;
+class WidgetSettings;
 class WidgetMessage;
+class WidgetMessageList;
 class WidgetMessageDetails;
 class WidgetMessageEdit;
-class WidgetSettings;
-class WidgetAbout;
-class FragmentViewEdit;
-class FragmentViewDetails;
-class FragmentViewSettings;
-class FragmentViewAbout;
-class FragmentViewAR;
-class FragmentViewHome;
-class FragmentView;
 class NActivity;
 class Wrapper;
 
@@ -111,35 +94,26 @@ void dump(const String& vHeader)
 #include "Tables.h"
 #include "BOMessage.h"
 #include "BOPOI.h"
+#include "EventManager.h"
 #include "RootLayout.h"
 #include "OpUnitEvents.h"
 #include "OpUnitAnim.h"
+#include "OpUnitAR.h"
+#include "OpUnitDB.h"
 #include "OpUnitPeer.h"
 #include "OpUnitListener.h"
 #include "OpUnitCore.h"
-#include "OpUnitUI.h"
 #include "OpUnitServer.h"
-#include "FragmentLevel.h"
-#include "FragmentLevel0.h"
-#include "FragmentLevel1.h"
-#include "FragmentLevel2.h"
 #include "Wrapper.h"
 #include "NActivity.h"
 #include "AREngine.h"
 #include "Widget.h"
-#include "WidgetMessageEdit.h"
-#include "WidgetMessageDetails.h"
-#include "WidgetMessage.h"
-#include "WidgetSettings.h"
-#include "WidgetAbout.h"
 #include "WidgetAR.h"
-#include "WidgetHome.h"
-#include "FragmentView.h"
-#include "FragmentViewEdit.h"
-#include "FragmentViewDetails.h"
-#include "FragmentViewSettings.h"
-#include "FragmentViewAbout.h"
-#include "FragmentViewAR.h"
-#include "FragmentViewHome.h"
+#include "WidgetAbout.h"
+#include "WidgetSettings.h"
+#include "WidgetMessage.h"
+#include "WidgetMessageList.h"
+#include "WidgetMessageDetails.h"
+#include "WidgetMessageEdit.h"
 
 #endif

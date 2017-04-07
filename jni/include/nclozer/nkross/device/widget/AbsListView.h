@@ -15,9 +15,9 @@ public:
 
     public:
         LayoutParams(int w, int h)
-            : ViewGroup::LayoutParams(NSNKROSS::w->mNKrossFriend->instance<ViewGroup::LayoutParams>())
+            : ViewGroup::LayoutParams(NKrossWrapper::w->mNKrossFriend->instance<ViewGroup::LayoutParams>())
         {
-            NSNKROSS::w->mNVisitorWidgetView->tRun(NSNKROSS::w->mNTau00, (NParam)this, (NParam)w, (NParam)h);
+            NKrossWrapper::w->mNVisitorWidgetView->tRun(NKrossWrapper::w->mNTau00, (NParam)this, (NParam)w, (NParam)h);
         }
 
         virtual ~LayoutParams()
@@ -26,7 +26,7 @@ public:
 
     private:
         LayoutParams(NKrossFriend* vNKrossFriend)
-            : ViewGroup::LayoutParams(NSNKROSS::w->mNKrossFriend->instance<ViewGroup::LayoutParams>())
+            : ViewGroup::LayoutParams(NKrossWrapper::w->mNKrossFriend->instance<ViewGroup::LayoutParams>())
         {
         }
     };
@@ -37,7 +37,7 @@ public:
 
 private:
     AbsListView(NKrossFriend* vNKrossFriend)
-        : AdapterView(NSNKROSS::w->mNKrossFriend->instance<AdapterView>())
+        : AdapterView(NKrossWrapper::w->mNKrossFriend->instance<AdapterView>())
     {
     }
 };

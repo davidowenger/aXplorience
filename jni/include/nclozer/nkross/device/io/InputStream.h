@@ -15,7 +15,7 @@ public:
 
     int close()
     {
-        return (nint)NSNKROSS::w->mNVisitorIO->tRun(NSNKROSS::w->mNAlpha00, (NParam)this);
+        return (nint)NKrossWrapper::w->mNVisitorIO->tRun(NKrossWrapper::w->mNAlpha00, (NParam)this);
     }
 
     int read(String& buffer, int byteOffset, int byteCount)
@@ -24,12 +24,12 @@ public:
         // -1 if end of the stream is reached
         // -2 if stream is closed or another IO exception occurred
         // -3 if UTF-8 is not supported
-        NReturn err = NSNKROSS::w->mNVisitorIO->tRun(NSNKROSS::w->mNBeta00, (NParam)this, (NParam)nullptr, (NParam)byteOffset, (NParam)byteCount);
+        NReturn err = NKrossWrapper::w->mNVisitorIO->tRun(NKrossWrapper::w->mNBeta00, (NParam)this, (NParam)nullptr, (NParam)byteOffset, (NParam)byteCount);
 
         if (err >= 0) {
             nint vIndex;
             size_t size = buffer.size();
-            String vRead = NSNKROSS::w->mNKrossSystem->tGetString(NSNKROSS::w->mNKrossSystem->tRunObject((NParam)err));
+            String vRead = NKrossWrapper::w->mNKrossSystem->tGetString(NKrossWrapper::w->mNKrossSystem->tRunObject((NParam)err));
             err = vRead.size();
 
             for (vIndex = size ; vIndex < byteOffset ; ++vIndex) {

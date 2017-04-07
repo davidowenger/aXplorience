@@ -15,20 +15,20 @@ public:
 
     virtual DisplayMetrics* getDisplayMetrics()
     {
-        DisplayMetrics* b = NSNKROSS::w->mNKrossFriend->pointer<DisplayMetrics>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorContentRes->tRun(NSNKROSS::w->mNAlpha01, (NParam)this, (NParam)b));
+        DisplayMetrics* b = NKrossWrapper::w->mNKrossFriend->pointer<DisplayMetrics>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorContentRes->tRun(NKrossWrapper::w->mNAlpha01, (NParam)this, (NParam)b));
     }
 
     virtual Configuration* getConfiguration()
     {
-        Configuration* b = NSNKROSS::w->mNKrossFriend->pointer<Configuration>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorContentRes->tRun(NSNKROSS::w->mNBeta01, (NParam)this, (NParam)b));
+        Configuration* b = NKrossWrapper::w->mNKrossFriend->pointer<Configuration>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorContentRes->tRun(NKrossWrapper::w->mNBeta01, (NParam)this, (NParam)b));
     }
 
     virtual Drawable* getDrawable(const String& vString)
     {
-        Drawable* b = NSNKROSS::w->mNKrossFriend->pointer<Drawable>();
-        return NSNKROSS::w->mNKrossFriend->emplaceKey(b, NSNKROSS::w->mNVisitorContentRes->tRun(NSNKROSS::w->mNGamma01, (NParam)this, (NParam)b, NKrossParam(vString).n));
+        Drawable* b = NKrossWrapper::w->mNKrossFriend->pointer<Drawable>();
+        return NKrossWrapper::w->mNKrossFriend->emplaceKey(b, NKrossWrapper::w->mNVisitorContentRes->tRun(NKrossWrapper::w->mNGamma01, (NParam)this, (NParam)b, NKrossParam(vString).n));
     }
 
 private:

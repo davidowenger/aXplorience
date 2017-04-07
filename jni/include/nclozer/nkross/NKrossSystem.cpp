@@ -1,7 +1,5 @@
 #include "NKrossCommon.h"
 
-int NSDEVICE::Build::VERSION::SDK_INT = 0;
-
 namespace NSNATIVE
 {
 

@@ -1,4 +1,3 @@
-#define NSNKROSS_EXPORT
 #include <nkross/NKrossCommon.h>
 
 namespace NSNATIVE
@@ -109,7 +108,7 @@ JNIEXPORT NReturn JNICALL Java_y_b_TKrossSystem_nInit(JNIEnv* vEnv, jobject vTKr
         vEnv->DeleteGlobalRef(vTKrossSystemJavaClass);
         vEnv->GetJavaVM(&w->mNKrossWrapper->mVM);
 
-        NSNKROSS::w = w->mNKrossWrapper;
+        NKrossWrapper::w = w->mNKrossWrapper;
     } else {
         w = ((NKrossSystem*)vNKrossSystem)->mNWrapper;
     }

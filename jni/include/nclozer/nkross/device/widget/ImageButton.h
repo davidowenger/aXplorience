@@ -10,9 +10,9 @@ friend NSNATIVE::NKrossFriend;
 
 public:
     ImageButton(Context* context)
-        : ImageView(NSNKROSS::w->mNKrossFriend->instance<ImageView>())
+        : ImageView(NKrossWrapper::w->mNKrossFriend->instance<ImageView>())
     {
-        NSNKROSS::w->mNVisitorWidget->tRun(NSNKROSS::w->mNOmicron00, (NParam)this, (NParam)context);
+        NKrossWrapper::w->mNVisitorWidget->tRun(NKrossWrapper::w->mNOmicron00, (NParam)this, (NParam)context);
     }
 
     virtual ~ImageButton()
@@ -21,7 +21,7 @@ public:
 
 private:
     ImageButton(NKrossFriend* vNKrossFriend)
-        : ImageView(NSNKROSS::w->mNKrossFriend->instance<ImageView>())
+        : ImageView(NKrossWrapper::w->mNKrossFriend->instance<ImageView>())
     {
     }
 };

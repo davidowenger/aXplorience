@@ -26,18 +26,21 @@ public:
     TextView** mTextView;
 };
 
-class WidgetMessageEdit : public Widget
+class WidgetMessageEdit : public Widget, public View::OnTouchListener
 {
 public:
     WidgetMessageEdit(Wrapper* w);
     virtual ~WidgetMessageEdit() override;
 
+    void init(nuint vcView, DBObject* vDBObject);
     void update(DBObject* vDBObject);
+
+    // View::OnTouchListener
+    virtual bool onTouch(View* v, MotionEvent* event) override;
 
     nint mcPadding;
     DBObject* mDBObject;
     nint mcCategoryId;
-
     AdapterCategory* mAdapterCategory;
     ScrollView* mScrollView;
     LinearLayout* mContent;
