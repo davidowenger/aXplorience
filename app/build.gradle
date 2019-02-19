@@ -1,0 +1,65 @@
+apply plugin: 'com.android.application'
+
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreProperties = new Properties()
+def hasKeystoreProperties = false
+
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    hasKeystoreProperties = true
+}
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "y.b"
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 7
+        versionName "1.0"
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_TOOLCHAIN=clang"
+                cppFlags "-fno-rtti -fexceptions -Wall -Wextra -Werror -Wno-unused-parameter -Wno-inconsistent-missing-override -Wno-overloaded-virtual"
+            }
+        }
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
+    }
+    signingConfigs{
+        release {
+            keyAlias 'myKeyAlias'
+            keyPassword 'mykeyPassword'
+            storeFile file('myStoreFileLocation')
+            storePassword 'myStorePassword'
+
+            if (hasKeystoreProperties) {
+                android.signingConfigs.release.storeFile = file(keystoreProperties['storeFileLocation'])
+                android.signingConfigs.release.storePassword = keystoreProperties['storePassword']
+                android.signingConfigs.release.keyAlias = keystoreProperties['keyAlias']
+                android.signingConfigs.release.keyPassword = keystoreProperties['keyPassword']
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            jniDebuggable true
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+}
